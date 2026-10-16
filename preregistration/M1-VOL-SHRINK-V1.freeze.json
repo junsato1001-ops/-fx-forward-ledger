@@ -1,0 +1,12 @@
+{
+  "spec_id": "M1-VOL-SHRINK-V1",
+  "file": "preregistration/M1-VOL-SHRINK-V1.md",
+  "sha256": "511ecaea39029d9ef99b88787dfb2a6442f42b7437db7466a5bc77be9b261977",
+  "freeze_date_jst": "2026-10-16",
+  "status": "SPECIFICATION FREEZE / PASS",
+  "role": "Shadow / Pipeline Pilot (not a confirmatory promotion trial)",
+  "parent": "S0-EMPCLIM-STD-EXP-V1",
+  "evaluation_spec": "EVAL-SPEC-V1 (sha256 fdb11fcfbfcaaf760a3df8973b35138889befae190f9f39050f7c77925420ba4)",
+  "not_yet_closed": ["implementation", "historical prequential replay", "independent audit"],
+  "change_rule": "No in-place changes. Any change requires a new version, a stated reason and a new Trial."
+}
