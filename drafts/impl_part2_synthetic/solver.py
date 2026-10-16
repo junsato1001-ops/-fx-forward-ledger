@@ -70,7 +70,8 @@ def stage1(P,B=10.0,eps=1e-13,lam=0.3,maxit=3000):
         xm=exact_master(cuts,d,B,r.x)
         if xm is None: return dict(ok=False,why='EXACT_MASTER',it=it+1)
         LBx=xm[d]; gap=Fr(best[0])-LBx
-        if gap<=Fr(eps): return dict(ok=True,bhat=best[1],UB=best[0],LB=LBx,xm=xm,it=it+1,cuts=cuts)
+        if gap< -Fr(eps): return dict(ok=False,why='CERT_INCONSISTENT',it=it+1)
+        if abs(gap)<=Fr(eps): return dict(ok=True,bhat=best[1],UB=best[0],LB=LBx,xm=xm,it=it+1,cuts=cuts)
         lev=float(LBx)+lam*float(gap);A2=[];r2=[]
         for sv,c in cuts: A2.append(np.r_[sv,0]);r2.append(lev-c)
         for j in range(d):
@@ -120,7 +121,9 @@ def stage2(P,s1,B=10.0,eps=1e-13,maxit=100):
         A=[list(sv) for sv,_ in cuts]+[list(np.eye(d)[k]) for k in range(d)]+[list(-np.eye(d)[k]) for k in range(d)]
         bb=[LB-Fr(c) for _,c in cuts]+[Fr(B)]*(2*d)
         xs=exact_minnorm(A,bb,x0); b2=np.array([float(v) for v in xs]); J2=P.phi(b2)
-        if Fr(J2)-LB<=Fr(eps): return dict(ok=True,beta=b2,J=J2,it=it+1)
+        dJ=Fr(J2)-LB
+        if dJ< -Fr(eps): return dict(ok=False,beta=b2,it=it+1,why='CERT_INCONSISTENT')
+        if abs(dJ)<=Fr(eps): return dict(ok=True,beta=b2,J=J2,it=it+1,dJ=float(dJ))
         cuts.append(P.piece(b2))
         R,H=rows_of(cuts,d,B)
         r=linprog(np.r_[np.zeros(d),1],A_ub=np.array(R),b_ub=np.array(H),bounds=[(None,None)]*(d+1),method='highs-ds',options=OPT)

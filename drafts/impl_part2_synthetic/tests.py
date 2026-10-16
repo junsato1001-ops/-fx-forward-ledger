@@ -4,7 +4,7 @@ rng=np.random.default_rng(7)
 def show(name,s1,s2,expect=None):
     e='' if expect is None else ' err=%.1e'%np.abs(s2['beta']-expect).max()
     g=float(s1['UB']-s1['LB']) if s1['ok'] else float('nan')
-    print(f"{name}: s1 ok={s1['ok']} {s1.get('why','')} it={s1['it']} gap={g:.1e} | s2 ok={s2['ok']} it={s2['it']} beta={np.round(s2['beta'],9)}{e}",flush=True)
+    print(f"{name}: s1 ok={s1['ok']} {s1.get('why','')} it={s1['it']} gap={g:.1e} | s2 dJ={s2.get('dJ',float('nan')):.1e} s2 ok={s2['ok']} it={s2['it']} beta={np.round(s2['beta'],9)}{e}",flush=True)
 # A: known exact minimizer via symmetric construction, shifted by c
 def caseA(G=300,N=200,c=np.array([.004,-.006,.003])):
     X=rng.normal(0,.3,(G,3));X[1::3,0]=0;X[2::3,0]=0;sig=rng.uniform(.004,.008,G);Z=rng.standard_t(5,(G,N));y=sig*rng.standard_t(5,G)
