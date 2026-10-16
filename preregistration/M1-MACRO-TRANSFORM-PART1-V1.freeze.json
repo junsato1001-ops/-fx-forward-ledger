@@ -1,0 +1,12 @@
+{
+  "spec_id": "M1-MACRO-TRANSFORM-PART1-V1",
+  "file": "preregistration/M1-MACRO-TRANSFORM-PART1-V1.md",
+  "sha256": "42918ab8c2e18bba4fff9aa7d41d71270aeec4bf19a4e91453c3b4be37e1c654",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 03:10 JST",
+  "interpretation_notes": [
+    "Section 3 'minimum history: the value 20 days earlier exists' is a transform computability requirement: both the current value and the value 20 source-business-days earlier must be point-in-time available at the Origin's T_info. It is NOT a statistical warm-up parameter (no '20 observations' warm-up is introduced)."
+  ],
+  "not_frozen_here": "Pair/Horizon mapping (incl. holdout pairs) and the missing-feature policy are decided in Part 2.",
+  "performance_seal": "INTACT"
+}
