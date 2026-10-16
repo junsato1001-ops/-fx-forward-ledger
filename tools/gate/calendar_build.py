@@ -316,7 +316,7 @@ def boj_actual():
                 continue
             a = jdate(y, m.group(1), m.group(2))
             b = jdate(y, m.group(3) or m.group(1), m.group(4)) if m.group(4) else a
-            out.append((a, b, href, d["sha256"]))
+            out.append((a, b, d["url"], d["sha256"]))
     # meetings of 2026 whose minutes are not out yet: from the current schedule page, held before today
     d = page(f"{BOJ}/mopo/mpmsche_minu/index.htm")
     tl = d["text_lines"]; i0 = next(i for i, l in enumerate(tl) if l.startswith("表 2026年"))
@@ -570,9 +570,11 @@ def build_boj():
             continue   # documented change (DIRECT row already written)
         gw = [g for g in gapw if g[0] <= a <= g[1]]
         if m in snap_conflict or gw:
+            su = gw[0][3] if gw else snap_conflict[m]
             add(Central_Bank="BOJ", Event_Type="ACTUAL_MEETING_SCHEDULE_UNKNOWN", Actual_Start=a, Actual_End=b,
-                Reconstruction_Status="GAP", Source_URL=(gw[0][3] if gw else snap_conflict[m]), Source_SHA256=sha,
-                Note=(gw[0][2] if gw else "held, but a schedule table published before it shows a different date and no change notice explains it"))
+                Reconstruction_Status="GAP", Source_URL=su, Source_SHA256=page(su)["sha256"],
+                Note=(gw[0][2] if gw else "held, but a schedule table published before it shows a different date and no change notice explains it")
+                     + f"; actual date from {href}")
             gaps.append(m); continue
         if a >= first_direct_regime:
             if not in_snap_before(m):

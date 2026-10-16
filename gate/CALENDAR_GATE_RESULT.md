@@ -1,12 +1,14 @@
 # Data Implementation Gate — 日銀・FOMC 会合日程の point-in-time 再構築(結果)
 
 - 実施: 2026-10-17(Claude)。計画 `gate/CALENDAR_GATE_PLAN.md`(むすび承認 2026-10-17 02:19 JST、条件付き)に従った。
+- **判定: CALENDAR DATA IMPLEMENTATION GATE = PASS WITH DOCUMENTED GAPS**(むすび 2026-10-17 02:46 JST)。CFTC Gate = PASS。Performance Seal = INTACT。
 - 封印: 扱ったのは会合の日付と告知の日付だけ。金利・価格・成績は扱っていない(Performance Seal INTACT)。
 - 機械的な出力:
-  - `gate/calendar_event_log.csv`(730行、SHA-256 a372e669…)
+  - `gate/calendar_event_log.csv`(730行。全64桁の SHA-256 は `gate/calendar_gate_summary.json` の event_log_sha256)
+  - `gate/calendar_source_manifest.csv`(取得したページごとに URL、HTTP の状態、バイト数、SHA-256、取得した実行の開始時刻、Actions の実行 ID、抽出プログラムの main の commit と SHA-256)
   - `gate/calendar_gate_summary.json`
   - 生成プログラム: `tools/gate/calendar_build.py`
-  - 入力(各ページの抜粋と SHA-256): 作業用ブランチ `gate-work` の `calendar/`
+  - 入力: 作業用ブランチ `gate-work` の `calendar/`(各ページの抜粋)。監査の後に削除した(§5)
 - event log の列: Central_Bank, Announcement_Date, Announcement_Time, Effective_From_Tinfo, Event_Type, Old_Meeting_Start/End, New_Meeting_Start/End, Actual_Start/End, Reconstruction_Status, Source_URL, Source_SHA256, Note
 - Effective_From_Tinfo: その情報を使ってよい最初の Origin(JST)。
   - 時刻が分かる告知: 公表時刻以後の最初の T_info。
@@ -47,8 +49,10 @@ Event_Type の内訳:
 
 | | 結果 | 補足 |
 |---|---|---|
-| FOMC | **Origin 2003-09-17 以降**、すべて DIRECT_SOURCE | 2003-09-15 の特別な会合を、日程の特徴量に関係しない事象と判断する場合は、2001-12-13 以降 |
-| 日銀 | **Origin 2011-12-01 以降**、DIRECT_SOURCE と RULE_RECONSTRUCTED で切れ目なし | 2015-08 までは RULE_RECONSTRUCTED が中心。DIRECT_SOURCE だけで切れ目がないのは、2015-08-07 の日程表が対象とする 2015年9月以降の会合から |
+| FOMC | **Origin 2003-09-17 以降**(正式値)。すべて DIRECT_SOURCE | 2003-09-15 を判断で除外して遡ることはしない(むすびの決定。機械的で監査できる値を使う) |
+| 日銀 | **Origin 2011-12-01 以降**(正式値): DIRECT_SOURCE + RULE_RECONSTRUCTED で切れ目なし | **DIRECT_SOURCE だけで切れ目のない期間: 2015年9月以降の会合**(2015-08-07 の日程表から)。両方を保存する |
+
+RULE_RECONSTRUCTED を使うかどうかは、ここでは決めない。Transformation Spec で、利用できる期間の長さではなく、point-in-time の証拠の強さを基準に決める(むすびの検討案: Primary = DIRECT_SOURCE のみ、過去の初期化と感度分析 = DIRECT_SOURCE + RULE_RECONSTRUCTED)。
 
 GAP の期間をまたぐ Origin では、日程の特徴量を MODEL_PREREQ_UNAVAILABLE にする(計画 §3-4)。最終的な M1-MACRO の開始日は、Transformation Spec の欠測の規則から決める。
 
@@ -80,8 +84,9 @@ GAP の期間をまたぐ Origin では、日程の特徴量を MODEL_PREREQ_UNA
 
 ## 5. 補足と確認事項
 
-- 作業用ブランチ `gate-work` には、FRB・日銀のページから抜き出した文章の抜粋が入っている。日銀のサイトは著作権表示(All Rights Reserved)を掲げている。
-  - event log 自体は日付と URL と SHA-256 だけなので問題は小さい。
-  - 抜粋はむすびの監査が終わったら、ブランチごと削除することを提案する(SHA-256 は event log に残るので、後の監査では公式ページを取り直して照合する)。
+- 作業用ブランチ `gate-work`(FRB・日銀のページの抜粋)は、main に監査情報が残っていることを読み直して確認した後に削除した(むすび承認)。
+  - main に残したもの: event log、取得ページの一覧(URL・SHA-256・取得時刻・抽出プログラムの commit)、生成プログラム、Gate の結果。
+  - 将来の監査の経路: 公式 URL を取り直す → SHA-256 を比べる → `tools/gate/extract_pages.py` で抜き出す → `tools/gate/calendar_build.py` を実行する → event log を比べる。公式ページが変わっていて SHA-256 が一致しない場合は、その事実を記録する。
+  - 注意: ブランチを削除しても、push 済みの commit やオブジェクトが GitHub から直ちに完全に消える保証はない。目的は「正式な main に作業用の抜粋を残さない」ことである。
 - 告知の多くは時刻が分からないため、公表日の翌日の T_info から使う保守的な規則になっている。
 - 2026年10月以降の会合は予定だけで、実際の開催との突き合わせはしていない。

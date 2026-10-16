@@ -121,7 +121,7 @@
    {
     "start": "2001-09-18",
     "end": "2001-09-18",
-    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2001/index.htm"
    },
    {
     "start": "2001-09-18",
@@ -131,42 +131,42 @@
    {
     "start": "2004-01-19",
     "end": "2004-01-20",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-02-26",
     "end": "2004-02-26",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-03-15",
     "end": "2004-03-16",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-04-28",
     "end": "2004-04-28",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-05-19",
     "end": "2004-05-20",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-06-14",
     "end": "2004-06-15",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2004-06-25",
     "end": "2004-06-25",
-    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2004/index.htm"
    },
    {
     "start": "2011-02-14",
     "end": "2011-02-15",
-    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2011/index.htm"
    },
    {
     "start": "2011-02-16",
@@ -176,7 +176,7 @@
    {
     "start": "2011-11-30",
     "end": "2011-11-30",
-    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it; actual date from https://www.boj.or.jp/mopo/mpmsche_minu/minu_2011/index.htm"
    }
   ],
   "last_gap_meeting_end": "2011-11-30",
@@ -192,5 +192,5 @@
   "scheduled_not_found_in_actual": []
  },
  "generated_from": "branch gate-work calendar/*; tools/gate/calendar_build.py",
- "event_log_sha256": "a372e6696d312b3401095eb238fb07a645f60ffe76335facd64f2a47ff25c339"
+ "event_log_sha256": "fb2ac24289cb027a1395e659d3d5358cc85c9d6a2013ed210b3c3f7809302a44"
 }
