@@ -1,0 +1,20 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART2-V1",
+  "file": "preregistration/M1-MACRO-IMPL-PART2-V1.md",
+  "sha256": "1789ff486b01ad27840bc596b053c5c58a52c7f679afd8d18f74525e30ba8756",
+  "git_blob_sha1": "e5862bd579aab85caf4e5dcdb4532a9507b05178",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 06:14 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART2-V2.candidate.md; 0 further change requests)",
+  "note": "The frozen text is the audited draft revision v2 (header says 案 v2), byte-identical. Registered under spec_id M1-MACRO-IMPL-PART2-V1 (first frozen version of Implementation Part 2); draft revisions v0/v1 were never frozen.",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA e5862bd579aab85caf4e5dcdb4532a9507b05178 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob e5862bd579aab85caf4e5dcdb4532a9507b05178, SHA-256 1789ff486b01ad27840bc596b053c5c58a52c7f679afd8d18f74525e30ba8756)."
+  ],
+  "summary": "Estimator/Solver: aggregated exact pieces as global minorants; float HiGHS LP for search only; exact rational certification of the master LP optimum; stage 2 minimum-L2 over F = {max_r L_r <= LB} with no loss allowance (exact rational active-set QP); two-sided checks |UB-LB| <= eps_tie and |Phi(beta2)-LB| <= eps_tie, eps_tie = 1e-13 as numerical identity only; CERT_INCONSISTENT and other failures -> ABSTAIN_SYSTEM / ESTIMATION_FAILED, no fallback; each (t,h) solved from scratch; independent-implementation agreement thresholds.",
+  "status_detail": {
+    "estimator_solver_specification": "CLOSED",
+    "implementation_verification": "NOT YET COMPLETE (required before implementation freeze: full-scale synthetic test incl. eps_tie margin gate on negative-side quantities and independent-implementation differences; production implementation reproduces synthetic cases A-E; independent implementation agreement; real-data blind numerical run with output restricted to status/iterations/gap/agreement/failure subreason)",
+    "change_rule": "Any change to eps_tie, solver settings or algorithm found necessary during verification is made as a new version of Part 2 and re-audited, never silently in code."
+  },
+  "performance_seal": "INTACT"
+}
