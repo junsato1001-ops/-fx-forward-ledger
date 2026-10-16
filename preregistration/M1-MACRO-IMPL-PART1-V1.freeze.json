@@ -1,0 +1,18 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART1-V1",
+  "file": "preregistration/M1-MACRO-IMPL-PART1-V1.md",
+  "sha256": "bf4c63d431e696ef42ba4f260484c6d2bfca9edf8659ba7e3481133ce4b8e6f1",
+  "git_blob_sha1": "f78211035cfaf63d1d296b6d6bd2666fff254174",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 04:38 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART1-V1.candidate.md; 0 further change requests)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA f78211035cfaf63d1d296b6d6bd2666fff254174 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob f78211035cfaf63d1d296b6d6bd2666fff254174, SHA-256 bf4c63d431e696ef42ba4f260484c6d2bfca9edf8659ba7e3481133ce4b8e6f1)."
+  ],
+  "summary": "Implementation Spec Part 1 (Data/Input): point-in-time contracts for Treasury 2Y (Daily Treasury Par Yield Curve Rates / 2 Yr, fixed), MOF JGB 2Y, CFTC TFF JPY 097741 (Usable_From / Expected_Release); S0 linkage; fetch, storage, revision detection, dev snapshot; failure order incl. CALENDAR_INTEGRITY; seal boundary for implementation verification.",
+  "interpretation_notes": [
+    "Private immutable storage for U.S. Treasury raw bytes (むすび 04:38): for V1 a private repository owned by 純 is acceptable, with immutability provided by cryptographic commitment rather than by the medium. On each storage of raw bytes, the public manifest commits source identifier, retrieval UTC, byte count, raw SHA-256 and private object path; any later replacement on the private side is detected by hash mismatch. The exact manifest format is fixed before implementation freeze.",
+    "Inspection of input and feature values is allowed for implementation verification only; beta, mu, M1 forecasts, M1-S0 loss differences and performance statistics remain sealed."
+  ],
+  "performance_seal": "INTACT"
+}
