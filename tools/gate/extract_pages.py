@@ -35,6 +35,18 @@ def main():
             r=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":"fx-forward-ledger gate (research)"}),timeout=60); b=r.read(); st=r.status
         except Exception as e:
             b=b""; st=repr(e)[:100]
+        if b[:5]==b"%PDF-":
+            try:
+                import pypdf, io as _io
+                t="\n".join((pg.extract_text() or "") for pg in pypdf.PdfReader(_io.BytesIO(b)).pages)
+            except Exception as e:
+                t="PDF_PARSE_ERROR "+repr(e)[:80]
+            lines=[re.sub(r"\s+"," ",l).strip() for l in t.split("\n")]
+            lines=[l for l in lines if l]
+            rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":"PDF","date_lines":[l for l in lines if DATE.search(l)],"text_lines":lines[:600],"links":[]}
+            fn=re.sub(r"[^A-Za-z0-9._-]","_",u.split("://",1)[1])+".json"
+            json.dump(rec,open(os.path.join(out,fn),"w",encoding="utf-8"),ensure_ascii=False,indent=0)
+            man.append({"url":u,"status":st,"bytes":len(b),"sha256":rec["sha256"],"file":fn}); time.sleep(1.0); continue
         enc="utf-8"
         m=re.search(rb'charset=["\']?([A-Za-z0-9_-]+)',b[:3000])
         if m: enc=m.group(1).decode()
@@ -43,9 +55,10 @@ def main():
         p=P(); p.feed(t)
         text="".join(p.txt)
         lines=[re.sub(r"\s+"," ",l).strip() for l in text.split("\n")]
-        lines=[l for l in lines if l and DATE.search(l)]
+        alll=[l for l in lines if l]
+        lines=[l for l in alll if DATE.search(l)]
         links=[[urllib.parse.urljoin(u,h),re.sub(r"\s+"," ",x).strip()] for h,x in p.links]
-        rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":re.sub(r"\s+"," ",p.title).strip(),"date_lines":lines,"links":links}
+        rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":re.sub(r"\s+"," ",p.title).strip(),"date_lines":lines,"text_lines":alll[:600],"links":links}
         fn=re.sub(r"[^A-Za-z0-9._-]","_",u.split("://",1)[1])+".json"
         json.dump(rec,open(os.path.join(out,fn),"w",encoding="utf-8"),ensure_ascii=False,indent=0)
         man.append({"url":u,"status":st,"bytes":len(b),"sha256":rec["sha256"],"file":fn})
