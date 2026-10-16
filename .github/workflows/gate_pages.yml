@@ -1,0 +1,27 @@
+name: gate-fetch-calendar-pages
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "space-separated URLs (federalreserve.gov / boj.or.jp only)"
+        required: true
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch pages
+        env:
+          PAGES: ${{ inputs.pages }}
+        run: python tools/gate/fetch_pages.py pages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: calendar-pages
+          path: pages/
+          retention-days: 30
