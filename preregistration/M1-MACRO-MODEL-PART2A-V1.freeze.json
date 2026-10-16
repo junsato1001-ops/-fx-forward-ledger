@@ -1,0 +1,10 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART2A-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART2A-V1.md",
+  "sha256": "cd9afc45783aca5c1f7e154904580acab0d43bfc05db5c8ff44035fe12e282f4",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 03:36 JST",
+  "summary": "Estimation loss per opportunity = CRPS(shifted S0 empirical distribution, y) / sigma_M0 (standard empirical CRPS, no fair CRPS); eligible only if sigma_M0 finite and > 0; uniqueness rule to be frozen after regularization.",
+  "audit_consequence": "The division by sigma_M0 is part of the per-opportunity loss definition, not a weight. Origin weighting must not re-apply sigma-based weights or add pair weights based on sigma (that would be a different specification).",
+  "performance_seal": "INTACT"
+}
