@@ -8,7 +8,7 @@ ALLOW = ("https://www.federalreserve.gov/", "https://www.boj.or.jp/")
 DATE = re.compile(r"(January|February|March|April|May|June|July|August|September|October|November|December|Jan\.|Feb\.|Aug\.|Sept\.|Oct\.|Nov\.|Dec\.)\s*\d|\d{4}年|\d{1,2}月\s*\d{1,2}日|\d{1,2}/\d{1,2}|\d{4}-\d{2}-\d{2}|unscheduled|Unscheduled|conference call|延期|変更|臨時")
 class P(HTMLParser):
     def __init__(s):
-        super().__init__(); s.links=[]; s.cur=None; s.txt=[]; s.title=""; s.intitle=False; s.skip=0
+        super().__init__(); s.links=[]; s.cur=None; s.txt=[]; s.title=""; s.intitle=False; s.skip=0; s.stk=[]
     def handle_starttag(s,t,a):
         a=dict(a)
         if t in("script","style"): s.skip+=1
@@ -16,7 +16,16 @@ class P(HTMLParser):
         if t=="a" and a.get("href"): s.cur=[a["href"],""]
         if t in("br","p","div","tr","li","h1","h2","h3","h4","td","th","table"): s.txt.append("\n")
         if t in("td","th"): s.txt.append(" | ")
+        st=(a.get("style") or "")+" "+(a.get("class") or "")
+        strike=t in("s","del","strike") or "line-through" in st or "strike" in st.lower() or "torikeshi" in st.lower()
+        if t not in("br","img","input","meta","link","hr"):
+            s.stk.append((t,strike))
+            if strike: s.txt.append(" ~~[")
     def handle_endtag(s,t):
+        for i in range(len(s.stk)-1,-1,-1):
+            if s.stk[i][0]==t:
+                if s.stk[i][1]: s.txt.append("]~~ ")
+                del s.stk[i:]; break
         if t in("script","style"): s.skip-=1
         if t=="title": s.intitle=False
         if t=="a" and s.cur: s.links.append(s.cur); s.cur=None
