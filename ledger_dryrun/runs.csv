@@ -1,0 +1,2 @@
+Run_ID,Mode,Started_At_UTC,Started_At_JST,Data_Zip_SHA256,Data_CSV_SHA256,Data_Last_Date,Forecast_Rows,Abstain_Rows,Outcome_Rows,Status,Note
+38852086873-1,dryrun,2026-10-16T04:44:49Z,2026-10-16T13:44:49+09:00,e691b95610e75f324b3f2552682cc3809490368adadda2a02a398d6e9ca89891,03cb5389680fc0e761a08ba7a1ea00d9ceffe16cadb163a81079632eab7fb7bb,2026-10-15,0,0,0,OK,
