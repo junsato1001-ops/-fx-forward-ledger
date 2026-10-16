@@ -1,0 +1,23 @@
+{
+  "spec_id": "M1-VOL-SHRINK-V1",
+  "spec_sha256": "511ecaea39029d9ef99b88787dfb2a6442f42b7437db7466a5bc77be9b261977",
+  "implementation_status": "REFERENCE_SELFTEST_PASS__INDEPENDENT_AUDIT_PENDING",
+  "files": {
+    "forward/m1_vol_shrink_v1.py": "29555565ac3070231a83606eea7267e03ade2e67d1f2443791ef0a826721f5ad",
+    "tests/test_m1_vol_shrink_v1.py": "f5fccdcd06637ec891b8049af0f35cead48afc34d065f7a3aff5fdde8064ef2a",
+    "tests/output/m1_vol_shrink_v1_replay.csv": "3660910d375d65da5ca9777ea8cd57876ff98281eab43cbbc001375767a19cd3",
+    "tests/output/m1_vol_shrink_v1_selftest.json": "b7a425640b0c9ac1875230813ce17576bec227b7d527999aeb96feaa65c4770c"
+  },
+  "inputs": {
+    "ecb_snapshot": "tests/fixtures/eurofxref-hist_20261009.zip (f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649)",
+    "ledger_builder": "forward/ledger_builder.py (reproduces frozen ledger e4edb850...)",
+    "frozen_s0_for_identity_test": "frozen/s0_empclim_std_exp_v1_1.py (84c31766...)"
+  },
+  "replay_role": "Historical prequential replay = initialization only, not performance evidence (spec 6)",
+  "implementation_notes_for_audit": [
+    "sigma_M1 is computed and recorded for every FORECAST_READY opportunity, including rows whose distribution warmup is not yet met (M1_WARMUP_INSUFFICIENT); otherwise the Z_M1 pool could never start. This mirrors S0, whose pool uses sigma_M0 of every VOL-ready row.",
+    "v_long uses a running float sum of r^2 in date order divided by the count.",
+    "Class probabilities compare x_i = sigma_M1 * Z_i with +-0.25 * sigma_M0 in y-space (spec 4.2).",
+    "No predictive performance metric was computed."
+  ]
+}

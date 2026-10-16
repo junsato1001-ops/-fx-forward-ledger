@@ -1,0 +1,26 @@
+{
+ "result": "PASS",
+ "fails": [],
+ "n_fails": 0,
+ "first_estimated_origin": {
+  "1D": "2000-12-14",
+  "1W": "2004-10-17",
+  "4W": "2019-03-24"
+ },
+ "s0_identity_rows_compared": {
+  "1D": 300,
+  "1W": 300,
+  "4W": 1277
+ },
+ "decision_counts": {
+  "NOT_APPLICABLE": 3605,
+  "MODEL_PREREQ_UNAVAILABLE": 2878,
+  "FORECAST": 23538
+ },
+ "parameter_state_counts": {
+  "DEFAULT_PARENT": 3493,
+  "ESTIMATED": 21863
+ },
+ "replay_csv_sha256": "3660910d375d65da5ca9777ea8cd57876ff98281eab43cbbc001375767a19cd3",
+ "m1_code_sha256": "29555565ac3070231a83606eea7267e03ade2e67d1f2443791ef0a826721f5ad"
+}
