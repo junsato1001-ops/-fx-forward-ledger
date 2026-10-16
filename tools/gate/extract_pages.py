@@ -52,7 +52,7 @@ def main():
                 t="PDF_PARSE_ERROR "+repr(e)[:80]
             lines=[re.sub(r"\s+"," ",l).strip() for l in t.split("\n")]
             lines=[l for l in lines if l]
-            rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":"PDF","date_lines":[l for l in lines if DATE.search(l)],"text_lines":lines[:600],"links":[]}
+            rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":"PDF","date_lines":[l for l in lines if DATE.search(l)],"text_lines":lines[:20000],"links":[]}
             fn=re.sub(r"[^A-Za-z0-9._-]","_",u.split("://",1)[1])+".json"
             json.dump(rec,open(os.path.join(out,fn),"w",encoding="utf-8"),ensure_ascii=False,indent=0)
             man.append({"url":u,"status":st,"bytes":len(b),"sha256":rec["sha256"],"file":fn}); time.sleep(1.0); continue
@@ -67,7 +67,7 @@ def main():
         alll=[l for l in lines if l]
         lines=[l for l in alll if DATE.search(l)]
         links=[[urllib.parse.urljoin(u,h),re.sub(r"\s+"," ",x).strip()] for h,x in p.links]
-        rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":re.sub(r"\s+"," ",p.title).strip(),"date_lines":lines,"text_lines":alll[:600],"links":links}
+        rec={"url":u,"status":st,"bytes":len(b),"sha256":hashlib.sha256(b).hexdigest(),"title":re.sub(r"\s+"," ",p.title).strip(),"date_lines":lines,"text_lines":alll[:20000],"links":links}
         fn=re.sub(r"[^A-Za-z0-9._-]","_",u.split("://",1)[1])+".json"
         json.dump(rec,open(os.path.join(out,fn),"w",encoding="utf-8"),ensure_ascii=False,indent=0)
         man.append({"url":u,"status":st,"bytes":len(b),"sha256":rec["sha256"],"file":fn})
