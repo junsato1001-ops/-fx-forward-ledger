@@ -1,0 +1,9 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART1-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART1-V1.md",
+  "sha256": "54aa6ca88560256827a77a221b9e7b495ef19b907a5430a7aa39464bcf52ecf4",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 03:30 JST",
+  "summary": "Parent = S0-EMPCLIM-STD-EXP-V1; S0 Z-pool and sigma_M0 kept unchanged; location shift mu in y-space; no intercept; mu = 0 reproduces S0 exactly; F_POS = 0 is the economic zero (no re-centering). Estimation loss is NOT fixed here (Model Spec Part 2).",
+  "performance_seal": "INTACT"
+}
