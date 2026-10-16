@@ -1,0 +1,16 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART2E-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART2E-V1.md",
+  "sha256": "28b4d04ca6a30d4a54d23ad4e50fb277138f2cbdd53a8510870d6e4b0b49d060",
+  "git_blob_sha1": "15ae38b79e6c5c67d2be8488ed8123024388d7a0",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 04:17 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-MODEL-PART2E-V0.draft.md; approved as-is, no v1 rewrite)",
+  "note": "The frozen text is the audited v0 draft, byte-identical; its header says 'DRAFT ... 案 v0'. Frozen as M1-MACRO-MODEL-PART2E-V1 without edits to keep the approved hash.",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 15ae38b7... (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 15ae38b7..., SHA-256 28b4d04c...)."
+  ],
+  "summary": "All beta unconstrained. Sign conventions fixed (y > 0 = yen weaker; beta_k > 0 = F_k > 0 predicts yen weakening). No one-directional prior expectation recorded; the two-sided hypothesis table is an interpretation map used only after confirmatory evaluation.",
+  "milestone": "With this part, all statistical-model degrees of freedom of M1-MACRO-V1 are frozen (Transformation Part1/2A/2B, Model Part1/2A/2B/2C/2D/2E).",
+  "performance_seal": "INTACT"
+}
