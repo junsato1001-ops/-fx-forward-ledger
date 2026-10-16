@@ -1,0 +1,2 @@
+Spec_ID,Spec_SHA256,Freeze_Date_JST,Freeze_Commit,Commit_Time,Note
+EVAL-SPEC-V1,fdb11fcfbfcaaf760a3df8973b35138889befae190f9f39050f7c77925420ba4,2026-10-16,555cb66e7edc480c6eb6bc61d18db873c15bc31d,2026-10-16T14:27:04+09:00,Evaluation spec frozen before any M1 result
