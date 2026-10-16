@@ -15,6 +15,7 @@ import csv
 import datetime as dt
 import hashlib
 import io
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -70,10 +71,23 @@ def main():
                "M0_P_Down", "M0_P_Neutral", "M0_P_Up", "M0_PI10", "M0_PI90", "Prereq_Status"]
     cols_s0 = ["Pool_N", "Mean_Z", "Q10_Z", "Q90_Z", "S0_Point_LogReturn", "P_Down", "P_Neutral", "P_Up",
                "PI10", "PI90", "S0_Status", "Decision_Class"]
+    # M1-VOL-SHRINK-V1: frozen historical prequential replay (sha256 from preregistration/M1-VOL-SHRINK-V1.impl.json)
+    impl = json.loads((ROOT / "preregistration" / "M1-VOL-SHRINK-V1.impl.json").read_text(encoding="utf-8"))
+    for rel, want in impl["files"].items():
+        if rel.endswith("_selftest.json"):
+            continue
+        got = sha(Path(ROOT / rel).read_bytes())
+        if got != want:
+            fails.append(f"M1 frozen file sha {rel}")
+    with open(ROOT / "tests" / "output" / "m1_vol_shrink_v1_replay.csv", encoding="utf-8", newline="") as f:
+        m1r = {(r["Pair"], r["Origin"], r["Horizon"]): r for r in csv.DictReader(f)}
+    cols_m1 = ["Sigma_M1", "W", "Parameter_State", "N_Param_Origins", "V_Long", "Pool_N", "Mean_Z", "Q10_Z", "Q90_Z",
+               "Point_LogReturn", "P_Down", "P_Neutral", "P_Up", "PI10", "PI90", "Decision_Class"]
     for o, h in SIM_ORIGINS:
-        L, S, laf = issue.issue_forecasts(m0, mp, s0, raw, dt.date.fromisoformat(o), h)
+        L, S, M, laf = issue.issue_forecasts(m0, mp, s0, raw, dt.date.fromisoformat(o), h)
         for k in L:
             bad = [c for c in cols_m0 if L[k][c] != led[k][c]] + [c for c in cols_s0 if S[k][c] != s0r[k][c]]
+            bad += ["M1:" + c for c in cols_m1 if M[k][c] != m1r[k][c]]
             if bad:
                 fails.append(f"sim {k} {bad}")
         print("sim", o, h, "laf", laf, "OK" if not any(f.startswith(f"sim ('") and o in f for f in fails) else "FAIL")

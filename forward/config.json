@@ -5,12 +5,18 @@
     "1W": "2026-10-18",
     "4W": "2026-10-18"
   },
-  "pairs": ["USDJPY", "CHFJPY", "INRJPY"],
+  "pairs": [
+    "USDJPY",
+    "CHFJPY",
+    "INRJPY"
+  ],
   "models": {
     "M0-RW0": "M0 specification v1.2 (frozen/m0_walkforward_v1_2.py)",
-    "S0-EMPCLIM-STD-EXP-V1": "S0 reference implementation v1.1 (frozen/s0_empclim_std_exp_v1_1.py)"
+    "S0-EMPCLIM-STD-EXP-V1": "S0 reference implementation v1.1 (frozen/s0_empclim_std_exp_v1_1.py)",
+    "M1-VOL-SHRINK-V1": "M1-VOL-SHRINK-V1 Pilot (forward/m1_vol_shrink_v1.py, spec 511ecaea...); Shadow/Pipeline Pilot, parent S0"
   },
   "cutoff_jst": "08:30",
   "data_source": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
-  "sealed_holdout": "RFX-HOLDOUT-A-V1 (GBPJPY, AUDJPY, CADJPY, SGDJPY, KRWJPY) is not computed by this repository"
+  "sealed_holdout": "RFX-HOLDOUT-A-V1 (GBPJPY, AUDJPY, CADJPY, SGDJPY, KRWJPY) is not computed by this repository",
+  "first_origin_note": "first_origin applies to all three models, including M1-VOL-SHRINK-V1 (integrated before the first scheduled origin)"
 }

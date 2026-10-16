@@ -10,7 +10,7 @@ GitHubのcommit時刻とpush記録が、「結果が出る前に予測してい�
 | 項目 | 内容 |
 |---|---|
 | 通貨ペア | USDJPY / CHFJPY / INRJPY(ECB参照レートから作るクロスレート) |
-| モデル | `M0-RW0`(M0仕様 v1.2)、`S0-EMPCLIM-STD-EXP-V1`(S0参照実装 v1.1) |
+| モデル | `M0-RW0`(M0仕様 v1.2)、`S0-EMPCLIM-STD-EXP-V1`(S0参照実装 v1.1)、`M1-VOL-SHRINK-V1`(Shadow / Pipeline Pilot、親S0、仕様 `preregistration/M1-VOL-SHRINK-V1.md`) |
 | ホライズン | 1D(TARGET営業日ごと)、1W・4W(毎週日曜) |
 | 締切 | 各起点日の 08:30 JST。使える情報は直前のTARGET営業日のECB公表値まで |
 | 最初の正式起点 | 1W・4W: 2026-10-18(日)、1D: 2026-10-19(月)(`forward/config.json`) |

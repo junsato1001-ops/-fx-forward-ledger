@@ -36,6 +36,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ledger_builder as lb  # noqa: E402
+import m1_vol_shrink_v1 as m1  # noqa: E402
 
 ROOT = lb.ROOT
 LEDGER = ROOT / "ledger"
@@ -50,7 +51,7 @@ HORIZONS = ("1D", "1W", "4W")
 FORECAST_FIELDS = [
     "Model", "Pair", "Origin", "Horizon", "Cutoff_JST", "Last_Available_Fix", "Target_Start", "Target_End",
     "H_Canonical_Intervals", "Sigma_H", "Point_LogReturn", "P_Down", "P_Neutral", "P_Up", "PI10", "PI90",
-    "S0_Pool_N", "S0_Mean_Z", "S0_Q10_Z", "S0_Q90_Z",
+    "Pool_N", "Mean_Z", "Q10_Z", "Q90_Z", "Sigma_Model", "W", "Parameter_State", "N_Param_Origins", "V_Long",
     "Decision_Class", "Reason_Code", "Issued_At_UTC", "Data_Zip_SHA256", "Data_Last_Date", "Code_SHA256", "Run_ID",
 ]
 OUTCOME_FIELDS = [
@@ -61,7 +62,7 @@ RUN_FIELDS = [
     "Run_ID", "Mode", "Started_At_UTC", "Started_At_JST", "Data_Zip_SHA256", "Data_CSV_SHA256", "Data_Last_Date",
     "Forecast_Rows", "Abstain_Rows", "Outcome_Rows", "Status", "Note",
 ]
-MODELS = ("M0-RW0", "S0-EMPCLIM-STD-EXP-V1")
+MODELS = ("M0-RW0", "S0-EMPCLIM-STD-EXP-V1", "M1-VOL-SHRINK-V1")
 
 
 def utc_iso(t: dt.datetime) -> str:
@@ -73,7 +74,7 @@ def code_sha() -> str:
     parts = []
     for name in sorted(lb.FROZEN_SHA256):
         parts.append(f"{name}:{lb.sha256_file(lb.FROZEN / name)}")
-    for p in ("forward/ledger_builder.py", "forward/issue.py", "forward/config.json"):
+    for p in ("forward/ledger_builder.py", "forward/m1_vol_shrink_v1.py", "forward/issue.py", "forward/config.json"):
         parts.append(f"{p}:{lb.sha256_file(ROOT / p)}")
     return lb.sha256_bytes("\n".join(parts).encode())
 
@@ -133,8 +134,12 @@ def scheduled_origins(mp, first, last_date):
     return out
 
 
-def issue_forecasts(m0, mp, s0mod, raw_all, origin, horizon):
-    """Return {pair: {"M0": row, "S0": row, "ledger": row}} or raise NotReady."""
+def issue_forecasts(m0, mp, s0mod, raw_all, origin, horizon, issued_m1_sigma=None):
+    """Return (ledger rows, S0 rows, M1 rows, laf) for the forward origin, or raise NotReady.
+
+    issued_m1_sigma: {(pair, origin_iso, horizon): Sigma_Model} of M1 rows already in the formal
+    ledger. The prequential replay must reproduce every one of them exactly (issued sigma is
+    immutable); otherwise PIPELINE_FAILURE."""
     start = mp.next_target_day_on_or_after(origin)
     laf = mp.previous_target_day(start)
     raw = [r for r in raw_all if r["Date"] <= laf]  # leakage guard
@@ -149,7 +154,14 @@ def issue_forecasts(m0, mp, s0mod, raw_all, origin, horizon):
     s0r = {(r["Pair"], r["Origin"], r["Horizon"]): r for r in s0_out if (r["Pair"], r["Origin"], r["Horizon"]) in key}
     if len(led) != len(lb.PAIRS) or len(s0r) != len(lb.PAIRS):
         raise RuntimeError("PIPELINE_FAILURE: forward origin rows missing")
-    return led, s0r, laf
+    rows_h = [r for r in srows if r["Horizon"] == horizon]
+    m1_out, _ = m1.generate(rows_h, raw, lb.PAIRS)
+    m1_all = {(r["Pair"], r["Origin"], r["Horizon"]): r for r in m1_out}
+    for k, sig in (issued_m1_sigma or {}).items():
+        if k[2] == horizon and k in m1_all and m1_all[k]["Sigma_M1"] != sig:
+            raise RuntimeError(f"PIPELINE_FAILURE: M1_ISSUED_SIGMA_MISMATCH {k}")
+    m1r = {k: m1_all[k] for k in key}
+    return led, s0r, m1r, laf
 
 
 class NotReady(Exception):
@@ -199,6 +211,9 @@ def main():
     existing = {(r["Model"], r["Pair"], r["Origin"], r["Horizon"]) for r in read_csv(f_fc)}
     existing_out = {(r["Pair"], r["Origin"], r["Horizon"]) for r in read_csv(f_out)}
     today = now_jst.date()
+    issued_m1 = {(r["Pair"], r["Origin"], r["Horizon"]): r["Sigma_Model"] for r in read_csv(f_fc)
+                 if r["Model"] == "M1-VOL-SHRINK-V1" and r["Decision_Class"] != "ABSTAIN_SYSTEM"}
+    pipeline_failure = False
 
     for origin, h in scheduled_origins(mp, first, today):
         keys = [(m, p, origin.isoformat(), h) for m in MODELS for p in lb.PAIRS]
@@ -211,10 +226,14 @@ def main():
             if raw_all is None:
                 continue  # retry in a later run before the cutoff
             try:
-                led, s0r, laf = issue_forecasts(m0, mp, s0mod, raw_all, origin, h)
+                led, s0r, m1r, laf = issue_forecasts(m0, mp, s0mod, raw_all, origin, h, issued_m1)
             except NotReady as e:
                 note.append(f"{origin} {h}: {e}")
                 continue  # retry in a later run before the cutoff
+            except RuntimeError as e:
+                note.append(f"{origin} {h}: {e}")
+                pipeline_failure = True
+                continue
             issued_at = utc_iso(dt.datetime.now(dt.timezone.utc)) if not args.now else utc_iso(now)
             for p in lb.PAIRS:
                 L = led[(p, origin.isoformat(), h)]
@@ -234,9 +253,17 @@ def main():
                 new_fc.append({**common, "Model": "S0-EMPCLIM-STD-EXP-V1",
                                "Point_LogReturn": S["S0_Point_LogReturn"], "P_Down": S["P_Down"],
                                "P_Neutral": S["P_Neutral"], "P_Up": S["P_Up"], "PI10": S["PI10"], "PI90": S["PI90"],
-                               "S0_Pool_N": S["Pool_N"], "S0_Mean_Z": S["Mean_Z"], "S0_Q10_Z": S["Q10_Z"],
-                               "S0_Q90_Z": S["Q90_Z"], "Decision_Class": S["Decision_Class"],
+                               "Pool_N": S["Pool_N"], "Mean_Z": S["Mean_Z"], "Q10_Z": S["Q10_Z"],
+                               "Q90_Z": S["Q90_Z"], "Sigma_Model": L["Sigma_H"], "Decision_Class": S["Decision_Class"],
                                "Reason_Code": S["Reason_Code"]})
+                M = m1r[(p, origin.isoformat(), h)]
+                new_fc.append({**common, "Model": "M1-VOL-SHRINK-V1",
+                               "Point_LogReturn": M["Point_LogReturn"], "P_Down": M["P_Down"],
+                               "P_Neutral": M["P_Neutral"], "P_Up": M["P_Up"], "PI10": M["PI10"], "PI90": M["PI90"],
+                               "Pool_N": M["Pool_N"], "Mean_Z": M["Mean_Z"], "Q10_Z": M["Q10_Z"], "Q90_Z": M["Q90_Z"],
+                               "Sigma_Model": M["Sigma_M1"], "W": M["W"], "Parameter_State": M["Parameter_State"],
+                               "N_Param_Origins": M["N_Param_Origins"], "V_Long": M["V_Long"],
+                               "Decision_Class": M["Decision_Class"], "Reason_Code": M["Reason_Code"]})
             continue
         if before_cutoff:
             continue  # future origin (should not happen) - never pre-issue
@@ -287,7 +314,7 @@ def main():
 
     n_fc = sum(1 for r in new_fc if r["Decision_Class"] != "ABSTAIN_SYSTEM")
     n_ab = len(new_fc) - n_fc
-    status = "OK" if raw_all is not None else "DATA_UNAVAILABLE"
+    status = "PIPELINE_FAILURE" if pipeline_failure else ("OK" if raw_all is not None else "DATA_UNAVAILABLE")
     run.update({"Data_Zip_SHA256": zip_sha, "Data_CSV_SHA256": csv_sha, "Data_Last_Date": data_last,
                 "Forecast_Rows": n_fc, "Abstain_Rows": n_ab, "Outcome_Rows": len(new_out),
                 "Status": status, "Note": " | ".join(note)[:500]})
@@ -306,9 +333,13 @@ def main():
                 "outcomes": [{k: r.get(k, "") for k in OUTCOME_FIELDS} for r in new_out],
                 "run": {k: str(run.get(k, "")) for k in RUN_FIELDS}}
     (ROOT / "expected_this_run.json").write_text(json.dumps(expected, ensure_ascii=False, indent=1), encoding="utf-8")
+    if pipeline_failure:
+        print("PIPELINE_FAILURE: " + run["Note"], file=sys.stderr)
     print(json.dumps({"run_id": run_id, "mode": args.mode, "now_jst": run["Started_At_JST"], "data_last": data_last,
                       "forecast_rows": n_fc, "abstain_rows": n_ab, "outcome_rows": len(new_out), "note": run["Note"]},
                      ensure_ascii=False))
+    if pipeline_failure:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
