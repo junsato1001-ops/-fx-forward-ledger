@@ -40,7 +40,7 @@ def page(url):
             continue
         d = json.load(open(f, encoding="utf-8"))
         if d.get("url") == url and d.get("bytes", 0) > 0:
-            if best is None or ("text_lines" in d and "text_lines" not in best):
+            if best is None or len(d.get("text_lines", [])) > len(best.get("text_lines", [])):
                 best = d
     if best is None:
         raise KeyError(url)
@@ -231,7 +231,7 @@ def build_fed():
                 if not r:
                     continue
                 a, b = r
-                if a <= rdate:
+                if a <= rdate or (a.month, a.day) == (rdate.month, rdate.day):
                     continue
                 sched.append((rdate, rt, a, b, url, d["sha256"])); seen += 1
         if seen < 8:
@@ -320,7 +320,8 @@ def boj_actual():
     # meetings of 2026 whose minutes are not out yet: from the current schedule page, held before today
     d = page(f"{BOJ}/mopo/mpmsche_minu/index.htm")
     tl = d["text_lines"]; i0 = next(i for i, l in enumerate(tl) if l.startswith("表 2026年"))
-    cells = [nz(l) for l in tl[i0:i0 + 80] if l.startswith("|")]
+    i1 = next((i for i in range(i0 + 1, len(tl)) if tl[i].startswith("表 ")), i0 + 80)
+    cells = [nz(l) for l in tl[i0:i1] if l.startswith("|")]
     for c in cells:
         m = re.match(r"^\|\s*(\d{1,2})月(\d{1,2})日\(.\)・(\d{1,2})日\(.\)", c)
         if m:
@@ -565,6 +566,8 @@ def build_boj():
         m = (a, b)
         if m in explained:
             continue
+        if m in changes_by_new and changes_by_new[m][1] <= a and a >= first_direct_regime:
+            continue   # documented change (DIRECT row already written)
         gw = [g for g in gapw if g[0] <= a <= g[1]]
         if m in snap_conflict or gw:
             add(Central_Bank="BOJ", Event_Type="ACTUAL_MEETING_SCHEDULE_UNKNOWN", Actual_Start=a, Actual_End=b,
@@ -613,7 +616,8 @@ def main():
         cnt = {}
         for r in rs:
             cnt[r["Reconstruction_Status"]] = cnt.get(r["Reconstruction_Status"], 0) + 1
-        g = sorted((r["Actual_Start"], r["Actual_End"], r["Note"]) for r in rs if r["Reconstruction_Status"] == "GAP")
+        g = sorted((r["Actual_Start"] or r["New_Meeting_Start"], r["Actual_End"] or r["New_Meeting_End"],
+                    ("[scheduled, not held] " if not r["Actual_Start"] else "") + r["Note"]) for r in rs if r["Reconstruction_Status"] == "GAP")
         last_gap = max((x[1] for x in g), default=None)
         summ[cb] = {"rows": len(rs), "status_counts": cnt,
                     "gap_meetings": [{"start": a, "end": b, "note": n} for a, b, n in g],

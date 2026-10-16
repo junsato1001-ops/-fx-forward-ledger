@@ -1,0 +1,196 @@
+{
+ "FOMC": {
+  "rows": 278,
+  "status_counts": {
+   "DIRECT_SOURCE": 261,
+   "GAP": 17
+  },
+  "gap_meetings": [
+   {
+    "start": "2000-02-01",
+    "end": "2000-02-02",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-03-21",
+    "end": "2000-03-21",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-05-16",
+    "end": "2000-05-16",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-06-27",
+    "end": "2000-06-28",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-08-22",
+    "end": "2000-08-22",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-10-03",
+    "end": "2000-10-03",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-11-15",
+    "end": "2000-11-15",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2000-12-19",
+    "end": "2000-12-19",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-01-30",
+    "end": "2001-01-31",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-03-20",
+    "end": "2001-03-20",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-05-15",
+    "end": "2001-05-15",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-06-26",
+    "end": "2001-06-27",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-08-21",
+    "end": "2001-08-21",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-10-02",
+    "end": "2001-10-02",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-11-06",
+    "end": "2001-11-06",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2001-12-11",
+    "end": "2001-12-11",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   },
+   {
+    "start": "2003-09-15",
+    "end": "2003-09-15",
+    "note": "no primary-source announcement of this meeting date before it was held"
+   }
+  ],
+  "last_gap_meeting_end": "2003-09-15",
+  "continuous_from_origin": "2003-09-17",
+  "event_types": [
+   "ACTUAL_MEETING_SCHEDULE_UNKNOWN",
+   "CONFERENCE_CALL",
+   "MEETING_CANCELLED",
+   "MEETING_EXTENDED",
+   "MEETING_SHORTENED",
+   "SCHEDULE_ANNOUNCED",
+   "UNSCHEDULED_MEETING"
+  ],
+  "scheduled_not_found_in_actual": []
+ },
+ "BOJ": {
+  "rows": 452,
+  "status_counts": {
+   "DIRECT_SOURCE": 196,
+   "GAP": 13,
+   "RULE_RECONSTRUCTED": 243
+  },
+  "gap_meetings": [
+   {
+    "start": "1998-04-09",
+    "end": "1998-04-09",
+    "note": "[scheduled, not held] Apr-Jun 1998 marked provisional (to be re-decided under the new BOJ Act); SCHEDULED_BUT_NOT_HELD_AND_NO_CHANGE_NOTICE"
+   },
+   {
+    "start": "2001-09-18",
+    "end": "2001-09-18",
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+   },
+   {
+    "start": "2001-09-18",
+    "end": "2001-09-19",
+    "note": "[scheduled, not held] revised table (two-day meetings); SCHEDULED_BUT_NOT_HELD_AND_NO_CHANGE_NOTICE"
+   },
+   {
+    "start": "2004-01-19",
+    "end": "2004-01-20",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-02-26",
+    "end": "2004-02-26",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-03-15",
+    "end": "2004-03-16",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-04-28",
+    "end": "2004-04-28",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-05-19",
+    "end": "2004-05-20",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-06-14",
+    "end": "2004-06-15",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2004-06-25",
+    "end": "2004-06-25",
+    "note": "2004-01-20 change notice (ads0120): the revised table is not available as text (EN page: crossed-out = dates first announced 2003-12-16); changed meetings cannot be identified"
+   },
+   {
+    "start": "2011-02-14",
+    "end": "2011-02-15",
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+   },
+   {
+    "start": "2011-02-16",
+    "end": "2011-02-17",
+    "note": "[scheduled, not held] table attached to a change notice; SCHEDULED_BUT_NOT_HELD_AND_NO_CHANGE_NOTICE"
+   },
+   {
+    "start": "2011-11-30",
+    "end": "2011-11-30",
+    "note": "held, but a schedule table published before it shows a different date and no change notice explains it"
+   }
+  ],
+  "last_gap_meeting_end": "2011-11-30",
+  "continuous_from_origin": "2011-12-01",
+  "event_types": [
+   "ACTUAL_MEETING_SCHEDULE_UNKNOWN",
+   "MEETING_EXTENDED",
+   "MEETING_SHORTENED",
+   "SCHEDULE_ANNOUNCED",
+   "SCHEDULE_CHANGED",
+   "UNSCHEDULED_MEETING"
+  ],
+  "scheduled_not_found_in_actual": []
+ },
+ "generated_from": "branch gate-work calendar/*; tools/gate/calendar_build.py",
+ "event_log_sha256": "a372e6696d312b3401095eb238fb07a645f60ffe76335facd64f2a47ff25c339"
+}
