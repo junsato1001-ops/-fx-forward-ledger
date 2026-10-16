@@ -1,0 +1,12 @@
+{
+  "spec_id": "EVAL-SPEC-V1",
+  "file": "preregistration/EVAL-SPEC-V1.md",
+  "sha256": "fdb11fcfbfcaaf760a3df8973b35138889befae190f9f39050f7c77925420ba4",
+  "freeze_date_jst": "2026-10-16",
+  "status": "FREEZE / PASS",
+  "declared_by": "musubi (independent audit) and Claude; approved by Jun Sato",
+  "block_length_origin_units": {"1D": 4, "1W": 1, "4W": 12},
+  "block_length_code_audit": "NOT_INDEPENDENTLY_VERIFIED_BY_MUSUBI",
+  "delta_and_delta_min": "UNDEFINED_PENDING_DECISION_POLICY",
+  "change_rule": "No in-place changes. Any change requires a new version, a stated reason and a new Trial."
+}
