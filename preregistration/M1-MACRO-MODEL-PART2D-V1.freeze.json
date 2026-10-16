@@ -1,0 +1,14 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART2D-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART2D-V1.md",
+  "sha256": "10976519e4b530d0cd32e48e48e50c5e86384565059c1639b7c386a2dc520dce",
+  "git_blob_sha1": "04605a4b90a7b6352ef29f3d034a13f771479e9d",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 04:14 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-MODEL-PART2D-V1.candidate.md)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 04605a4b... (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 04605a4b..., SHA-256 10976519...). Byte-identical copy of the audited candidate."
+  ],
+  "summary": "Warm-up: ESTIMATED iff |E_{t,h}| >= 250 distinct eligible origins (all horizons; no 4W x1/4). Below threshold: beta = 0, DEFAULT_PARENT, FORECAST (identical to S0). Feature / parent prerequisite failures follow M1-MACRO-TRANSFORM-PART2A-V1 and Model Part 1 s5; never fall back to DEFAULT_PARENT. 250 is not an effective sample size.",
+  "performance_seal": "INTACT"
+}
