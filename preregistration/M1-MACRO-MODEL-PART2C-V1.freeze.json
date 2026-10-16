@@ -1,0 +1,14 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART2C-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART2C-V1.md",
+  "sha256": "1762b6e23449f36379f970862bcedd75975571743401f338b563f0e95b084e60",
+  "git_blob_sha1": "7f1a6470f16a789a5f27c09ba7ebbee414109d6e",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 04:07 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-MODEL-PART2C-V1.candidate.md)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 7f1a6470... (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 7f1a6470..., SHA-256 1762b6e2...). The frozen file is a byte-identical copy of the audited candidate."
+  ],
+  "summary": "lambda = 0 (no penalty, no shrinkage). Non-unique minimizers resolved by minimum L2 norm within the global CRPS minimizer set (tie-break, not regularization). Warm-up is not a substitute for regularization. Solver tolerance is an implementation constant fixed before implementation freeze.",
+  "performance_seal": "INTACT"
+}
