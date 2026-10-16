@@ -1,0 +1,16 @@
+{
+  "description": "Pre-registered configuration of the formal forward ledger. Changing this file changes Code_SHA256.",
+  "first_origin": {
+    "1D": "2026-10-19",
+    "1W": "2026-10-18",
+    "4W": "2026-10-18"
+  },
+  "pairs": ["USDJPY", "CHFJPY", "INRJPY"],
+  "models": {
+    "M0-RW0": "M0 specification v1.2 (frozen/m0_walkforward_v1_2.py)",
+    "S0-EMPCLIM-STD-EXP-V1": "S0 reference implementation v1.1 (frozen/s0_empclim_std_exp_v1_1.py)"
+  },
+  "cutoff_jst": "08:30",
+  "data_source": "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.zip",
+  "sealed_holdout": "RFX-HOLDOUT-A-V1 (GBPJPY, AUDJPY, CADJPY, SGDJPY, KRWJPY) is not computed by this repository"
+}
