@@ -1,0 +1,17 @@
+{
+  "spec_id": "M1-MACRO-MODEL-PART2B-V1",
+  "file": "preregistration/M1-MACRO-MODEL-PART2B-V1.md",
+  "sha256": "02fd0faf44ad9d80373d043a684d11500928eab677fe638a0fce3f50ba62461c",
+  "git_blob_sha1": "ff7a40c891fc542614cb61201e70d1b9b80959a7",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 04:00 JST (full text retrieved independently via GitHub connector from drafts/M1-MACRO-MODEL-PART2B-V1.candidate.md)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA ff7a40c8... (not SHA-256; むすび did not recompute SHA-256).",
+    "Claude computed both identifiers of the same bytes: Git blob SHA ff7a40c8... and SHA-256 02fd0faf..., linking the text むすび audited to the SHA-256 recorded here.",
+    "The frozen file is a byte-identical copy of the audited candidate (no edits)."
+  ],
+  "editorial_notes": [
+    "The phrase 'Part 2-A(Transformation)の complete case' refers to M1-MACRO-TRANSFORM-PART2A-V1 (not M1-MACRO-MODEL-PART2A-V1). Editorial clarification only; text left unchanged to keep the approved hash."
+  ],
+  "performance_seal": "INTACT"
+}
