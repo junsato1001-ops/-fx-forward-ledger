@@ -10,9 +10,16 @@ D = dt.date
 def run():
     r = {}
     # holidays
-    assert uscal.is_holiday(D(2021, 6, 18)) and not uscal.is_holiday(D(2020, 6, 19))
-    assert uscal.is_holiday(D(2021, 12, 31))          # New Year 2022 (Sat) observed Fri 2021-12-31
-    assert uscal.is_holiday(D(2017, 1, 20)) and uscal.is_holiday(D(2013, 1, 21))
+    assert uscal.is_cftc_holiday(D(2021, 6, 18)) and not uscal.is_cftc_holiday(D(2020, 6, 19))
+    assert uscal.is_cftc_holiday(D(2021, 12, 31))          # New Year 2022 (Sat) observed Fri 2021-12-31
+    assert uscal.is_cftc_holiday(D(2017, 1, 20)) and uscal.is_cftc_holiday(D(2013, 1, 21))
+    # Fixture required by むすび (V1.2 freeze, 22:33): 2021-01-20 Inauguration Day
+    assert uscal.holiday_type(D(2021, 1, 20)) == uscal.INAUGURATION_DAY_DC_AREA
+    assert uscal.is_treasury_expected_business_day(D(2021, 1, 20)) is True
+    assert uscal.is_cftc_business_day(D(2021, 1, 20)) is False
+    assert C.normal_release_date(D(2021, 1, 19)) == D(2021, 1, 25)   # CFTC: holiday week -> next Monday
+    assert uscal.holiday_type(D(2025, 12, 24)) == uscal.SPECIAL_CLOSURE
+    assert uscal.holiday_type(D(2025, 12, 25)) == uscal.FEDERAL_NATIONAL_HOLIDAY
     assert uscal.next_business_day(D(2025, 12, 23)) == D(2025, 12, 29)
     assert uscal.next_business_day(D(2025, 12, 12)) == D(2025, 12, 15)
     # 2026 official schedule (Release Schedule page) vs normal rule for Tuesday reports

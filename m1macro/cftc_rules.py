@@ -35,7 +35,7 @@ def _at(d):
 def normal_release_date(report_date):
     """Rule 3/5: Friday of the report's Mon-Sun week; next Monday if a federal holiday falls on Tue-Fri."""
     monday = report_date - dt.timedelta(days=report_date.weekday())
-    if any(uscal.is_holiday(monday + dt.timedelta(days=i)) for i in range(1, 5)):
+    if any(uscal.is_cftc_holiday(monday + dt.timedelta(days=i)) for i in range(1, 5)):
         return monday + dt.timedelta(days=7)
     return monday + dt.timedelta(days=4)
 

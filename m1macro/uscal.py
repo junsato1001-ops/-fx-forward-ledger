@@ -49,30 +49,56 @@ def statutory_holidays(y):
     add(_observed(dt.date(y, 11, 11)), "Veterans Day")
     add(_nth_weekday(y, 11, 3, 4), "Thanksgiving Day")
     add(_observed(dt.date(y, 12, 25)), "Christmas Day")
-    if (y - 1965) % 4 == 0:
-        inaug = dt.date(y, 1, 20)
-        if inaug.weekday() == 6:
-            inaug += dt.timedelta(days=1)
-        if inaug.weekday() < 5:
-            out.setdefault(inaug, "Inauguration Day (D.C. area)")
     return {d: n for d, n in out.items() if d.year == y}
+
+
+def inauguration_day(y):
+    """5 U.S.C. 6103(c): Washington D.C. area only (CFTC headquarters)."""
+    if (y - 1965) % 4 != 0:
+        return None
+    d = dt.date(y, 1, 20)
+    if d.weekday() == 6:
+        d += dt.timedelta(days=1)
+    return d if d.weekday() < 5 else None
 
 
 _cache = {}
 
+FEDERAL_NATIONAL_HOLIDAY = "FEDERAL_NATIONAL_HOLIDAY"
+INAUGURATION_DAY_DC_AREA = "INAUGURATION_DAY_DC_AREA"
+SPECIAL_CLOSURE = "SPECIAL_CLOSURE"
 
-def is_holiday(d):
+
+def holiday_type(d):
+    """Impl Part 1 V1.2 §2.3: table types are kept distinct."""
     if d.year not in _cache:
         _cache[d.year] = statutory_holidays(d.year)
-    return d in _cache[d.year] or d in SPECIAL_CLOSURES
+    if d in SPECIAL_CLOSURES:
+        return SPECIAL_CLOSURE
+    if d in _cache[d.year]:
+        return FEDERAL_NATIONAL_HOLIDAY
+    if d == inauguration_day(d.year):
+        return INAUGURATION_DAY_DC_AREA
+    return None
 
 
-def is_business_day(d):
-    return d.weekday() < 5 and not is_holiday(d)
+def is_cftc_holiday(d):
+    """CFTC rule 3 and next-business-day counts: all three types are days off (later = safer bound)."""
+    return holiday_type(d) is not None
+
+
+def is_cftc_business_day(d):
+    return d.weekday() < 5 and not is_cftc_holiday(d)
+
+
+def is_treasury_expected_business_day(d):
+    """Treasury Expected Publication Calendar (V1.2 §1.2): Inauguration Day is a publication day."""
+    return d.weekday() < 5 and holiday_type(d) not in (FEDERAL_NATIONAL_HOLIDAY, SPECIAL_CLOSURE)
 
 
 def next_business_day(d):
+    """CFTC/federal-office business day (used for 'next business day after the scheduled date')."""
     d += dt.timedelta(days=1)
-    while not is_business_day(d):
+    while not is_cftc_business_day(d):
         d += dt.timedelta(days=1)
     return d
