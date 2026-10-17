@@ -10,7 +10,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.01,
+  "sec": 0.0,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -18,7 +18,7 @@
    "ok": true,
    "schedule_2026_mismatch": {}
   },
-  "sec": 0.03,
+  "sec": 0.02,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -26,40 +26,40 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 25.7,
+    "build_sec": 20.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.3,
+    "solve_sec": 5.2,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.2,
+    "build_sec": 19.9,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.9,
+    "solve_sec": 5.6,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.0,
+    "build_sec": 19.9,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.2,
+    "solve_sec": 5.0,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 95.32,
+  "sec": 76.01,
   "status": "PASS"
  },
  "test_indep": {
@@ -112,7 +112,7 @@
    "D_600x800": {
     "d_UB": 2.220446049250313e-16,
     "d_beta_inf": 1.9880321347476304e-13,
-    "d_mu_over_sigma": 3.827413938260714e-11,
+    "d_mu_over_sigma": 3.8274139382607144e-11,
     "indep_gap": 4.440892098500626e-16,
     "iterations": 10,
     "method": "epigraph",
@@ -132,7 +132,7 @@
     "pass_mu": true
    }
   },
-  "sec": 157.08,
+  "sec": 126.0,
   "status": "PASS"
  },
  "test_solver": {
@@ -197,7 +197,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.6,
+    "sec": 1.3,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -207,7 +207,7 @@
     ],
     "ok": true,
     "phi2_lb": 1.0343952490597432e-16,
-    "sec": 0.3,
+    "sec": 0.2,
     "ub_lb": 1.0343952490597432e-16
    },
    "E": {
@@ -215,7 +215,7 @@
     "ok": true
    }
   },
-  "sec": 5.97,
+  "sec": 4.58,
   "status": "PASS"
  }
 }
