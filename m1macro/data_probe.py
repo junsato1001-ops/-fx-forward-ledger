@@ -21,15 +21,15 @@ SRC = {
 }
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from m1macro import tls, cftc_parse  # noqa: E402
+
+CFTC_HIST = ["https://www.cftc.gov/files/dea/history/fin_fut_txt_2006_2016.zip"] + [
+    f"https://www.cftc.gov/files/dea/history/fut_fin_txt_{y}.zip" for y in range(2017, 2026)]
+
+
 def _ctx(url, outdir):
-    import ssl
-    if "cftc.gov" not in url:
-        return None
-    ctx = ssl.create_default_context()
-    pem = Path(outdir, "R46_from_host.pem")
-    if pem.exists():
-        ctx.load_verify_locations(cafile=str(pem))
-    return ctx
+    return tls.context_for(url)
 
 
 def get(url, outdir="out"):
@@ -67,13 +67,39 @@ def main(outdir):
                 rec["jpy_sample"] = [dict(zip(hdr, r)) for r in jp[:2]]
                 rec["n_rows"] = len(rd) - 1
             else:
-                t = b.decode("utf-8", errors="replace")
-                import re
-                i = t.find("Release Schedule")
-                rec["text_sample"] = re.sub(r"<[^>]+>", " ", t[i:i + 6000])[:3000]
+                Path(outdir, "cftc_schedule.html").write_bytes(b)   # public domain (Part 1 §4)
             out[k] = rec
         except Exception as e:
             out[k] = {"url": u, "error": repr(e)}
+    hist = {}
+    for u in CFTC_HIST:
+        k = u.rsplit("/", 1)[1]
+        try:
+            b, st, ct, sec = get(u, outdir)
+            z = zipfile.ZipFile(io.BytesIO(b))
+            raw = z.read(z.namelist()[0])
+            txt = raw.decode("utf-8-sig", errors="replace")
+            rd = csv.reader(io.StringIO(txt)); hdr = [h.strip() for h in next(rd)]
+            c = cftc_parse.cols()
+            dcol = next((d for d in c["report_date_candidates"] if d in hdr), None)
+            rec = {"bytes": len(b), "sha256": hashlib.sha256(b).hexdigest(), "members": z.namelist(),
+                   "header_has": {n: (n in hdr) for n in [c["contract_code"], c["lev_long"], c["lev_short"], c["open_interest"]]},
+                   "date_cols": [h for h in hdr if "Date" in h], "date_col_used": dcol}
+            if dcol:
+                ci, di = hdr.index(c["contract_code"]), hdr.index(dcol)
+                ds = [r[di] for r in rd if len(r) > max(ci, di) and r[ci].strip() == "097741"]
+                rec["jpy_date_strings_sample"] = ds[:2] + ds[-2:]; rec["jpy_rows"] = len(ds)
+            try:
+                p = cftc_parse.parse_zip(b)
+                rec["parsed"] = {"n": len(p), "min": str(min(p)), "max": str(max(p)),
+                                 "oi_missing": sum(1 for r in p.values() if r.oi is None),
+                                 "oi_zero": sum(1 for r in p.values() if r.oi == 0)}
+            except Exception as e:
+                rec["parse_error"] = repr(e)
+            hist[k] = rec
+        except Exception as e:
+            hist[k] = {"error": repr(e)}
+    out["cftc_history"] = hist
     Path(outdir, "data_probe.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps({k: (v.get("http"), v.get("bytes"), v.get("error")) for k, v in out.items()}))
 

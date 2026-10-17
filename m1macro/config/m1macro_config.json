@@ -34,5 +34,23 @@
   "00:40",
   "02:40"
  ],
- "cftc_snapshot_window_hours": 6
+ "cftc_snapshot_window_hours": 6,
+ "cftc_tls": {
+  "root_file": "certs/SectigoPublicServerAuthenticationRootR46.pem",
+  "root_sha256": "7bb647a62aeeac88bf257aa522d01ffea395e0ab45c73f93f65654ec38f25a06",
+  "root_subject": "C=GB, O=Sectigo Limited, CN=Sectigo Public Server Authentication Root R46",
+  "fingerprint_source": "Mozilla Bugzilla 1840432 (CA inclusion record) and runner trust store /etc/ssl/certs (dev run 39038301649)"
+ },
+ "cftc_columns": {
+  "contract_code": "CFTC_Contract_Market_Code",
+  "contract_code_value": "097741",
+  "report_date_candidates": [
+   "Report_Date_as_YYYY-MM-DD",
+   "Report_Date_as_MM_DD_YYYY"
+  ],
+  "lev_long": "Lev_Money_Positions_Long_All",
+  "lev_short": "Lev_Money_Positions_Short_All",
+  "open_interest": "Open_Interest_All",
+  "status": "checked against fut_fin_txt_2026.zip header (dev run 39038301649); historical files pending header probe"
+ }
 }
