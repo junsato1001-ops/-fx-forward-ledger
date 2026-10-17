@@ -26,17 +26,6 @@ jobs:
           docker pull -q "$DIG" > /dev/null
           docker run --rm "$DIG" python -c "import sys,platform;print(sys.version);print(platform.platform())" > out/env/python.txt
           (grep -m1 'model name' /proc/cpuinfo; nproc) > out/env/cpu.txt
-      - name: TLS chain probe (cftc.gov)
-        continue-on-error: true
-        timeout-minutes: 5
-        run: |
-          set +e
-          mkdir -p out
-          { echo | timeout 30 openssl s_client -connect www.cftc.gov:443 -servername www.cftc.gov -showcerts 2>&1 | grep -E "s:|i:|Verify return" ;
-            DIG=$(cat env/IMAGE_DIGEST); docker run --rm "$DIG" sh -c 'ls -la /etc/ssl/certs | head -3; python -c "import ssl;print(ssl.get_default_verify_paths(), ssl.OPENSSL_VERSION)"' ;
-            for f in /etc/ssl/certs/*.pem; do openssl x509 -in "$f" -noout -subject 2>/dev/null | grep -q "Sectigo Public Server Authentication Root R46" && cp "$f" out/R46_from_host.pem; done;
-            ls -la out/R46_from_host.pem; openssl x509 -in out/R46_from_host.pem -noout -subject -issuer -fingerprint -sha256 -dates ;
-            timeout 90 python3 -c "import ssl,urllib.request;print('host python', urllib.request.urlopen('https://www.cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule/index.htm',timeout=60).status)" ; } > out/tls_probe.txt 2>&1
       - name: Run dev suite inside pinned image (synthetic only)
         run: |
           set -eu
@@ -47,7 +36,7 @@ jobs:
               pip install -q --require-hashes -r out/env/requirements.lock &&
               python -c "import numpy,scipy,highspy,tzdata;print(numpy.__version__,scipy.__version__)" > out/env/import_check.txt &&
               if [ -f m1macro/dev_suite.py ]; then python -I m1macro/dev_suite.py out; else echo "no suite yet" > out/suite.txt; fi;
-              if [ -f m1macro/data_probe.py ]; then python -I m1macro/data_probe.py out; fi' \
+              mkdir -p out/snapcheck && python -I m1macro/snapshot_acq.py out/snapcheck check' \
             > out/run_stdout.txt 2>&1 || echo "SUITE_EXIT=$?" >> out/run_stdout.txt
           tail -50 out/run_stdout.txt
       - name: Commit results to m1macro-dev-results

@@ -38,7 +38,13 @@ def run():
     r = P.parse_zip(_zip(t))
     assert set(r) == {dt.date(2026, 10, 13), dt.date(2026, 10, 6)}
     assert r[dt.date(2026, 10, 13)].long == 65309 and r[dt.date(2026, 10, 13)].oi == 373502
-    assert r[dt.date(2026, 10, 6)].oi is None               # -> TOTAL_OI_MISSING downstream
+    assert r[dt.date(2026, 10, 6)].oi is None
+    old = H + '"JAPANESE YEN",12/27/2016 12:00:00 AM,097741,170000.000000,30369.000000,40000.000000\n'
+    assert P.parse_zip(_zip(old))[dt.date(2016, 12, 27)].long == 30369
+    try:
+        P.parse_zip(_zip(H + '"JPY",2026-10-13,097741,1,1.5,1\n')); raise AssertionError("fraction accepted")
+    except P.ParseFailure:
+        pass               # -> TOTAL_OI_MISSING downstream
     for bad in (H + '"JPY",2026-10-13,097741,1,1,1\n"JPY",2026-10-13,097741,1,1,1\n',   # duplicate date
                 H.replace("Lev_Money_Positions_Short_All", "X") + '"JPY",2026-10-13,097741,1,1,1\n',  # missing column
                 H + '"JPY",2026-10-13,097741,1,,1\n'):                                  # missing positions

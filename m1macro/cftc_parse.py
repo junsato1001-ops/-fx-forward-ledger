@@ -4,6 +4,7 @@ import datetime as dt
 import io
 import json
 import zipfile
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from m1macro.cftc_feature import Report
@@ -29,10 +30,17 @@ def parse_report_date(s: str) -> dt.date:
 
 
 def _int(s):
+    """Integer counts; the 2006-2016 file writes them as e.g. '30369.000000'. A non-integral value is a parse failure."""
     s = (s or "").strip()
     if s in ("", "."):
         return None
-    return int(s)
+    try:
+        d = Decimal(s)
+    except InvalidOperation:
+        raise ParseFailure("non-numeric count")
+    if not d.is_finite() or d != d.to_integral_value():
+        raise ParseFailure("non-integral count")
+    return int(d)
 
 
 def parse_text(text: str, c=None) -> dict:

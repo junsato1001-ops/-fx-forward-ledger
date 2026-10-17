@@ -45,12 +45,11 @@
   "contract_code": "CFTC_Contract_Market_Code",
   "contract_code_value": "097741",
   "report_date_candidates": [
-   "Report_Date_as_YYYY-MM-DD",
-   "Report_Date_as_MM_DD_YYYY"
+   "Report_Date_as_YYYY-MM-DD"
   ],
   "lev_long": "Lev_Money_Positions_Long_All",
   "lev_short": "Lev_Money_Positions_Short_All",
   "open_interest": "Open_Interest_All",
-  "status": "checked against fut_fin_txt_2026.zip header (dev run 39038301649); historical files pending header probe"
+  "status": "checked against the headers of fin_fut_txt_2006_2016.zip and fut_fin_txt_2017..2026.zip (dev runs 39038301649, 39038642316); 2006-2016 uses M/D/YYYY 12:00:00 AM dates and counts written as N.000000"
  }
 }

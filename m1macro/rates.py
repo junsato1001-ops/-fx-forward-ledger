@@ -44,11 +44,12 @@ def parse_treasury_csv(b: bytes) -> Dict[dt.date, Decimal]:
         if v in ("", "N/A"):
             continue
         try:
-            out[d] = Decimal(v)
+            val = Decimal(v)
         except InvalidOperation:
-            raise ParseError(f"bad value {v!r}")
-        if d in out and out[d] != Decimal(v):
+            raise ParseError("bad value")
+        if d in out and out[d] != val:
             raise ParseError("duplicate date with different value")
+        out[d] = val
     return out
 
 
