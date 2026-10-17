@@ -26,12 +26,14 @@ def _clock(*ts):
 def write_final(root, code_sha, first=FIRST):
     """Test fixture: a consistent FINAL freeze state (record, marker, audit) in a working tree."""
     root = Path(root); rec = _rec(code_sha, first); af = F.a_first(first, 6)
+    t0 = min(af.values()) - dt.timedelta(days=2)                     # freeze well before every A_first(h)
+    ts = lambda s: F.utc_s(t0 + dt.timedelta(seconds=s))
     m = {"Run_ID": "FZ", "Run_Attempt": "1", "Record_Path": F.RECORD, "Record_SHA256": hashlib.sha256(rec).hexdigest(),
-         "Record_Main_Commit": "0" * 40, "Code_SHA256": code_sha, "Record_Reread_At_UTC": "2026-10-20T00:00:10Z",
-         "Status": "COMPLETE", "Recorded_At_UTC": "2026-10-20T00:00:11Z"}
-    a = {"Run_ID": "FZ", "Run_Attempt": "1", "Code_SHA256": code_sha, "Run_Started_At_Server_UTC": "2026-10-20T00:00:00Z",
+         "Record_Main_Commit": "0" * 40, "Code_SHA256": code_sha, "Record_Reread_At_UTC": ts(10),
+         "Status": "COMPLETE", "Recorded_At_UTC": ts(11)}
+    a = {"Run_ID": "FZ", "Run_Attempt": "1", "Code_SHA256": code_sha, "Run_Started_At_Server_UTC": ts(0),
          "Record_Reread_At_UTC": m["Record_Reread_At_UTC"], "Recorded_At_UTC": m["Recorded_At_UTC"],
-         "Marker_Reread_At_UTC": "2026-10-20T00:00:20Z", "Anchor_Status": "PASS",
+         "Marker_Reread_At_UTC": ts(20), "Anchor_Status": "PASS",
          **{f"A_First_{h}_UTC": F.utc_s(af[h]) for h in F.HORIZONS}, "D2_Status": "PASS", "Freeze_Status": "FINAL"}
     for p, b in ((F.RECORD, rec), (F.MARKER, F.header_bytes(F.MARKER_FIELDS) + F.row_bytes(F.MARKER_FIELDS, m)),
                  (F.AUDIT, F.header_bytes(F.AUDIT_FIELDS) + F.row_bytes(F.AUDIT_FIELDS, a))):
@@ -114,7 +116,7 @@ def run():
         orig = {x: (p / x).read_bytes() for x in (F.RECORD, F.MARKER, F.AUDIT)}
         for path, new in ((F.RECORD, orig[F.RECORD].replace(b"\n}", b',"x":1\n}')),
                           (F.MARKER, orig[F.MARKER] + orig[F.MARKER].split(b"\n", 1)[1]),
-                          (F.AUDIT, orig[F.AUDIT].replace(b"2026-10-20T00:00:00Z", b"2026-10-20T00:00:12Z")),
+                          (F.AUDIT, orig[F.AUDIT].replace(b"2026-11-07T12:00:00Z", b"2026-11-07T12:00:12Z")),  # start > reread
                           (F.AUDIT, orig[F.AUDIT].replace(b"FINAL", b"REJECTED")),
                           (F.AUDIT, orig[F.AUDIT].replace(b"2026-11-09T12:00:00Z", b"2026-11-09T13:00:00Z")),
                           (F.AUDIT, b"")):
