@@ -1,13 +1,38 @@
 {
-  "config_version": "candidate-dev",
-  "model": "M1-MACRO-V1",
-  "private_raw_storage": {
-    "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
-    "auth_secret_name": "PRIVATE_RAW_TOKEN",
-    "approved": "むすび 2026-10-17 17:14 JST (connectivity probe run 39016504914 PASS)"
-  },
-  "solver_constants": {"EPS_TIE": 1e-13, "LAMBDA_LEV": 0.3, "BOX_B": 10.0, "CAND_SIZES": [8, 12, 16, 24],
-                       "STAGE1_MAX": 3000, "STAGE2_MAX": 100, "LP_TOL": 1e-10},
-  "pending": ["CFTC exception tables (IMPL-FINDINGS-01 #1)", "production Usable_From guard (IMPL-FINDINGS-01 #2)",
-              "series URLs and column names", "first forward origin (set at implementation freeze)"]
+ "config_version": "candidate-dev",
+ "model": "M1-MACRO-V1",
+ "private_raw_storage": {
+  "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
+  "auth_secret_name": "PRIVATE_RAW_TOKEN",
+  "approved": "むすび 2026-10-17 17:14 JST (connectivity probe run 39016504914 PASS)"
+ },
+ "solver_constants": {
+  "EPS_TIE": 1e-13,
+  "LAMBDA_LEV": 0.3,
+  "BOX_B": 10.0,
+  "CAND_SIZES": [
+   8,
+   12,
+   16,
+   24
+  ],
+  "STAGE1_MAX": 3000,
+  "STAGE2_MAX": 100,
+  "LP_TOL": 1e-10
+ },
+ "pending": [
+  "series URLs and column names",
+  "first forward origin (set at implementation freeze)"
+ ],
+ "frozen_specs": {
+  "M1-MACRO-IMPL-PART1-V1.1": "04b49c7e96b2ec520e6562df25391dab5efc7ac32c5ac82128eda4598f233e1b",
+  "M1-MACRO-IMPL-PART2-V1": "1789ff486b01ad27840bc596b053c5c58a52c7f679afd8d18f74525e30ba8756",
+  "M1-MACRO-IMPL-PART3-V1": "a6ea20968ec76cfdd485e1c55bda25d5d402f34212ed4cf5a8e68870e4d2a592",
+  "M1-MACRO-IMPL-PART4-V1": "f5b1571a006debe39a9000a29b3ac9dc1e6602e43c9025d811e76480a101f2ca"
+ },
+ "cftc_pre_tinfo_fetch_jst": [
+  "00:40",
+  "02:40"
+ ],
+ "cftc_snapshot_window_hours": 6
 }
