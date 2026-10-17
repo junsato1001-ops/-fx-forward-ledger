@@ -6,45 +6,60 @@
   "sec": 0.01,
   "status": "PASS"
  },
+ "test_cftc_feature": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.01,
+  "status": "PASS"
+ },
+ "test_cftc_rules": {
+  "detail": {
+   "ok": true,
+   "schedule_2026_mismatch": {}
+  },
+  "sec": 0.03,
+  "status": "PASS"
+ },
  "test_fullscale": {
   "detail": {
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 25.5,
+    "build_sec": 25.7,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.1,
+    "solve_sec": 6.3,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.3,
+    "build_sec": 25.2,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.7,
+    "solve_sec": 6.9,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.2,
+    "build_sec": 25.0,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.3,
+    "solve_sec": 6.2,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 95.15,
+  "sec": 95.32,
   "status": "PASS"
  },
  "test_indep": {
@@ -117,7 +132,7 @@
     "pass_mu": true
    }
   },
-  "sec": 157.71,
+  "sec": 157.08,
   "status": "PASS"
  },
  "test_solver": {
@@ -182,7 +197,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.7,
+    "sec": 1.6,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -200,7 +215,7 @@
     "ok": true
    }
   },
-  "sec": 6.02,
+  "sec": 5.97,
   "status": "PASS"
  }
 }

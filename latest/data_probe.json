@@ -1,0 +1,76 @@
+{
+ "treasury_2026": {
+  "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
+  "http": 200,
+  "content_type": "text/csv; charset=UTF-8",
+  "bytes": 16229,
+  "sha256": "b06702248327bb7aa652e3be1d104649bb7cce199bf04c176e4d62a9ff6803d8",
+  "sec": 19.4,
+  "header": "Date,\"1 Mo\",\"1.5 Month\",\"2 Mo\",\"3 Mo\",\"4 Mo\",\"6 Mo\",\"1 Yr\",\"2 Yr\",\"3 Yr\",\"5 Yr\",\"7 Yr\",\"10 Yr\",\"20 Yr\",\"30 Yr\"",
+  "n_lines": 200,
+  "first_col_first": "10/16/2026",
+  "first_col_last": "01/02/2026"
+ },
+ "treasury_2010": {
+  "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2010/all?type=daily_treasury_yield_curve&field_tdr_date_value=2010&page&_format=csv",
+  "http": 200,
+  "content_type": "text/csv; charset=UTF-8",
+  "bytes": 16672,
+  "sha256": "f973bd3988989d3e408655cbc7fed89faefbaa8a1c111ec313241fb47fc75e2d",
+  "sec": 18.3,
+  "header": "Date,\"1 Mo\",\"3 Mo\",\"6 Mo\",\"1 Yr\",\"2 Yr\",\"3 Yr\",\"5 Yr\",\"7 Yr\",\"10 Yr\",\"20 Yr\",\"30 Yr\"",
+  "n_lines": 253,
+  "first_col_first": "12/31/2010",
+  "first_col_last": "01/04/2010"
+ },
+ "mof_all": {
+  "url": "https://www.mof.go.jp/jgbs/reference/interest_rate/data/jgbcm_all.csv",
+  "http": 200,
+  "content_type": "text/csv",
+  "bytes": 1178227,
+  "sha256": "3ed93b158ca7abec8c8c17e9b6b7c04df50cd4da276d731c5625bbca6afce951",
+  "sec": 2.4,
+  "encoding": "shift_jis",
+  "head": [
+   "国債金利情報,,,,,,,,,,,,,,,(単位 : %)",
+   "基準日,1年,2年,3年,4年,5年,6年,7年,8年,9年,10年,15年,20年,25年,30年,40年",
+   "S49.9.24,10.327,9.362,8.83,8.515,8.348,8.29,8.24,8.121,8.127,-,-,-,-,-,-",
+   "S49.9.25,10.333,9.364,8.831,8.516,8.348,8.29,8.24,8.121,8.127,-,-,-,-,-,-"
+  ],
+  "tail": [
+   "R8.9.28,1.689,1.981,2.125,2.311,2.441,2.55,2.666,2.821,2.949,3.082,3.602,3.888,4.149,4.122,4.124",
+   "R8.9.29,1.692,1.976,2.116,2.302,2.425,2.545,2.662,2.818,2.946,3.082,3.603,3.887,4.144,4.126,4.127",
+   "R8.9.30,1.684,1.952,2.086,2.273,2.399,2.525,2.639,2.796,2.926,3.057,3.583,3.877,4.131,4.098,4.099"
+  ],
+  "n_lines": 13311
+ },
+ "mof_current": {
+  "url": "https://www.mof.go.jp/jgbs/reference/interest_rate/jgbcm.csv",
+  "http": 200,
+  "content_type": "text/csv",
+  "bytes": 1261,
+  "sha256": "4d2d060bbd937f602fdcf8f5d7d0e2c958c2d955df20879ab9744715b8b32248",
+  "sec": 0.7,
+  "encoding": "shift_jis",
+  "head": [
+   "国債金利情報 (令和8年10月),,,,,,,,,,,,,,,(単位 : %)",
+   "基準日,1年,2年,3年,4年,5年,6年,7年,8年,9年,10年,15年,20年,25年,30年,40年",
+   "R8.10.1,1.668,1.939,2.077,2.274,2.407,2.534,2.657,2.82,2.952,3.092,3.62,3.91,4.154,4.122,4.125",
+   "R8.10.2,1.65,1.919,2.065,2.259,2.397,2.528,2.657,2.821,2.957,3.097,3.626,3.925,4.171,4.148,4.168"
+  ],
+  "tail": [
+   "R8.10.15,1.652,1.913,2.045,2.209,2.331,2.431,2.535,2.686,2.818,2.948,3.489,3.786,4.048,4.024,4.031",
+   ",,,,,,,,,,,,,,,",
+   "※最新のcsvデータがダウンロードできない場合、ご利用のブラウザにおいてキャッシュの削除を実施し再度ダウンロードください。,,,,,,,,,,,,,,,"
+  ],
+  "n_lines": 14
+ },
+ "cftc_2026": {
+  "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2026.zip",
+  "error": "URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)'))"
+ },
+ "cftc_schedule": {
+  "url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule/index.htm",
+  "error": "URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)'))"
+ }
+}
