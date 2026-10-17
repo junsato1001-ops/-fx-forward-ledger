@@ -90,3 +90,36 @@ def verify_against_issued(outputs, issued):
 def pool(pools, pair, horizon, origin_iso):
     p = pools[(pair, horizon)]
     return np.sort(p["cand"][:p["n"][origin_iso]], kind="stable")
+
+
+FROZEN_SHA = {   # tests/test_reproduce_frozen.py (frozen formal ledger and S0 v1.1 outputs)
+    "zip": "f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649",
+    "ledger": "e4edb850c480626398d192e5232e8e88bdedb8e82697ceaa6e94470f36c38120",
+    "s0": "98e94866251a0b72377a241fddc3b2aa2bce912248511a3df8b30421afe3fcc1",
+}
+ECB_DEV_ZIP = ROOT / "tests" / "fixtures" / "eurofxref-hist_20261009.zip"
+
+
+def reconstruct(tmpdir):
+    """Reconstruction period (Part 3 §4): M0 rows and S0 outputs from the ECB development snapshot, each checked
+    byte for byte against the frozen SHA-256 (ledger e4edb850..., S0 98e94866...). Pools are captured from that
+    same frozen S0 run. Returns (m0_rows_as_loaded, s0_outputs, pools)."""
+    import sys
+    sys.path.insert(0, str(ROOT / "forward"))
+    import ledger_builder as lb
+    zb = ECB_DEV_ZIP.read_bytes()
+    if hashlib.sha256(zb).hexdigest() != FROZEN_SHA["zip"]:
+        raise PipelineFailure("ECB_DEV_SNAPSHOT_SHA")
+    m0, mp, s0 = lb.load_frozen()
+    _, raw = lb.read_ecb_zip(zb)
+    p = Path(tmpdir) / "m0_ledger.csv"
+    lb.write_csv(p, lb.build_rows(m0, mp, raw))
+    if hashlib.sha256(p.read_bytes()).hexdigest() != FROZEN_SHA["ledger"]:
+        raise PipelineFailure("M0_LEDGER_SHA")
+    rows = s0.load_csv(p)
+    outputs, pools = regenerate(s0, rows)
+    q = Path(tmpdir) / "s0.csv"
+    s0.write_csv(q, outputs)
+    if hashlib.sha256(q.read_bytes()).hexdigest() != FROZEN_SHA["s0"]:
+        raise PipelineFailure("S0_OUTPUT_SHA")
+    return rows, outputs, pools

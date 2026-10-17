@@ -93,3 +93,33 @@ def code_manifest_bytes(entries: Sequence[tuple]) -> bytes:
 
 def range_sha256(row_bytes: Sequence[bytes]) -> str:
     return sha256_hex(b"".join(row_bytes))
+
+
+def pool_sorted_np(z):
+    """Vectorized pool_sorted (same order): numeric sort, then within the run of zeros +0.0 before -0.0
+    (the only numerically equal values whose hex strings differ)."""
+    import numpy as np
+    a = np.asarray(z, dtype=np.float64)
+    if not np.all(np.isfinite(a)):
+        raise NonFinite("pool")
+    a = np.sort(a, kind="stable")
+    zero = np.flatnonzero(a == 0.0)
+    if len(zero):
+        lo, hi = zero[0], zero[-1] + 1
+        neg = np.signbit(a[lo:hi]).sum()
+        a[lo:hi - neg] = 0.0
+        a[hi - neg:hi] = -0.0
+    return a
+
+
+def pool_bytes_np(pair: str, origin: str, horizon: str, z) -> bytes:
+    import numpy as np
+    a = pool_sorted_np(z)
+    hx = np.ascontiguousarray(a, dtype=">f8").tobytes().hex()
+    body = "\n".join(hx[i:i + 16] for i in range(0, len(hx), 16))
+    head = f"POOL_V1\n{pair},{origin},{horizon},{int_ascii(len(a))}\n"
+    return (head + body + ("\n" if len(a) else "")).encode("ascii")
+
+
+def pool_sha256_np(pair: str, origin: str, horizon: str, z) -> str:
+    return sha256_hex(pool_bytes_np(pair, origin, horizon, z))
