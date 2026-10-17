@@ -11,40 +11,40 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 20.1,
+    "build_sec": 25.5,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 5.3,
+    "solve_sec": 6.1,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 19.9,
+    "build_sec": 25.3,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 5.8,
+    "solve_sec": 6.7,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 19.8,
+    "build_sec": 25.2,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 5.3,
+    "solve_sec": 6.3,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 76.18,
+  "sec": 95.15,
   "status": "PASS"
  },
  "test_indep": {
@@ -57,6 +57,28 @@
     "indep_gap": 1.1102230246251565e-16,
     "iterations": 2,
     "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   },
+   "D_12000x6000_a": {
+    "d_UB": 8.881784197001252e-16,
+    "d_beta_inf": 6.29860211470018e-09,
+    "d_mu_over_sigma": 1.0415101433183471e-06,
+    "indep_gap": 3.717026686445024e-13,
+    "iterations": 38,
+    "method": "kelley_fast_longdouble",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   },
+   "D_12000x6000_b": {
+    "d_UB": 1.1546319456101628e-13,
+    "d_beta_inf": 1.332765775085426e-08,
+    "d_mu_over_sigma": 1.703302885072788e-06,
+    "indep_gap": 8.850697952311748e-13,
+    "iterations": 37,
+    "method": "kelley_fast_longdouble",
     "pass_UB": true,
     "pass_beta": true,
     "pass_mu": true
@@ -75,7 +97,7 @@
    "D_600x800": {
     "d_UB": 2.220446049250313e-16,
     "d_beta_inf": 1.9880321347476304e-13,
-    "d_mu_over_sigma": 3.8274139382607144e-11,
+    "d_mu_over_sigma": 3.827413938260714e-11,
     "indep_gap": 4.440892098500626e-16,
     "iterations": 10,
     "method": "epigraph",
@@ -95,7 +117,7 @@
     "pass_mu": true
    }
   },
-  "sec": 35.04,
+  "sec": 157.71,
   "status": "PASS"
  },
  "test_solver": {
@@ -160,7 +182,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.4,
+    "sec": 1.7,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -170,7 +192,7 @@
     ],
     "ok": true,
     "phi2_lb": 1.0343952490597432e-16,
-    "sec": 0.2,
+    "sec": 0.3,
     "ub_lb": 1.0343952490597432e-16
    },
    "E": {
@@ -178,7 +200,7 @@
     "ok": true
    }
   },
-  "sec": 4.71,
+  "sec": 6.02,
   "status": "PASS"
  }
 }
