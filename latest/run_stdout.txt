@@ -3,6 +3,19 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
+{"not_issued_recorded": 1}
+{"status": "AFTER_CUTOFF"}
+{"not_issued_recorded": 0}
+{"status": "AFTER_CUTOFF"}
+[{"origin": "2026-10-07", "run_id": "R2", "status": "COMPLETE", "deadline_status": "LATE", "failed_step": null}]
+[{"origin": "2026-10-08", "run_id": "R3", "status": "COMPLETE", "deadline_status": "LATE", "failed_step": null}]
+{"not_issued_recorded": 1}
+{"status": "AFTER_CUTOFF"}
+{"not_issued_recorded": 1}
+{"status": "AFTER_CUTOFF"}
+[{"origin": "2026-10-09", "run_id": "R4", "status": "COMPLETE", "deadline_status": "ON_TIME", "failed_step": null}]
+{"deadline_audit_gate": "FAIL", "violations": ["NOT_ISSUED_THEN_ON_TIME"]}
+{"deadline_audit_gate": "FAIL", "violations": ["NOT_ISSUED_THEN_ON_TIME"]}
 {"run_id": "R1", "status": "REFUSED_NOT_FROZEN", "n_tx": 0, "n_not_issued": 0}
 [{"origin": "2026-10-08", "run_id": "R1", "status": "COMPLETE", "deadline_status": "ON_TIME", "failed_step": null}]
 [{"origin": "2026-10-08", "status": "ALREADY_COMPLETE"}]
@@ -10,5 +23,5 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 {"status": "AFTER_CUTOFF"}
 {"not_issued_recorded": 0}
 {"status": "AFTER_CUTOFF"}
-{"test_canon": "PASS", "test_cftc_rules": "PASS", "test_cftc_feature": "PASS", "test_rates": "PASS", "test_s0link": "PASS", "test_forecast": "PASS", "test_cftc_parse": "PASS", "test_cftc_schedule": "PASS", "test_features": "PASS", "test_ledger_tx": "PASS", "test_gitrepo_tx": "PASS", "test_forward_commit": "PASS", "test_estimation": "PASS", "test_reconstruct": "PASS", "test_forward_run": "PASS", "test_solver": "PASS", "test_fullscale": "PASS", "test_indep": "PASS"}
+{"test_canon": "PASS", "test_cftc_rules": "PASS", "test_cftc_feature": "PASS", "test_rates": "PASS", "test_s0link": "PASS", "test_forecast": "PASS", "test_cftc_parse": "PASS", "test_cftc_schedule": "PASS", "test_features": "PASS", "test_ledger_tx": "PASS", "test_gitrepo_tx": "PASS", "test_forward_commit": "PASS", "test_deadline_gate": "PASS", "test_manifest_gate": "PASS", "test_freeze_gate": "PASS", "test_estimation": "PASS", "test_reconstruct": "PASS", "test_forward_run": "PASS", "test_solver": "PASS", "test_fullscale": "PASS", "test_indep": "PASS"}
 {"ok": true, "n_files": 50, "errors": []}
