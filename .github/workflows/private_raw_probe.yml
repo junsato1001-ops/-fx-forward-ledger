@@ -1,0 +1,64 @@
+name: private-raw-connectivity-probe
+# Connectivity check for the private immutable storage (Impl Part 1 §4, Part 4 §8).
+# Writes one small probe text file (no market data) to the private repository,
+# reads it back from a fresh clone, and records only metadata on public main.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: private-raw-probe
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      PRIVATE_REPO: junsato1001-ops/fx-ledger-private-raw
+      TOKEN: ${{ secrets.PRIVATE_RAW_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe private repository (write, push, fresh-clone readback)
+        id: probe
+        run: |
+          set -u
+          STATUS=FAIL; REASON=""; PCOMMIT=""; SHA=""; BYTES=""; MATCH=false
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          PROBE="probe/connectivity_${GITHUB_RUN_ID}.txt"
+          if [ -z "${TOKEN}" ]; then
+            REASON="SECRET_PRIVATE_RAW_TOKEN_MISSING"
+          else
+            URL="https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git"
+            if git clone -q "$URL" priv 2>/dev/null; then
+              cd priv
+              git config user.name "junsato1001-ops"
+              git config user.email "junsato1001-ops@users.noreply.github.com"
+              mkdir -p probe
+              printf 'connectivity probe; no market data\nrun_id=%s\nutc=%s\n' "$GITHUB_RUN_ID" "$NOW" > "$PROBE"
+              SHA=$(sha256sum "$PROBE" | cut -d' ' -f1); BYTES=$(stat -c %s "$PROBE")
+              git add "$PROBE" && git commit -q -m "connectivity probe ${GITHUB_RUN_ID}"
+              if git push -q origin HEAD:main 2>/dev/null; then
+                PCOMMIT=$(git rev-parse HEAD); cd ..
+                if git clone -q "$URL" priv2 2>/dev/null && [ -f "priv2/$PROBE" ]; then
+                  RB=$(sha256sum "priv2/$PROBE" | cut -d' ' -f1)
+                  if [ "$RB" = "$SHA" ] && [ "$(git -C priv2 rev-parse HEAD)" = "$PCOMMIT" ]; then MATCH=true; STATUS=PASS; else REASON="READBACK_MISMATCH"; fi
+                else REASON="READBACK_FAILED"; fi
+              else REASON="PUSH_FAILED"; cd ..; fi
+            else REASON="CLONE_FAILED (repository name or token permission)"; fi
+          fi
+          rm -rf priv priv2
+          mkdir -p audit_log
+          cat > audit_log/private_raw_probe.json <<J
+          {"run_id": "${GITHUB_RUN_ID}", "checked_at_utc": "${NOW}", "private_repository": "${PRIVATE_REPO}",
+           "probe_path": "${PROBE}", "probe_bytes": "${BYTES}", "probe_sha256": "${SHA}",
+           "private_commit": "${PCOMMIT}", "fresh_clone_readback_match": ${MATCH},
+           "status": "${STATUS}", "reason": "${REASON}",
+           "note": "Probe file contains only run id and timestamp, no market data. Token never written."}
+          J
+      - name: Record result on public main (metadata only)
+        run: |
+          git config user.name "junsato1001-ops"
+          git config user.email "junsato1001-ops@users.noreply.github.com"
+          git add audit_log/private_raw_probe.json
+          git commit -q -m "audit: private raw storage connectivity probe ${GITHUB_RUN_ID}"
+          for i in 1 2 3 4 5; do git pull -q --rebase && git push -q && break; sleep 5; done
+          cat audit_log/private_raw_probe.json
