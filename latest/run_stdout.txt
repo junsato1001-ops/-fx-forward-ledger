@@ -1,6 +1,10 @@
+debconf: delaying package configuration, since apt-utils is not installed
 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
 
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-{"test_canon": "PASS", "test_cftc_rules": "PASS", "test_cftc_feature": "PASS", "test_rates": "PASS", "test_s0link": "PASS", "test_forecast": "PASS", "test_cftc_parse": "PASS", "test_cftc_schedule": "PASS", "test_features": "PASS", "test_ledger_tx": "PASS", "test_estimation": "PASS", "test_solver": "PASS", "test_fullscale": "PASS", "test_indep": "PASS"}
+{"run_id": "R1", "status": "REFUSED_NOT_FROZEN"}
+{"run_id": "R1", "status": "COMPLETE", "deadline_status": "ON_TIME", "failed_step": null}
+{"status": "ALREADY_COMPLETE"}
+{"test_canon": "PASS", "test_cftc_rules": "PASS", "test_cftc_feature": "PASS", "test_rates": "PASS", "test_s0link": "PASS", "test_forecast": "PASS", "test_cftc_parse": "PASS", "test_cftc_schedule": "PASS", "test_features": "PASS", "test_ledger_tx": "PASS", "test_gitrepo_tx": "PASS", "test_estimation": "PASS", "test_reconstruct": "PASS", "test_forward_run": "PASS", "test_solver": "PASS", "test_fullscale": "PASS", "test_indep": "PASS"}
 {"ok": true, "n_files": 50, "errors": []}
