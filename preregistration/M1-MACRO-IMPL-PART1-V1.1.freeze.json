@@ -1,0 +1,17 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART1-V1.1",
+  "file": "preregistration/M1-MACRO-IMPL-PART1-V1.1.md",
+  "sha256": "04b49c7e96b2ec520e6562df25391dab5efc7ac32c5ac82128eda4598f233e1b",
+  "git_blob_sha1": "58359397d51046f3bb7853276be8b5186f878621",
+  "status": "FREEZE / PASS",
+  "supersedes": "M1-MACRO-IMPL-PART1-V1 (sha256 bf4c63d4...) for the implementation candidate; V1 stays on record unchanged",
+  "approved_by": "むすび 2026-10-17 18:54 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART1-V1.1.candidate.md; 0 further change requests)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 58359397d51046f3bb7853276be8b5186f878621 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 58359397d51046f3bb7853276be8b5186f878621, SHA-256 04b49c7e96b2ec520e6562df25391dab5efc7ac32c5ac82128eda4598f233e1b)."
+  ],
+  "summary": "Scope limited to CFTC forward acquisition/availability: CFTC Forward Snapshot Gate (report usable iff Usable_From <= T_info AND contained in a normal official snapshot retrieved in (T_info-6h, T_info]); no pre-T_info snapshot -> ABSTAIN_SYSTEM (FEATURE_UNAVAILABLE, CFTC_PRE_TINFO_SNAPSHOT_UNAVAILABLE), no fallback; pre-T_info fetch at 00:40/02:40 JST; CFTC historical exception table recorded (gate closed).",
+  "findings_closed": ["CFTC_HISTORICAL_RELEASE_GATE = PASS / CLOSE", "CFTC_FORWARD_LOOKAHEAD_FINDING = CLOSED"],
+  "unchanged": "Transformation, Model and EVAL specs are not reopened.",
+  "performance_seal": "INTACT"
+}
