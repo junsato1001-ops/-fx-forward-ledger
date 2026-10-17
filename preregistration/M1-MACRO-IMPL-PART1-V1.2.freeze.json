@@ -1,0 +1,19 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART1-V1.2",
+  "file": "preregistration/M1-MACRO-IMPL-PART1-V1.2.md",
+  "sha256": "705f1d49a0c2a2ba4088208014fd775a074cab90c588f2fc244d181ab7ac3bdf",
+  "git_blob_sha1": "656c496626cbc4635ee3f0961a5f2c6085aa19f1",
+  "status": "FREEZE / PASS",
+  "supersedes": "M1-MACRO-IMPL-PART1-V1.1 (sha256 04b49c7e...) for the implementation candidate; V1 and V1.1 stay on record unchanged",
+  "approved_by": "むすび 2026-10-17 22:33 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART1-V1.2.candidate.md; 0 further change requests)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 656c496626cbc4635ee3f0961a5f2c6085aa19f1 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 656c496626cbc4635ee3f0961a5f2c6085aa19f1, SHA-256 705f1d49a0c2a2ba4088208014fd775a074cab90c588f2fc244d181ab7ac3bdf)."
+  ],
+  "summary": "Observed Source Calendar (values, 20-day lags) vs Expected Publication Calendar (forward expected date and 0-2 business-day staleness; >=3 FEATURE_STALE); calendar anomalies audited, values not rewritten. Transport decision: CFTC TLS with system CA + pinned Sectigo Public Server Authentication Root R46 file (in Code_SHA256), fingerprint checked at start, CFTC hostname only. Calendar table types FEDERAL_NATIONAL_HOLIDAY / INAUGURATION_DAY_DC_AREA / SPECIAL_CLOSURE; Inauguration Day is a holiday for CFTC rule 3 but not for the Treasury expected calendar.",
+  "implementation_requirements": [
+    "Test fixture 2021-01-20: Treasury F_US Expected Publication Calendar = business day; CFTC calendar = INAUGURATION_DAY_DC_AREA (むすび 22:33)."
+  ],
+  "findings_closed": ["02-1 calendar ambiguity", "02-2 TLS (implementation requirement)", "02-3 Inauguration Day"],
+  "performance_seal": "INTACT"
+}
