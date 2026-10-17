@@ -34,6 +34,8 @@ jobs:
           mkdir -p out
           { echo | timeout 30 openssl s_client -connect www.cftc.gov:443 -servername www.cftc.gov -showcerts 2>&1 | grep -E "s:|i:|Verify return" ;
             DIG=$(cat env/IMAGE_DIGEST); docker run --rm "$DIG" sh -c 'ls -la /etc/ssl/certs | head -3; python -c "import ssl;print(ssl.get_default_verify_paths(), ssl.OPENSSL_VERSION)"' ;
+            for f in /etc/ssl/certs/*.pem; do openssl x509 -in "$f" -noout -subject 2>/dev/null | grep -q "Sectigo Public Server Authentication Root R46" && cp "$f" out/R46_from_host.pem; done;
+            ls -la out/R46_from_host.pem; openssl x509 -in out/R46_from_host.pem -noout -subject -issuer -fingerprint -sha256 -dates ;
             timeout 90 python3 -c "import ssl,urllib.request;print('host python', urllib.request.urlopen('https://www.cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule/index.htm',timeout=60).status)" ; } > out/tls_probe.txt 2>&1
       - name: Run dev suite inside pinned image (synthetic only)
         run: |

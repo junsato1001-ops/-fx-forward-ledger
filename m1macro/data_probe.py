@@ -21,9 +21,20 @@ SRC = {
 }
 
 
-def get(url):
+def _ctx(url, outdir):
+    import ssl
+    if "cftc.gov" not in url:
+        return None
+    ctx = ssl.create_default_context()
+    pem = Path(outdir, "R46_from_host.pem")
+    if pem.exists():
+        ctx.load_verify_locations(cafile=str(pem))
+    return ctx
+
+
+def get(url, outdir="out"):
     t0 = time.time()
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120) as r:
+    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120, context=_ctx(url, outdir)) as r:
         b = r.read(); st = r.status; ct = r.headers.get("Content-Type")
     return b, st, ct, round(time.time() - t0, 1)
 
@@ -32,7 +43,7 @@ def main(outdir):
     out = {}
     for k, u in SRC.items():
         try:
-            b, st, ct, sec = get(u)
+            b, st, ct, sec = get(u, outdir)
             rec = {"url": u, "http": st, "content_type": ct, "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest(), "sec": sec}
             if k.startswith("treasury"):
                 txt = b.decode("utf-8-sig", errors="replace").splitlines()
@@ -54,8 +65,12 @@ def main(outdir):
                 jp = [r for r in rd[1:] if len(r) > 3 and "097741" in r]
                 rec["jpy_rows"] = len(jp)
                 rec["jpy_sample"] = [dict(zip(hdr, r)) for r in jp[:2]]
+                rec["n_rows"] = len(rd) - 1
             else:
-                rec["text_sample"] = b.decode("utf-8", errors="replace")[:200]
+                t = b.decode("utf-8", errors="replace")
+                import re
+                i = t.find("Release Schedule")
+                rec["text_sample"] = re.sub(r"<[^>]+>", " ", t[i:i + 6000])[:3000]
             out[k] = rec
         except Exception as e:
             out[k] = {"url": u, "error": repr(e)}
