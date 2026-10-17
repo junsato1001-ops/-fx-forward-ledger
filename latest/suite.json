@@ -45,7 +45,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.44,
+  "sec": 0.45,
   "status": "PASS"
  },
  "test_features": {
@@ -66,7 +66,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.11,
+  "sec": 0.08,
   "status": "PASS"
  },
  "test_forward_run": {
@@ -75,7 +75,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 65.31,
+  "sec": 65.27,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -83,47 +83,47 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 14.9,
+    "build_sec": 14.1,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 3.8,
+    "solve_sec": 4.5,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 14.5,
+    "build_sec": 14.0,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 4.4,
+    "solve_sec": 5.0,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 14.5,
+    "build_sec": 14.1,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 3.9,
+    "solve_sec": 4.3,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 56.26,
+  "sec": 55.97,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.32,
+  "sec": 1.36,
   "status": "PASS"
  },
  "test_indep": {
@@ -202,7 +202,7 @@
     "pass_mu": true
    }
   },
-  "sec": 89.56,
+  "sec": 90.82,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -226,7 +226,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 7.38,
+  "sec": 7.26,
   "status": "PASS"
  },
  "test_s0link": {
@@ -318,7 +318,7 @@
     "ok": true
    }
   },
-  "sec": 3.38,
+  "sec": 3.24,
   "status": "PASS"
  }
 }
