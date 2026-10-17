@@ -1,0 +1,112 @@
+name: m1macro-gates
+# Formal implementation gates G1-G9 (Impl Part 4 §5) on ONE candidate commit (push to branch m1macro-gates).
+# G6-G8 are blind: the container writes only allow-listed fields (m1macro/gates.py); its stdout/stderr are discarded;
+# per-run hashes for G7 never leave the container. Results -> branch m1macro-gates-results under <Code_SHA256>/.
+on:
+  push:
+    branches: [m1macro-gates]
+permissions:
+  contents: write
+concurrency:
+  group: m1macro-gates
+  cancel-in-progress: false
+env:
+  PRIVATE_REPO: junsato1001-ops/fx-ledger-private-raw
+  N_SHARDS: "20"
+jobs:
+  suite:            # G1-G4 (+ unit tests) inside the pinned image
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: G1-G4 suite
+        run: |
+          set -eu; mkdir -p out
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
+            -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 "$DIG" sh -c '
+              (apt-get -qq update && apt-get -qq install -y --no-install-recommends git > /dev/null) &&
+              pip install -q --require-hashes -r env/requirements.lock && python -I m1macro/manifest.py out/code_manifest.txt > out/code_sha256.txt &&
+              python -I m1macro/dev_suite.py out' > out/suite_stdout.txt 2>&1 || echo "SUITE_EXIT=$?" >> out/suite_stdout.txt
+      - uses: actions/upload-artifact@v4
+        with: { name: suite, path: out/, retention-days: 7 }
+  g5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Development snapshot (public from main; Treasury from private storage; token never printed)
+        env: { TOKEN: "${{ secrets.PRIVATE_RAW_TOKEN }}" }
+        run: |
+          set -eu
+          git fetch -q origin main && git checkout -q origin/main -- data/m1macro/dev_snapshot data/m1macro/treasury_raw_manifest.csv
+          git clone -q --depth 1 "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" priv 2>/dev/null
+      - name: G5 inside pinned image
+        run: |
+          set -eu; mkdir -p out
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 "$DIG" sh -c '
+            pip install -q --require-hashes -r env/requirements.lock &&
+            python -I m1macro/gates.py g5 out data/m1macro/dev_snapshot/manifest.json data/m1macro/dev_snapshot priv/m1macro_dev_snapshot' \
+            > /dev/null 2>&1 || echo "G5_EXIT=$?" > out/g5_exit.txt
+          rm -rf priv
+      - uses: actions/upload-artifact@v4
+        with: { name: g5, path: out/, retention-days: 7 }
+  g678:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Development snapshot (token never printed)
+        env: { TOKEN: "${{ secrets.PRIVATE_RAW_TOKEN }}" }
+        run: |
+          set -eu
+          git fetch -q origin main && git checkout -q origin/main -- data/m1macro/dev_snapshot
+          git clone -q --depth 1 "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" priv 2>/dev/null
+      - name: G6/G7/G8 shard (blind; output discarded except allow-listed files)
+        run: |
+          set -eu; mkdir -p out
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          S=${{ matrix.shard }}
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
+            -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 "$DIG" sh -c "
+              pip install -q --require-hashes -r env/requirements.lock &&
+              A='data/m1macro/dev_snapshot/manifest.json data/m1macro/dev_snapshot priv/m1macro_dev_snapshot' &&
+              python -I m1macro/gates.py g678 /tmp/g \$A $S $N_SHARDS A &&
+              python -I m1macro/gates.py g678 /tmp/g \$A $S $N_SHARDS B &&
+              python -I m1macro/gates.py shardsum /tmp/g out $S" > /dev/null 2>&1 || echo "SHARD_EXIT=$?" > out/exit_${{ matrix.shard }}.txt
+          rm -rf priv
+      - uses: actions/upload-artifact@v4
+        with: { name: "g678-${{ matrix.shard }}", path: out/, retention-days: 7 }
+  aggregate:
+    needs: [suite, g5, g678]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: arts }
+      - name: Aggregate and publish (allow-listed files only)
+        run: |
+          set -eu
+          mkdir -p shards res
+          cp arts/g678-*/* shards/ 2>/dev/null || true
+          python3 -I m1macro/gates.py aggregate res shards
+          CS=$(cat arts/suite/code_sha256.txt)
+          cp arts/suite/suite.json arts/suite/code_manifest.txt arts/suite/code_sha256.txt res/ 2>/dev/null || true
+          cp arts/g5/g5_summary.json arts/g5/g5_features_reconstruction.csv res/ 2>/dev/null || true
+          cat arts/g5/g5_exit.txt shards/exit_*.txt > res/exits.txt 2>/dev/null || true
+          git rev-parse HEAD > res/source_commit.txt
+          git fetch -q origin m1macro-gates-results || true
+          git checkout -q -B m1macro-gates-results origin/m1macro-gates-results 2>/dev/null || git checkout -q --orphan m1macro-gates-results
+          git rm -rq --cached . 2>/dev/null || true
+          mkdir -p "$CS" && cp res/* "$CS"/
+          git add "$CS"
+          git -c user.name=junsato1001-ops -c user.email=junsato1001-ops@users.noreply.github.com commit -q -m "gates for $(cat res/source_commit.txt) code $CS"
+          git push -q origin m1macro-gates-results

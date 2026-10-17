@@ -25,49 +25,21 @@ from m1macro import (canon, cftc_feature, cftc_parse, cftc_schedule, estimation 
                      manifest, rates, s0link, sources as S)
 from m1macro.forecast import decide, f17, forecast_fields, mu as mu_fn, n_of  # noqa: E402
 from m1macro.tz import JST, UTC  # noqa: E402
+from m1macro import forward_commit as FC  # noqa: E402
+from m1macro.forward_commit import (PipelineFailure, _complete_keys, _freeze_ok, commit_data, commit_tx,  # noqa: E402,F401
+                                    read_csv, utc_s, FREEZE_REL, FETCHES, TREASURY_MANIFEST)
+from m1macro.schema import ESTIMATION_FIELDS, FETCH_FIELDS, FORECAST_FIELDS, TREASURY_FIELDS  # noqa: E402,F401
 
 CFG = json.loads((ROOT / "m1macro" / "config" / "m1macro_config.json").read_text("utf-8"))
 DATA = "data/m1macro"
-FETCHES = f"{DATA}/source_fetches.csv"
-FETCH_FIELDS = ["Run_ID", "Source", "Source_URL", "Retrieved_At_UTC", "Byte_Count", "SHA256", "Path", "Normal",
-                "Subreason", "Dates_Path"]
-TREASURY_MANIFEST = f"{DATA}/treasury_raw_manifest.csv"
-TREASURY_FIELDS = ["Retrieved_At_UTC", "Source_URL", "Byte_Count", "SHA256", "Private_Repository", "Private_Path",
-                   "Private_Commit"]
-FREEZE_REL = "preregistration/M1-MACRO-IMPL-CODE-V1.freeze.json"
 HORIZONS = ("1D", "1W", "4W")
 CUTOFF = dt.time(8, 30)
 MODEL = "M1-MACRO-V1"
 PARENT = "S0-EMPCLIM-STD-EXP-V1"
-FORECAST_FIELDS = ["Model", "Pair", "Origin", "Horizon", "Cutoff_JST", "Last_Available_Fix", "Target_Start", "Target_End",
-                   "Point_LogReturn", "P_Down", "P_Neutral", "P_Up", "PI10", "PI90", "Pool_N", "Mean_Z", "Q10_Z", "Q90_Z",
-                   "Decision_Class", "Reason_Code", "Issued_At_UTC", "Code_SHA256", "Run_ID", "Parent", "Parent_Run_ID",
-                   "Sigma_M0", "Parameter_State", "Beta_US", "Beta_JP", "Beta_POS", "Mu", "Feature_Row_Origin",
-                   "Estimation_Row_Key"]
-ESTIMATION_FIELDS = ["Origin", "Horizon", "Parameter_State", "N_Warmup", "N_Groups", "N_Gap_Origins",
-                     "N_Excluded_Zero_Scale", "E_Input_SHA256", "Beta_US", "Beta_JP", "Beta_POS", "Solver_Status",
-                     "Solver_Subreason", "Stage1_Iterations", "Stage2_Iterations", "UB_minus_LB", "Phi_beta2_minus_LB",
-                     "J_Star", "Code_SHA256", "Run_ID"]
-
-
-class PipelineFailure(Exception):
-    pass
-
-
-def utc_s(t):
-    return t.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def parse_utc(s):
     return dt.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
-
-
-def read_csv(rel):
-    p = ROOT / rel
-    if not p.exists():
-        return []
-    with open(p, encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f))
 
 
 def run_id():
@@ -209,66 +181,12 @@ def fetch(stage, now=None):
     _rec_append(stage, "fetches.json", rec)
 
 
-# ------------------------------------------------------------------ host: public data commit
-def commit_data(stage, git):
-    """Copy staged public raw files and append fetch / Treasury manifest rows; push and reread (data, not ledger)."""
-    pub = Path(stage, "public")
-    for p in sorted(pub.rglob("*")) if pub.exists() else []:
-        if p.is_file():
-            rel = p.relative_to(pub).as_posix(); dst = ROOT / rel
-            if dst.exists():
-                if dst.read_bytes() != p.read_bytes():
-                    raise PipelineFailure("STAGED_FILE_CONFLICT")
-                continue
-            dst.parent.mkdir(parents=True, exist_ok=True); dst.write_bytes(p.read_bytes()); git.touched.add(rel)
-            git.pending = True
-    recs = json.loads(Path(stage, "fetches.json").read_text()) if Path(stage, "fetches.json").exists() else []
-    if recs:
-        git.ensure_header(FETCHES, L.header_bytes(FETCH_FIELDS))
-        for r in recs:
-            git.append(FETCHES, L.row_bytes(FETCH_FIELDS, r))
-    tre_p = Path(stage, "treasury_staged.json")
-    if tre_p.exists() and json.loads(tre_p.read_text()):
-        pc = Path(stage, "private_commit.txt").read_text().strip()
-        git.ensure_header(TREASURY_MANIFEST, L.header_bytes(TREASURY_FIELDS))
-        for t in json.loads(tre_p.read_text()):
-            git.append(TREASURY_MANIFEST, L.row_bytes(TREASURY_FIELDS, {
-                "Retrieved_At_UTC": t["retrieved_at_utc"], "Source_URL": t["url"], "Byte_Count": str(t["bytes"]),
-                "SHA256": t["sha256"], "Private_Repository": CFG["private_raw_storage"]["Private_Repository"],
-                "Private_Path": t["private_path"], "Private_Commit": pc}))
-    for i in range(L.PUSH_RETRIES):
-        try:
-            git.push(); break
-        except Exception:
-            if i == L.PUSH_RETRIES - 1:
-                raise PipelineFailure("DATA_PUSH_FAILED")
-    for rel in sorted(git.touched):
-        if git.remote(rel) != (ROOT / rel).read_bytes():
-            raise PipelineFailure("DATA_REREAD_MISMATCH")
 # ------------------------------------------------------------------ compute (pinned image; no git, no token)
-def _freeze_ok(code_sha):
-    fz = ROOT / FREEZE_REL
-    if not fz.exists():
-        return False
-    fr = json.loads(fz.read_text("utf-8"))
-    return fr.get("Code_SHA256") == code_sha
-
-
 def first_forward():
     v = CFG.get("first_forward_origin")
     if not v or any(not v.get(h) for h in HORIZONS):
         return None
     return {h: v[h] for h in HORIZONS}
-
-
-def _complete_keys():
-    """(origin, horizon) with a COMPLETE row on the synced tree (Part 4 §3: never issue twice)."""
-    out = set()
-    for r in read_csv(L.COMMITS):
-        if r.get("Status") == "COMPLETE":
-            for h in (r.get("Horizons") or "").split(";"):
-                out.add((r["Origin"], h))
-    return out
 
 
 def _this_run_fetches(source, rid):
@@ -496,13 +414,44 @@ def _pool_for(p, D_iso, h, laf, mp, s0mod, lb):
     return s0link.pool(pools, p, h, D_iso)
 
 
+def _tx(origin, horizons, fr, er, fc):
+    return {"origin": origin, "horizons": horizons,
+            "deadline_utc": utc_s(dt.datetime.combine(dt.date.fromisoformat(origin), CUTOFF, tzinfo=JST)),
+            "rows": {L.FEATURES: [base64.b64encode(L.row_bytes(features.FEATURE_FIELDS, r)).decode() for r in fr],
+                     L.ESTIMATION: [base64.b64encode(L.row_bytes(ESTIMATION_FIELDS, r)).decode() for r in er],
+                     L.FORECASTS: [base64.b64encode(L.row_bytes(FORECAST_FIELDS, r)).decode() for r in fc]}}
+
+
+def abstain_txs(now, rid, code_sha):
+    """Part 3 §3 step 1 (same rule as the existing forward ledger): every due (origin, horizon) whose cutoff has
+    passed without a COMPLETE run gets ABSTAIN_SYSTEM rows (NOT_ISSUED for past days, LATE_ISSUE for today)."""
+    sys.path.insert(0, str(ROOT / "forward"))
+    import ledger_builder as lb
+    _, mp, _ = lb.load_frozen()
+    first = first_forward(); done = _complete_keys()
+    today = now.astimezone(JST).date()
+    d = dt.date.fromisoformat(min(first.values())); out = []
+    while d <= today:
+        if now >= dt.datetime.combine(d, CUTOFF, tzinfo=JST):
+            hs = [h for h in HORIZONS if mp.is_formal_origin(d, h) and d.isoformat() >= first[h] and (d.isoformat(), h) not in done]
+            if hs:
+                reason = "NOT_ISSUED" if d < today else "LATE_ISSUE"
+                fc = [{"Model": MODEL, "Pair": p, "Origin": d.isoformat(), "Horizon": h, "Cutoff_JST": "08:30",
+                       "Decision_Class": "ABSTAIN_SYSTEM", "Reason_Code": reason, "Issued_At_UTC": utc_s(now),
+                       "Code_SHA256": code_sha, "Run_ID": rid, "Parent": PARENT} for h in hs for p in E.DEV_PAIRS]
+                out.append(_tx(d.isoformat(), ";".join(hs), [], [], fc))
+        d += dt.timedelta(days=1)
+    return out
+
+
 def compute(stage, priv_dev_dir, now=None):
     now = _now(now); rid = run_id(); code_sha = manifest.code_sha256()
-    out = {"run_id": rid, "code_sha256": code_sha, "status": "", "tx": None}
+    out = {"run_id": rid, "code_sha256": code_sha, "status": "", "txs": []}
     if not _freeze_ok(code_sha) or first_forward() is None:
         out["status"] = "REFUSED_NOT_FROZEN"          # never compute beta/mu on real data before the freeze
     else:
         D = now.astimezone(JST).date()
+        out["txs"] = abstain_txs(now, rid, code_sha)
         if now < features.tinfo_utc(D):
             out["status"] = "BEFORE_TINFO"
         elif now >= dt.datetime.combine(D, CUTOFF, tzinfo=JST):
@@ -515,34 +464,14 @@ def compute(stage, priv_dev_dir, now=None):
                 else:
                     fr, er, fc = res
                     out["status"] = "READY"
-                    out["tx"] = {"origin": D.isoformat(), "horizons": ";".join(sorted({r["Horizon"] for r in er})),
-                                 "deadline_utc": utc_s(dt.datetime.combine(D, CUTOFF, tzinfo=JST)),
-                                 "rows": {L.FEATURES: [base64.b64encode(L.row_bytes(features.FEATURE_FIELDS, r)).decode() for r in fr],
-                                          L.ESTIMATION: [base64.b64encode(L.row_bytes(ESTIMATION_FIELDS, r)).decode() for r in er],
-                                          L.FORECASTS: [base64.b64encode(L.row_bytes(FORECAST_FIELDS, r)).decode() for r in fc]}}
+                    out["txs"].append(_tx(D.isoformat(), ";".join(r["Horizon"] for r in er), fr, er, fc))
             except PipelineFailure as e:
                 out["status"] = "PIPELINE_FAILURE:" + str(e)[:60] if str(e).isupper() else "PIPELINE_FAILURE"
+            except Exception as e:                        # unexpected: type name only (messages may quote values)
+                out["status"] = "PIPELINE_FAILURE:" + type(e).__name__
     Path(stage, "tx.json").write_text(json.dumps(out))
-    print(json.dumps({"run_id": rid, "status": out["status"]}))          # no values
+    print(json.dumps({"run_id": rid, "status": out["status"], "n_tx": len(out["txs"])}))          # no values
     return out
-
-
-# ------------------------------------------------------------------ host: transaction
-def commit_tx(stage, git, now_fn=None):
-    tx = json.loads(Path(stage, "tx.json").read_text())
-    if tx["status"] != "READY":
-        print(json.dumps({"status": tx["status"]})); return None
-    if manifest.code_sha256() != tx["code_sha256"] or not _freeze_ok(tx["code_sha256"]):
-        raise PipelineFailure("CODE_SHA_CHANGED")
-    t = tx["tx"]
-    if any((t["origin"], h) in _complete_keys() for h in t["horizons"].split(";")):
-        print(json.dumps({"status": "ALREADY_COMPLETE"})); return None
-    rows = {k: [base64.b64decode(x) for x in v] for k, v in t["rows"].items()}
-    fields = {L.FEATURES: features.FEATURE_FIELDS, L.ESTIMATION: ESTIMATION_FIELDS, L.FORECASTS: FORECAST_FIELDS}
-    st = L.run_transaction(git, rows, fields, tx["run_id"], t["origin"], t["horizons"], t["deadline_utc"],
-                           now_fn or (lambda: utc_s(dt.datetime.now(UTC))))
-    print(json.dumps({k: st.get(k) for k in ("run_id", "status", "deadline_status", "failed_step")}))
-    return st
 
 
 def main(argv):
@@ -552,14 +481,8 @@ def main(argv):
         r = cftc_snapshot(stage); print(json.dumps({k: r.get(k) for k in ("Source", "Normal", "Subreason", "Retrieved_At_UTC")}))
     elif cmd == "fetch":
         fetch(stage)
-    elif cmd == "commit-data":
-        from m1macro import gitrepo
-        commit_data(stage, gitrepo.RealGit(ROOT, message=f"data: M1-MACRO sources run {run_id()}"))
     elif cmd == "compute":
         compute(stage, argv[2])
-    elif cmd == "commit-tx":
-        from m1macro import gitrepo
-        commit_tx(stage, gitrepo.RealGit(ROOT, message=f"ledger: M1-MACRO run {run_id()}"))
     else:
         raise SystemExit("unknown command")
 

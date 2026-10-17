@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 def main(outdir):
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
     results = {}
-    for name in ("test_canon", "test_cftc_rules", "test_cftc_feature", "test_rates", "test_s0link", "test_forecast", "test_cftc_parse", "test_cftc_schedule", "test_features", "test_ledger_tx", "test_gitrepo_tx", "test_estimation", "test_reconstruct", "test_forward_run", "test_solver", "test_fullscale", "test_indep"):
+    for name in ("test_canon", "test_cftc_rules", "test_cftc_feature", "test_rates", "test_s0link", "test_forecast", "test_cftc_parse", "test_cftc_schedule", "test_features", "test_ledger_tx", "test_gitrepo_tx", "test_forward_commit", "test_estimation", "test_reconstruct", "test_forward_run", "test_solver", "test_fullscale", "test_indep"):
         t0 = time.time()
         try:
             mod = __import__(f"m1macro.{name}", fromlist=["run"])

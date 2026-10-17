@@ -49,7 +49,9 @@ def g5(out, manifest, pub, priv):
     rows = []
     for o in sorted(ctx.feats):
         fus, fjp, fpos = ctx.feats[o]["_obj"]
-        rows.append(features.feature_row(dt.date.fromisoformat(o), fus, fjp, fpos, reports, {}, "", "", ""))
+        r = features.feature_row(dt.date.fromisoformat(o), fus, fjp, fpos, reports, {}, "", "", "")
+        r["F_US_Raw"] = r["F_US_Raw_Lag"] = "PRIVATE_SOURCE"      # Treasury raw values are not republished in bulk (Part 1 §4)
+        rows.append(r)
     import csv
     with open(Path(out, "g5_features_reconstruction.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=features.FEATURE_FIELDS, lineterminator="\n"); w.writeheader(); w.writerows(rows)
@@ -104,7 +106,7 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
             bb = canon.beta_bytes(t, h, est.state, est.beta if est.beta is not None else None)
             _emit(fh, {"t": t, "h": h, "state": est.state, "e_sha256": e.e_sha256,
                        "beta_sha256": canon.sha256_hex(bb)}, ALLOWED_HASH)
-            if est.state == "ESTIMATED":
+            if est.state == "ESTIMATED" and label == "A":          # run B: production only (G7 replicate)
                 r = est.result
                 rec.update(stage1_iter=r.stage1_iter, stage2_iter=r.stage2_iter, ub_minus_lb=r.ub_minus_lb,
                            phi2_minus_lb=r.phi2_minus_lb)
@@ -118,7 +120,7 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
                            d_beta_inf=c["d_beta_inf"], d_mu_over_sigma=c["d_mu_over_sigma"], pass_checks=bool(pc),
                            pass_UB=c["pass_UB"], pass_beta=c["pass_beta"], pass_mu=c["pass_mu"],
                            pass_all=bool(pc and c["pass_UB"] and c["pass_beta"] and c["pass_mu"]))
-            if est.state in ("ESTIMATED", "DEFAULT_PARENT"):
+            if est.state in ("ESTIMATED", "DEFAULT_PARENT") and label == "A":
                 nz = nm = nmm = 0
                 for p in el:
                     m = mu_fn(p, est.beta, {k: ctx.feats[t][k][3] for k in n_of(p)})
@@ -138,16 +140,26 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
         f.close()
 
 
+def shardsum(tmp, out, shard):
+    """Inside the container: G7 counts from the two runs' hashes (hash files stay in the container's /tmp)."""
+    tmp = Path(tmp); out = Path(out); out.mkdir(parents=True, exist_ok=True)
+    ha = {(r["t"], r["h"]): r for r in map(json.loads, open(tmp / f"hash_A_{shard}.jsonl"))}
+    hb = {(r["t"], r["h"]): r for r in map(json.loads, open(tmp / f"hash_B_{shard}.jsonl"))}
+    keys = set(ha) | set(hb)
+    res = {"shard": int(shard), "n_keys": len(keys), "n_run_A": len(ha), "n_run_B": len(hb),
+           "e_input_sha_mismatch": sum(1 for k in keys if k not in ha or k not in hb or ha[k]["e_sha256"] != hb[k]["e_sha256"]),
+           "beta_sha_or_state_mismatch": sum(1 for k in keys if k not in ha or k not in hb
+                                             or ha[k]["beta_sha256"] != hb[k]["beta_sha256"] or ha[k]["state"] != hb[k]["state"])}
+    (out / f"g7_{shard}.json").write_text(json.dumps(res, sort_keys=True))
+    for name in (f"g6_A_{shard}.jsonl", f"g8_A_{shard}.jsonl"):
+        (out / name).write_bytes((tmp / name).read_bytes())
+
+
 def aggregate(out, d):
     d = Path(d); out = Path(out)
     g6 = [json.loads(l) for p in sorted(d.glob("g6_A_*.jsonl")) for l in open(p)]
     g8 = [json.loads(l) for p in sorted(d.glob("g8_A_*.jsonl")) for l in open(p)]
-    ha = {(r["t"], r["h"]): r for p in sorted(d.glob("hash_A_*.jsonl")) for r in map(json.loads, open(p))}
-    hb = {(r["t"], r["h"]): r for p in sorted(d.glob("hash_B_*.jsonl")) for r in map(json.loads, open(p))}
-    keys = set(ha) | set(hb)
-    mism_e = sum(1 for k in keys if k not in ha or k not in hb or ha[k]["e_sha256"] != hb[k]["e_sha256"])
-    mism_b = sum(1 for k in keys if k not in ha or k not in hb or ha[k]["beta_sha256"] != hb[k]["beta_sha256"]
-                 or ha[k]["state"] != hb[k]["state"])
+    g7 = [json.loads(p.read_text()) for p in sorted(d.glob("g7_*.json"))]
     st = {}
     for r in g6:
         st[(r["h"], r.get("state", "ERROR"))] = st.get((r["h"], r.get("state", "ERROR")), 0) + 1
@@ -170,8 +182,10 @@ def aggregate(out, d):
                   "max_stage1_iter": max((r["stage1_iter"] for r in est), default=None),
                   "max_stage2_iter": max((r["stage2_iter"] for r in est), default=None),
                   "total_sec": round(sum(r.get("sec", 0) for r in g6), 1)},
-           "G7": {"n_keys": len(keys), "n_run_A": len(ha), "n_run_B": len(hb),
-                  "e_input_sha_mismatch": mism_e, "beta_sha_or_state_mismatch": mism_b},
+           "G7": {"n_shards": len(g7), "n_keys": sum(x["n_keys"] for x in g7), "n_run_A": sum(x["n_run_A"] for x in g7),
+                  "n_run_B": sum(x["n_run_B"] for x in g7),
+                  "e_input_sha_mismatch": sum(x["e_input_sha_mismatch"] for x in g7),
+                  "beta_sha_or_state_mismatch": sum(x["beta_sha_or_state_mismatch"] for x in g7)},
            "G8": {"n_mu_zero_rows": sum(r["n_mu_zero_rows"] for r in g8), "n_match": sum(r["n_match"] for r in g8),
                   "n_mismatch": sum(r["n_mismatch"] for r in g8)}}
     (out / "g678_summary.json").write_text(json.dumps(res, indent=1, sort_keys=True), encoding="utf-8")
@@ -182,4 +196,4 @@ def aggregate(out, d):
 
 if __name__ == "__main__":
     cmd = sys.argv[1]
-    {"g5": g5, "g678": g678, "aggregate": aggregate}[cmd](*sys.argv[2:])
+    {"g5": g5, "g678": g678, "shardsum": shardsum, "aggregate": aggregate}[cmd](*sys.argv[2:])

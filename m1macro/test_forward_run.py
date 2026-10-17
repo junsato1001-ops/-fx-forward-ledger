@@ -97,7 +97,7 @@ def run():
         _git(root, "add", "-A"); _git(root, "-c", "user.name=t", "-c", "user.email=t@e", "commit", "-q", "-m", "init")
         _git(root, "push", "-q", "origin", "HEAD:main")
         old_root, old_cfg, old_rid = FR.ROOT, dict(FR.CFG), FR.run_id
-        FR.ROOT = root
+        FR.ROOT = root; FR.FC.ROOT = root
         try:
             FR.CFG["first_forward_origin"] = {"1D": D.isoformat(), "1W": "2026-10-11", "4W": "2026-10-11"}
             rid = "R1"
@@ -149,10 +149,7 @@ def run():
             assert {r["Pair"] for r in fc} == {"USDJPY", "CHFJPY", "INRJPY"} and all(r["Beta_US"] == "" for r in fc if r["Pair"] != "USDJPY")
             # 4) transaction on the temporary repository (deadline 08:30 JST)
             tx = {"run_id": rid, "code_sha256": manifest.code_sha256(), "status": "READY",
-                  "tx": {"origin": D.isoformat(), "horizons": "1D", "deadline_utc": "2026-10-07T23:30:00Z",
-                         "rows": {L.FEATURES: [base64.b64encode(L.row_bytes(FR.features.FEATURE_FIELDS, r)).decode() for r in fr],
-                                  L.ESTIMATION: [base64.b64encode(L.row_bytes(FR.ESTIMATION_FIELDS, r)).decode() for r in er],
-                                  L.FORECASTS: [base64.b64encode(L.row_bytes(FR.FORECAST_FIELDS, r)).decode() for r in fc]}}}
+                  "txs": [FR._tx(D.isoformat(), "1D", fr, er, fc)]}
             (stage / "tx.json").write_text(json.dumps(tx))
             from m1macro import gitrepo
             ck = ["2026-10-07T21:00:00Z", "2026-10-07T21:00:05Z"]
@@ -160,8 +157,14 @@ def run():
             assert st["status"] == "COMPLETE" and st["deadline_status"] == "ON_TIME", st
             # 5) no second issuance of the same (origin, horizon)
             assert FR.build_rows_for_origin(D, now.astimezone(UTC), rid, manifest.code_sha256(), str(stage), None, ctx=ctx) is None
-            assert FR.commit_tx(str(stage), gitrepo.RealGit(root, message="t")) is None
+            assert FR.commit_tx(str(stage), gitrepo.RealGit(root, message="t"))["status"] == "ALREADY_COMPLETE"
+            # 6) after the cutoff, a due origin without COMPLETE gets ABSTAIN_SYSTEM rows (NOT_ISSUED / LATE_ISSUE)
+            FR.CFG["first_forward_origin"] = {"1D": "2026-10-07", "1W": "2026-10-11", "4W": "2026-10-11"}
+            ab = FR.abstain_txs(dt.datetime(2026, 10, 8, 9, 0, tzinfo=JST), rid, "c")
+            assert [(t["origin"], t["horizons"]) for t in ab] == [("2026-10-07", "1D")]
+            rr = base64.b64decode(ab[0]["rows"][L.FORECASTS][0])
+            assert b"NOT_ISSUED" in rr and ab[0]["rows"][L.FEATURES] == []
             out.update(ok=True, parameter_state=er[0]["Parameter_State"], n_warmup=int(er[0]["N_Warmup"]))
         finally:
-            FR.ROOT = old_root; FR.CFG.clear(); FR.CFG.update(old_cfg); FR.run_id = old_rid
+            FR.ROOT = old_root; FR.FC.ROOT = old_root; FR.CFG.clear(); FR.CFG.update(old_cfg); FR.run_id = old_rid
     return out
