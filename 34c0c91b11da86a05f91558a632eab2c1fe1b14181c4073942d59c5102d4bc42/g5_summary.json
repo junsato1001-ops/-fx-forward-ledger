@@ -1,0 +1,69 @@
+{
+ "anomalies_jp_sample": [],
+ "anomalies_us_sample": [
+  "('2010-12-31', 'OBSERVED_NOT_EXPECTED')",
+  "('2011-04-22', 'EXPECTED_NOT_OBSERVED')",
+  "('2012-10-30', 'EXPECTED_NOT_OBSERVED')",
+  "('2013-03-29', 'EXPECTED_NOT_OBSERVED')",
+  "('2014-04-18', 'EXPECTED_NOT_OBSERVED')",
+  "('2016-03-25', 'EXPECTED_NOT_OBSERVED')",
+  "('2017-04-14', 'EXPECTED_NOT_OBSERVED')",
+  "('2017-11-10', 'OBSERVED_NOT_EXPECTED')",
+  "('2018-03-30', 'EXPECTED_NOT_OBSERVED')",
+  "('2019-04-19', 'EXPECTED_NOT_OBSERVED')",
+  "('2020-04-10', 'EXPECTED_NOT_OBSERVED')",
+  "('2021-06-18', 'OBSERVED_NOT_EXPECTED')",
+  "('2021-12-31', 'OBSERVED_NOT_EXPECTED')",
+  "('2022-04-15', 'EXPECTED_NOT_OBSERVED')",
+  "('2023-11-10', 'OBSERVED_NOT_EXPECTED')",
+  "('2024-03-29', 'EXPECTED_NOT_OBSERVED')",
+  "('2025-01-09', 'OBSERVED_NOT_EXPECTED')",
+  "('2025-04-18', 'EXPECTED_NOT_OBSERVED')",
+  "('2025-12-24', 'OBSERVED_NOT_EXPECTED')",
+  "('2025-12-26', 'OBSERVED_NOT_EXPECTED')"
+ ],
+ "calendar_anomalies_jp_since_2026": 0,
+ "calendar_anomalies_us_since_2010": 20,
+ "cftc": {
+  "max": "2026-10-13",
+  "min": "2006-06-13",
+  "n_reports": 1062
+ },
+ "gate": "G5",
+ "holdout_rows": 0,
+ "mof": {
+  "max": "2026-10-15",
+  "min": "1974-09-24",
+  "n_dates": 12958
+ },
+ "n_origins": 8559,
+ "n_static_groups": {
+  "1D": 11745,
+  "1W": 2339,
+  "4W": 2032
+ },
+ "n_th": {
+  "1D": 7111,
+  "1W": 1448,
+  "4W": 1448
+ },
+ "status_counts": {
+  "F_JP": {
+   "OK": 8559
+  },
+  "F_POS": {
+   "MODEL_PREREQ_UNAVAILABLE/FEATURE_GATE_EXCLUDED": 63,
+   "MODEL_PREREQ_UNAVAILABLE/FEATURE_NOT_YET_AVAILABLE": 3678,
+   "MODEL_PREREQ_UNAVAILABLE/FEATURE_STALE/CFTC_EXPECTED_RELEASE_PASSED": 104,
+   "OK": 4714
+  },
+  "F_US": {
+   "OK": 8559
+  }
+ },
+ "treasury": {
+  "max": "2026-10-16",
+  "min": "1990-01-02",
+  "n_dates": 9204
+ }
+}
