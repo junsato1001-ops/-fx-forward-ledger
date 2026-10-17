@@ -21,12 +21,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: G1-G4 suite
         run: |
-          set -eu; mkdir -p out
+          set -eu; mkdir -p out mainref
+          git fetch -q --depth=1 origin main                       # D2 Pre-Freeze Gate reads the formal main branch
+          for f in data/m1macro/source_fetches.csv ledger/m1_macro_features.csv ledger/m1_macro_estimation.csv \
+                   ledger/m1_macro_forecasts.csv ledger/m1_macro_issue_commits.csv audit_log/m1_macro_issue_deadline.csv; do
+            mkdir -p "mainref/$(dirname $f)"; git show "FETCH_HEAD:$f" > "mainref/$f" 2>/dev/null || rm -f "mainref/$f"
+          done
           DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
           docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
             -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 "$DIG" sh -c '
               (apt-get -qq update && apt-get -qq install -y --no-install-recommends git > /dev/null) &&
               pip install -q --require-hashes -r env/requirements.lock && python -I m1macro/manifest.py out/code_manifest.txt > out/code_sha256.txt &&
+              { python -I m1macro/manifest_gate.py out/code_manifest.txt > out/manifest_gate.json || true; } &&
+              { python -I m1macro/freeze_gate.py pre --main-dir mainref > out/freeze_gate_pre.json || true; } &&
               python -I m1macro/dev_suite.py out' > out/suite_stdout.txt 2>&1 || echo "SUITE_EXIT=$?" >> out/suite_stdout.txt
       - uses: actions/upload-artifact@v4
         with: { name: suite, path: out/, retention-days: 7 }
@@ -99,7 +106,7 @@ jobs:
           cp arts/g678-*/* shards/ 2>/dev/null || true
           python3 -I m1macro/gates.py aggregate res shards
           CS=$(cat arts/suite/code_sha256.txt)
-          cp arts/suite/suite.json arts/suite/code_manifest.txt arts/suite/code_sha256.txt res/ 2>/dev/null || true
+          cp arts/suite/suite.json arts/suite/code_manifest.txt arts/suite/code_sha256.txt arts/suite/manifest_gate.json arts/suite/freeze_gate_pre.json res/ 2>/dev/null || true
           cp arts/g5/g5_summary.json arts/g5/g5_features_reconstruction.csv res/ 2>/dev/null || true
           cat arts/g5/g5_exit.txt shards/exit_*.txt > res/exits.txt 2>/dev/null || true
           git rev-parse HEAD > res/source_commit.txt

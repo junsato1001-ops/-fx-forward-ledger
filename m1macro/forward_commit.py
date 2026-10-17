@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from m1macro import ledger_tx as L, manifest  # noqa: E402
+from m1macro import deadline_gate as DG, ledger_tx as L, manifest  # noqa: E402
 from m1macro.schema import (ESTIMATION_FIELDS, FEATURE_FIELDS, FETCH_FIELDS, FORECAST_FIELDS,  # noqa: E402
                             TREASURY_FIELDS)
 
@@ -95,13 +95,46 @@ def commit_data(stage, git):
     for rel in sorted(git.touched):
         if git.remote(rel) != (ROOT / rel).read_bytes():
             raise PipelineFailure("DATA_REREAD_MISMATCH")
+
+
+def _ontime_keys():
+    """(origin, horizon) covered by a COMPLETE run that has an ON_TIME deadline audit row (formal issuance)."""
+    ontime = {r["Run_ID"] for r in read_csv(L.DEADLINE) if r.get("Deadline_Status") == "ON_TIME"}
+    out = set()
+    for r in read_csv(L.COMMITS):
+        if r.get("Status") == "COMPLETE" and r["Run_ID"] in ontime:
+            for h in (r.get("Horizons") or "").split(";"):
+                out.add((r["Origin"], h))
+    return out
+
+
+def _ledger_bytes(read):
+    return tuple(read(p) for p in (L.COMMITS, L.DEADLINE, L.FORECASTS))
+
+
+def _local(rel):
+    p = ROOT / rel
+    return p.read_bytes() if p.exists() else b""
+
+
+def _audit_gate(commits, deadline, forecasts, code):
+    v = DG.check(commits, deadline, forecasts)
+    if v:
+        print(json.dumps({"deadline_audit_gate": "FAIL", "violations": v}))
+        raise PipelineFailure(code)
+
+
 def record_not_issued(git, items, rid):
-    """Deadline audit rows with Deadline_Status = NOT_ISSUED (one per Origin, never duplicated; never written for an
-    Origin that has a COMPLETE run for the horizon). Committed_At_UTC / Verified_At_UTC stay empty."""
+    """D8 Option B: deadline audit rows with Deadline_Status = NOT_ISSUED. Written once per Origin whose due horizons
+    had no ON_TIME COMPLETE at the deadline (a COMPLETE that became LATE does not prevent it). Never duplicated,
+    never updated or deleted. Committed_At_UTC / Verified_At_UTC stay empty. No forecast row is written."""
     have = {r["Origin"] for r in read_csv(L.DEADLINE) if r.get("Deadline_Status") == "NOT_ISSUED"}
-    done = _complete_keys(); n = 0
+    done = _ontime_keys(); n = 0
+    if any(it["deadline_utc"] != DG.deadline_utc(it["origin"]) for it in items):     # validate before any write
+        raise PipelineFailure("NOT_ISSUED_DEADLINE_MISMATCH")
     for it in items:
-        if it["origin"] in have or any((it["origin"], h) in done for h in it["horizons"].split(";")):
+        hs = it["horizons"].split(";")
+        if it["origin"] in have or all((it["origin"], h) in done for h in hs):
             continue
         git.ensure_header(L.DEADLINE, L.header_bytes(L.DEADLINE_FIELDS))
         git.append(L.DEADLINE, L.row_bytes(L.DEADLINE_FIELDS, {"Run_ID": rid, "Origin": it["origin"], "Committed_At_UTC": "",
@@ -122,11 +155,22 @@ def record_not_issued(git, items, rid):
 
 def commit_tx(stage, git, now_fn=None):
     tx = json.loads(Path(stage, "tx.json").read_text())
+    pre = _ledger_bytes(_local)
+    _audit_gate(*pre, "DEADLINE_AUDIT_GATE_PRE")                  # fail closed on an inconsistent synced tree
     res = []
     if tx.get("txs"):
         res = _commit_txs(tx, git, now_fn)
     if tx.get("not_issued"):
         print(json.dumps({"not_issued_recorded": record_not_issued(git, tx["not_issued"], tx["run_id"])}))
+    if tx.get("txs") or tx.get("not_issued"):                    # after the writes: the remote, freshly reread
+        try:                                                      # a file absent locally was never written: b""
+            post = _ledger_bytes(lambda p: git.remote(p) if (ROOT / p).exists() else b"")
+        except Exception:
+            raise PipelineFailure("DEADLINE_AUDIT_REREAD_FAILED")
+        if not DG.append_only(pre[1], post[1]):
+            print(json.dumps({"deadline_audit_gate": "FAIL", "violations": ["AUDIT_ROW_UPDATED_OR_DELETED"]}))
+            raise PipelineFailure("DEADLINE_AUDIT_GATE_POST")
+        _audit_gate(*post, "DEADLINE_AUDIT_GATE_POST")
     if not tx.get("txs"):
         print(json.dumps({"status": tx["status"]})); return None
     return res[-1] if len(res) == 1 else res

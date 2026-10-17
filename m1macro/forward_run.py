@@ -423,17 +423,22 @@ def _tx(origin, horizons, fr, er, fc):
 
 
 def not_issued(now):
-    """D8 (むすび 2026-10-18): a due (origin, horizon) whose deadline passed without any COMPLETE run is recorded as
-    NOT_ISSUED in the deadline audit only (an issuance/audit state, not a forecast). No prediction rows are written."""
+    """D8 Option B (むすび 2026-10-18): an Origin whose deadline passed while a due horizon had no ON_TIME COMPLETE
+    is recorded as NOT_ISSUED in the deadline audit only (an issuance/audit state, not a forecast). A COMPLETE that
+    became LATE does not prevent it. No prediction rows are written. One transaction covers every due horizon of an
+    Origin, so a mix (some due horizons ON_TIME, others not) cannot arise; it is refused if it ever does."""
     sys.path.insert(0, str(ROOT / "forward"))
     import ledger_builder as lb
     _, mp, _ = lb.load_frozen()
-    first = first_forward(); done = _complete_keys()
+    first = first_forward(); done = FC._ontime_keys()
     d = dt.date.fromisoformat(min(first.values())); out = []
     while d <= now.astimezone(JST).date():
         dl = dt.datetime.combine(d, CUTOFF, tzinfo=JST)
         if now >= dl:
-            hs = [h for h in HORIZONS if mp.is_formal_origin(d, h) and d.isoformat() >= first[h] and (d.isoformat(), h) not in done]
+            due = [h for h in HORIZONS if mp.is_formal_origin(d, h) and d.isoformat() >= first[h]]
+            hs = [h for h in due if (d.isoformat(), h) not in done]
+            if hs and len(hs) != len(due):
+                raise PipelineFailure("PARTIAL_ISSUANCE")
             if hs:
                 out.append({"origin": d.isoformat(), "horizons": ";".join(hs), "deadline_utc": utc_s(dl)})
         d += dt.timedelta(days=1)

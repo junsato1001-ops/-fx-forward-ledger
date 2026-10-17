@@ -69,5 +69,7 @@ jobs:
             -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e GITHUB_RUN_ID -e GITHUB_RUN_ATTEMPT "$DIG" sh -c '
             pip install -q --require-hashes -r env/requirements.lock && python -I m1macro/forward_run.py compute stage privdev/m1macro_dev_snapshot'
           rm -rf privdev
+      - name: Deadline audit history is append-only (D8; fail closed)
+        run: python3 -I m1macro/deadline_gate.py history
       - name: Transaction (3 ledgers -> COMPLETE -> deadline audit)
         run: python3 -I m1macro/forward_commit.py commit-tx stage
