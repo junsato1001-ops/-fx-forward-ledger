@@ -1,0 +1,45 @@
+name: m1macro-freeze-record
+# Implementation Freeze record (Impl Part 4 §4; IMPL-FINDINGS-04 F1, むすび 2026-10-18 案(b) + two stages).
+# Push the AUDITED candidate commit to branch m1macro-freeze. The run recomputes Code_SHA256 (container and host),
+# checks the generated manifest (D10) and the Pre-Freeze Gate (D2) against main, requires the formal gate results for
+# this Code_SHA256, then: record -> push/reread -> COMPLETE marker (Recorded_At_UTC) -> push/reread -> freeze audit
+# (server run start <= record reread <= Recorded_At <= marker reread; Recorded_At < A_first(h)) -> push/reread.
+# FINAL only if the audit row on main says FINAL. One freeze per Version: an existing record refuses the run.
+on:
+  push:
+    branches: [m1macro-freeze]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: m1macro-forward            # never interleaves with forward issuance writes to main
+  cancel-in-progress: false
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Candidate checks inside pinned image (Code_SHA256, D10 manifest gate, D2 Pre-Freeze Gate on main)
+        run: |
+          set -eu; mkdir -p out mainref
+          git fetch -q origin main
+          for f in data/m1macro/source_fetches.csv ledger/m1_macro_features.csv ledger/m1_macro_estimation.csv \
+                   ledger/m1_macro_forecasts.csv ledger/m1_macro_issue_commits.csv audit_log/m1_macro_issue_deadline.csv; do
+            mkdir -p "mainref/$(dirname $f)"; git show "origin/main:$f" > "mainref/$f" 2>/dev/null || rm -f "mainref/$f"
+          done
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 "$DIG" sh -c '
+            pip install -q --require-hashes -r env/requirements.lock &&
+            python -I m1macro/manifest.py out/code_manifest.txt > out/code_sha256.txt &&
+            { python -I m1macro/manifest_gate.py out/code_manifest.txt > out/manifest_gate.json || true; } &&
+            { python -I m1macro/freeze_gate.py pre --main-dir mainref > out/freeze_gate_pre.json || true; }'
+          cat out/code_sha256.txt out/manifest_gate.json out/freeze_gate_pre.json
+      - name: Freeze transaction on main (host, standard library + git)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          git worktree add -q --detach mainwt origin/main
+          python3 -I m1macro/freeze_record.py run out mainwt "$GITHUB_SHA"

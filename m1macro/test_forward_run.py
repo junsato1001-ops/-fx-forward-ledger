@@ -106,8 +106,13 @@ def run():
             now = dt.datetime(2026, 10, 8, 5, 0, tzinfo=JST)
             # 1) refused before the freeze (no beta/mu computed)
             assert FR.compute(str(stage), str(dev / "priv"), now.isoformat())["status"] == "REFUSED_NOT_FROZEN"
-            (root / "preregistration").mkdir()
+            (root / FR.FREEZE_REL).parent.mkdir(exist_ok=True)
             (root / FR.FREEZE_REL).write_text(json.dumps({"Code_SHA256": manifest.code_sha256()}))
+            # a bare record is not a freeze (F1): still refused
+            assert FR.compute(str(stage), str(dev / "priv"), now.isoformat())["status"] == "REFUSED_NOT_FROZEN"
+            (root / FR.FREEZE_REL).unlink()
+            from m1macro.test_freeze_record import write_final
+            write_final(root, manifest.code_sha256(), FR.CFG["first_forward_origin"])
             # 2) sources of this run (synthetic), as commit-data would leave them on main
             tb = _treasury_bytes([r for r in rows if r[0] <= dt.date(2026, 10, 7)])
             pp = stage / "private" / "m1macro_forward" / "treasury" / "t.csv"; pp.parent.mkdir(parents=True); pp.write_bytes(tb)

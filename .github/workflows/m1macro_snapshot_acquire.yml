@@ -1,6 +1,7 @@
 name: m1macro-dev-snapshot-acquire
 # One-time acquisition of the M1-MACRO development snapshot (Impl Part 1 V1.2 §6, Part 4 §4, §8).
-# Runs only on a push to branch m1macro-acquire. Treasury raw bytes go to the private repository only;
+# Runs only on a push to branch m1macro-acquire. ONE-SHOT: the canonical snapshot was acquired by run 39045282957
+# (main 8ed83c2, private f424840); every later run fails closed at the guard below and never overwrites it. Treasury raw bytes go to the private repository only;
 # the public side gets MOF/CFTC raw files, the snapshot manifest and treasury_raw_manifest.csv rows.
 on:
   push:
@@ -20,6 +21,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+      - name: One-shot guard (fail closed if the canonical snapshot already exists on main or in private storage)
+        run: |
+          set -eu
+          git fetch -q origin main
+          if git cat-file -e origin/main:data/m1macro/dev_snapshot/manifest.json 2>/dev/null; then
+            echo "CANONICAL_SNAPSHOT_EXISTS (main)"; exit 1
+          fi
+          [ -n "${TOKEN}" ] || { echo "SECRET_MISSING"; exit 1; }
+          git clone -q --depth 1 "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" guardpriv 2>/dev/null
+          if [ -e guardpriv/m1macro_dev_snapshot ]; then rm -rf guardpriv; echo "CANONICAL_SNAPSHOT_EXISTS (private)"; exit 1; fi
+          rm -rf guardpriv
       - name: Fetch inside pinned image
         run: |
           set -eu
@@ -33,6 +45,7 @@ jobs:
           set -eu
           [ -n "${TOKEN}" ] || { echo "SECRET_MISSING"; exit 1; }
           git clone -q "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" priv 2>/dev/null
+          [ ! -e priv/m1macro_dev_snapshot ] || { echo "CANONICAL_SNAPSHOT_EXISTS (private)"; exit 1; }
           mkdir -p priv/m1macro_dev_snapshot
           cp -r acq/private/treasury priv/m1macro_dev_snapshot/
           cd priv

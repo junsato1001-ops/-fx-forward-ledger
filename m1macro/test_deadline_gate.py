@@ -91,8 +91,8 @@ def commit_path(td):
     bare, work = _repo(td, "c")
     old = FC.ROOT; FC.ROOT = work
     try:
-        (work / "preregistration").mkdir()
-        (work / FC.FREEZE_REL).write_text(json.dumps({"Code_SHA256": manifest.code_sha256()}))
+        from m1macro.test_freeze_record import write_final
+        write_final(work, manifest.code_sha256())
         stage = Path(td, "stage"); stage.mkdir()
         ni = [{"origin": "2026-10-07", "horizons": "1D", "deadline_utc": "2026-10-06T23:30:00Z"}]
         put = lambda tx: (stage / "tx.json").write_text(json.dumps(tx))

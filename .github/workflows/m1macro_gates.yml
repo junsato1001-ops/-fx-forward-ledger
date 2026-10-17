@@ -1,10 +1,12 @@
 name: m1macro-gates
 # Formal implementation gates G1-G9 (Impl Part 4 §5) on ONE candidate commit (push to branch m1macro-gates).
+# The same jobs on branch m1macro-devblind are the development blind run (Impl Part 2 §11; むすび F5 2026-10-18):
+# results go to m1macro-devblind-results with run_class DEVELOPMENT_BLIND and never count as formal gates.
 # G6-G8 are blind: the container writes only allow-listed fields (m1macro/gates.py); its stdout/stderr are discarded;
 # per-run hashes for G7 never leave the container. Results -> branch m1macro-gates-results under <Code_SHA256>/.
 on:
   push:
-    branches: [m1macro-gates]
+    branches: [m1macro-gates, m1macro-devblind]   # m1macro-devblind = development blind run (not a formal gate)
 permissions:
   contents: write
 concurrency:
@@ -12,6 +14,9 @@ concurrency:
   cancel-in-progress: false
 env:
   PRIVATE_REPO: junsato1001-ops/fx-ledger-private-raw
+  # formal results only from branch m1macro-gates; development blind results never reach m1macro-gates-results
+  RESULTS_BRANCH: ${{ github.ref_name == 'm1macro-gates' && 'm1macro-gates-results' || 'm1macro-devblind-results' }}
+  RUN_CLASS: ${{ github.ref_name == 'm1macro-gates' && 'FORMAL' || 'DEVELOPMENT_BLIND' }}
   N_SHARDS: "20"
 jobs:
   suite:            # G1-G4 (+ unit tests) inside the pinned image
@@ -110,10 +115,11 @@ jobs:
           cp arts/g5/g5_summary.json arts/g5/g5_features_reconstruction.csv res/ 2>/dev/null || true
           cat arts/g5/g5_exit.txt shards/exit_*.txt > res/exits.txt 2>/dev/null || true
           git rev-parse HEAD > res/source_commit.txt
-          git fetch -q origin m1macro-gates-results || true
-          git checkout -q -B m1macro-gates-results origin/m1macro-gates-results 2>/dev/null || git checkout -q --orphan m1macro-gates-results
+          echo "$RUN_CLASS" > res/run_class.txt
+          git fetch -q origin "$RESULTS_BRANCH" || true
+          git checkout -q -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH" 2>/dev/null || git checkout -q --orphan "$RESULTS_BRANCH"
           git rm -rq --cached . 2>/dev/null || true
           mkdir -p "$CS" && cp res/* "$CS"/
           git add "$CS"
-          git -c user.name=junsato1001-ops -c user.email=junsato1001-ops@users.noreply.github.com commit -q -m "gates for $(cat res/source_commit.txt) code $CS"
-          git push -q origin m1macro-gates-results
+          git -c user.name=junsato1001-ops -c user.email=junsato1001-ops@users.noreply.github.com commit -q -m "$RUN_CLASS gates for $(cat res/source_commit.txt) code $CS"
+          git push -q origin "$RESULTS_BRANCH"

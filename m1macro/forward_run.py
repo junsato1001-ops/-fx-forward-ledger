@@ -448,7 +448,7 @@ def not_issued(now):
 def compute(stage, priv_dev_dir, now=None):
     now = _now(now); rid = run_id(); code_sha = manifest.code_sha256()
     out = {"run_id": rid, "code_sha256": code_sha, "status": "", "txs": [], "not_issued": []}
-    if not _freeze_ok(code_sha) or first_forward() is None:
+    if first_forward() is None or not _freeze_ok(code_sha, first_forward()):
         out["status"] = "REFUSED_NOT_FROZEN"          # never compute beta/mu on real data before the freeze
     else:
         D = now.astimezone(JST).date()

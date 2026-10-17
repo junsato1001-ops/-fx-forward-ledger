@@ -37,7 +37,16 @@ def validate(src, b):
             "oi_missing": sum(1 for x in r.values() if x.oi is None), "oi_zero": sum(1 for x in r.values() if x.oi == 0)}
 
 
+CANONICAL_MANIFEST = "data/m1macro/dev_snapshot/manifest.json"   # canonical one-shot snapshot (むすび 2026-10-18)
+
+
+class SnapshotExists(Exception):
+    pass
+
+
 def main(outdir, mode, today=None):
+    if mode == "acquire" and (Path(__file__).resolve().parent.parent / CANONICAL_MANIFEST).exists():
+        raise SnapshotExists("CANONICAL_SNAPSHOT_EXISTS")   # one-shot guard (the workflow also checks main + private)
     today = today or dt.datetime.now(dt.timezone.utc).date()
     out = Path(outdir); recs = []; ok = True
     for src, rel, url in plan(today):

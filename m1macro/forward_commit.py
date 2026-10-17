@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from m1macro import deadline_gate as DG, ledger_tx as L, manifest  # noqa: E402
+from m1macro import deadline_gate as DG, freeze_record as FRZ, ledger_tx as L, manifest  # noqa: E402
 from m1macro.schema import (ESTIMATION_FIELDS, FEATURE_FIELDS, FETCH_FIELDS, FORECAST_FIELDS,  # noqa: E402
                             TREASURY_FIELDS)
 
@@ -18,7 +18,7 @@ CFG = json.loads((ROOT / "m1macro" / "config" / "m1macro_config.json").read_text
 DATA = "data/m1macro"
 FETCHES = f"{DATA}/source_fetches.csv"
 TREASURY_MANIFEST = f"{DATA}/treasury_raw_manifest.csv"
-FREEZE_REL = "preregistration/M1-MACRO-IMPL-CODE-V1.freeze.json"
+FREEZE_REL = "preregistration/M1-MACRO-IMPL-CODE-V1.freeze.json"   # = freeze_record.RECORD
 UTC = dt.timezone.utc
 
 
@@ -42,12 +42,10 @@ def read_csv(rel):
         return list(csv.DictReader(f))
 
 
-def _freeze_ok(code_sha):
-    fz = ROOT / FREEZE_REL
-    if not fz.exists():
-        return False
-    fr = json.loads(fz.read_text("utf-8"))
-    return fr.get("Code_SHA256") == code_sha
+def _freeze_ok(code_sha, first=None):
+    """Implementation freeze holds for code_sha: record + exactly one COMPLETE marker + FINAL freeze audit row
+    (anchor gate and D2 Freeze-finalization gate PASS) on the synced tree (freeze_record.is_final)."""
+    return FRZ.is_final_tree(ROOT, code_sha, first)
 
 
 def _complete_keys():

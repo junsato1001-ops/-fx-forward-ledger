@@ -26,6 +26,14 @@ class RealGit:
             raise GitError(f"header mismatch {path}")
         self.touched.add(path)
 
+    def create(self, path, b: bytes):
+        """Write a new file; refuse if it already exists (never overwrite)."""
+        p = self.dir / path
+        if p.exists():
+            raise GitError(f"exists {path}")
+        p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes(b)
+        self.touched.add(path); self.pending = True
+
     def append(self, path, b: bytes):
         with open(self.dir / path, "ab") as f:
             f.write(b)
