@@ -64,6 +64,7 @@ def _tx(td, name, run_start, clock, reject=(), fail_remote=(), first=FIRST):
 
 
 def run():
+    gate_results_negative()
     af = F.a_first(FIRST, 6)
     assert F.utc_s(af["1D"]) == "2026-11-09T12:00:00Z" and F.utc_s(af["1W"]) == "2026-11-14T12:00:00Z"
     # independent of freeze_gate (zoneinfo + cftc_feature.WINDOW): same values; config window == code window
@@ -129,3 +130,36 @@ def run():
 
 if __name__ == "__main__":
     print(run())
+
+
+def gate_results_negative():
+    """F5: freeze_record.gate_results accepts only run_class FORMAL results for this Code_SHA256 and commit."""
+    import subprocess
+    cs, cand = "c" * 64, "a" * 40
+    def results(td, name, files):
+        bare, work = _repo(td, name)
+        git = lambda *a: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@e", *a], cwd=work, check=True,
+                                        capture_output=True)
+        git("checkout", "-q", "--orphan", "m1macro-gates-results"); git("rm", "-rq", "--cached", ".")
+        for n, b in files.items():
+            p = Path(work, cs, n); p.parent.mkdir(parents=True, exist_ok=True); p.write_bytes(b)
+        git("add", cs); git("commit", "-q", "-m", "r"); git("push", "-q", "origin", "m1macro-gates-results")
+        git("checkout", "-q", "-f", "main")
+        return work
+    base = {"code_sha256.txt": (cs + "\n").encode(), "source_commit.txt": (cand + "\n").encode(),
+            "suite.json": b'{"test_x": {"status": "PASS"}}', "manifest_gate.json": b'{"pass": true}'}
+    cases = [({**base, "run_class.txt": b"FORMAL\n"}, None),
+             ({**base, "run_class.txt": b"DEVELOPMENT_BLIND\n"}, "GATE_RESULTS_NOT_FORMAL"),
+             (dict(base), "GATE_RESULTS_NOT_FORMAL"),                                          # label missing
+             ({**base, "run_class.txt": b"FORMAL\n", "source_commit.txt": b"b" * 40 + b"\n"}, "GATE_RESULTS_NOT_FOR_CANDIDATE"),
+             ({**base, "run_class.txt": b"FORMAL\n", "suite.json": b'{"test_x": {"status": "FAIL"}}'}, "GATE_SUITE_NOT_PASS"),
+             ({**base, "run_class.txt": b"FORMAL\n", "manifest_gate.json": b'{"pass": false}'}, "GATE_MANIFEST_NOT_PASS")]
+    with tempfile.TemporaryDirectory() as td:
+        for i, (files, want) in enumerate(cases):
+            work = results(td, f"g{i}", files)
+            try:
+                r = F.gate_results(str(work), cs, cand); got = None
+                assert r["Results_Dir"] == cs and set(r["Files_SHA256"]) == set(files)
+            except F.FreezeRefused as e:
+                got = str(e)
+            assert got == want, (i, got, want)
