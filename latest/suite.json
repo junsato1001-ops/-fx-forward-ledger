@@ -4,21 +4,21 @@
    "np_path_equal": true,
    "pool_sha256_example": "20584438fa2bda2d8e72130ff3f7c9605a6c45e31e3ae4e2ae3bc4a85d4ea920"
   },
-  "sec": 0.06,
+  "sec": 0.1,
   "status": "PASS"
  },
  "test_cftc_feature": {
   "detail": {
    "ok": true
   },
-  "sec": 0.0,
+  "sec": 0.01,
   "status": "PASS"
  },
  "test_cftc_parse": {
   "detail": {
    "ok": true
   },
-  "sec": 0.02,
+  "sec": 0.03,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -26,7 +26,7 @@
    "ok": true,
    "schedule_2026_mismatch": {}
   },
-  "sec": 0.01,
+  "sec": 0.02,
   "status": "PASS"
  },
  "test_cftc_schedule": {
@@ -34,14 +34,14 @@
    "n_releases": 52,
    "ok": true
   },
-  "sec": 0.0,
+  "sec": 0.01,
   "status": "PASS"
  },
  "test_deadline_gate": {
   "detail": {
    "ok": true
   },
-  "sec": 0.56,
+  "sec": 0.73,
   "status": "PASS"
  },
  "test_estimation": {
@@ -52,7 +52,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.44,
+  "sec": 0.81,
   "status": "PASS"
  },
  "test_features": {
@@ -66,19 +66,24 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.03,
+  "sec": 0.05,
   "status": "PASS"
  },
  "test_forward_commit": {
   "detail": {
    "ok": true
   },
-  "sec": 0.09,
+  "sec": 0.11,
   "status": "PASS"
  },
  "test_forward_run": {
-  "status": "FAIL",
-  "trace": "Traceback (most recent call last):\n  File \"/w/m1macro/dev_suite.py\", line 18, in main\n    results[name] = {\"status\": \"PASS\", \"detail\": mod.run(), \"sec\": round(time.time() - t0, 2)}\n                                                 ^^^^^^^^^\n  File \"/w/m1macro/test_forward_run.py\", line 161, in run\n    st = FR.commit_tx(str(stage), gitrepo.RealGit(root, message=\"t\"), lambda: ck.pop(0))\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/w/m1macro/forward_commit.py\", line 160, in commit_tx\n    res = _commit_txs(tx, git, now_fn)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/w/m1macro/forward_commit.py\", line 179, in _commit_txs\n    raise PipelineFailure(\"CODE_SHA_CHANGED\")\nm1macro.forward_commit.PipelineFailure: CODE_SHA_CHANGED\n"
+  "detail": {
+   "n_warmup": 3916,
+   "ok": true,
+   "parameter_state": "ESTIMATED"
+  },
+  "sec": 117.63,
+  "status": "PASS"
  },
  "test_freeze_gate": {
   "detail": {
@@ -94,7 +99,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 1.21,
+  "sec": 1.54,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -102,47 +107,47 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 14.1,
+    "build_sec": 25.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 4.0,
+    "solve_sec": 6.1,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 14.1,
+    "build_sec": 25.5,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 4.5,
+    "solve_sec": 6.7,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 14.1,
+    "build_sec": 25.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 4.1,
+    "solve_sec": 6.2,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 54.9,
+  "sec": 95.39,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.26,
+  "sec": 1.65,
   "status": "PASS"
  },
  "test_indep": {
@@ -199,7 +204,7 @@
    "D_600x800": {
     "d_UB": 2.220446049250313e-16,
     "d_beta_inf": 1.9880321347476304e-13,
-    "d_mu_over_sigma": 3.8274139382607144e-11,
+    "d_mu_over_sigma": 3.827413938260714e-11,
     "indep_gap": 4.440892098500626e-16,
     "iterations": 10,
     "method": "epigraph",
@@ -221,7 +226,7 @@
     "pass_mu": true
    }
   },
-  "sec": 88.6,
+  "sec": 159.44,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -243,14 +248,14 @@
     ".github/workflows/m1macro_snapshot_acquire.yml"
    ]
   },
-  "sec": 0.02,
+  "sec": 0.04,
   "status": "PASS"
  },
  "test_rates": {
   "detail": {
    "ok": true
   },
-  "sec": 0.01,
+  "sec": 0.02,
   "status": "PASS"
  },
  "test_reconstruct": {
@@ -260,7 +265,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 7.27,
+  "sec": 13.45,
   "status": "PASS"
  },
  "test_s0link": {
@@ -269,7 +274,7 @@
    "issued_checked": 800,
    "ok": true
   },
-  "sec": 0.04,
+  "sec": 0.06,
   "status": "PASS"
  },
  "test_solver": {
@@ -334,7 +339,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.0,
+    "sec": 1.6,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -344,7 +349,7 @@
     ],
     "ok": true,
     "phi2_lb": 1.0343952490597432e-16,
-    "sec": 0.2,
+    "sec": 0.3,
     "ub_lb": 1.0343952490597432e-16
    },
    "E": {
@@ -352,7 +357,7 @@
     "ok": true
    }
   },
-  "sec": 3.27,
+  "sec": 5.84,
   "status": "PASS"
  }
 }
