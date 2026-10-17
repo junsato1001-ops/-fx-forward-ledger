@@ -1,0 +1,5 @@
+{"run_id": "39016504914", "checked_at_utc": "2026-10-17T08:12:46Z", "private_repository": "junsato1001-ops/fx-ledger-private-raw",
+ "probe_path": "probe/connectivity_39016504914.txt", "probe_bytes": "79", "probe_sha256": "aeecda98a6308f2936ee5b9dc04eee90bf67467c7d11decbd8a363de1f4d2dd5",
+ "private_commit": "832bf60d2975bd8faa62c42857d3bcced9a65f8b", "fresh_clone_readback_match": true,
+ "status": "PASS", "reason": "",
+ "note": "Probe file contains only run id and timestamp, no market data. Token never written."}
