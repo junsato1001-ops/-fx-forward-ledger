@@ -16,18 +16,16 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
-      - name: Resolve image digest and hash-locked requirements
+      - name: Use committed pinned environment (env/IMAGE_DIGEST, env/requirements.lock)
         run: |
           set -eu
           mkdir -p out/env
-          IMG=$(cat env/IMAGE)
-          docker pull -q "$IMG" > /dev/null
-          docker inspect --format '{{index .RepoDigests 0}}' "$IMG" > out/env/image_digest.txt
-          DIG=$(cat out/env/image_digest.txt)
-          docker run --rm -v "$PWD":/w -w /w "$DIG" sh -c '
-            pip install -q pip-tools==7.4.1 &&
-            pip-compile -q --generate-hashes --allow-unsafe --no-strip-extras --output-file out/env/requirements.lock env/requirements.in' 
+          cp env/IMAGE_DIGEST out/env/image_digest.txt
+          cp env/requirements.lock out/env/requirements.lock
+          DIG=$(cat env/IMAGE_DIGEST)
+          docker pull -q "$DIG" > /dev/null
           docker run --rm "$DIG" python -c "import sys,platform;print(sys.version);print(platform.platform())" > out/env/python.txt
+          (grep -m1 'model name' /proc/cpuinfo; nproc) > out/env/cpu.txt
       - name: Run dev suite inside pinned image (synthetic only)
         run: |
           set -eu

@@ -1,0 +1,24 @@
+"""Development suite entry point: python -I -m m1macro.dev_suite <outdir>. Synthetic only."""
+import json
+import sys
+import time
+import traceback
+from pathlib import Path
+
+
+def main(outdir):
+    out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
+    results = {}
+    for name in ("test_canon", "test_solver", "test_fullscale"):
+        t0 = time.time()
+        try:
+            mod = __import__(f"m1macro.{name}", fromlist=["run"])
+            results[name] = {"status": "PASS", "detail": mod.run(), "sec": round(time.time() - t0, 2)}
+        except Exception:
+            results[name] = {"status": "FAIL", "trace": traceback.format_exc()[-3000:]}
+    (out / "suite.json").write_text(json.dumps(results, indent=1, sort_keys=True), encoding="utf-8")
+    print(json.dumps({k: v["status"] for k, v in results.items()}))
+
+
+if __name__ == "__main__":
+    main(sys.argv[1])
