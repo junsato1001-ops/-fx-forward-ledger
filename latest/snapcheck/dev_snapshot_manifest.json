@@ -7,7 +7,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1990.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1990/all?type=daily_treasury_yield_curve&field_tdr_date_value=1990&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:35:00Z",
+   "retrieved_at_utc": "2026-10-17T19:26:34Z",
    "bytes": 14069,
    "sha256": "d8d5e4bb7ae2f13ccf03a7f50537723a4a5a37e2ebe85da3e32f53328c411d18",
    "check": {
@@ -20,7 +20,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1991.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1991/all?type=daily_treasury_yield_curve&field_tdr_date_value=1991&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:35:19Z",
+   "retrieved_at_utc": "2026-10-17T19:26:55Z",
    "bytes": 14069,
    "sha256": "d52d81bd96f5e02d8b7a74384d568eaafe36c2a067272e0840c5ea4022c1d4d4",
    "check": {
@@ -33,7 +33,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1992.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1992/all?type=daily_treasury_yield_curve&field_tdr_date_value=1992&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:35:37Z",
+   "retrieved_at_utc": "2026-10-17T19:27:13Z",
    "bytes": 14125,
    "sha256": "13fb485ff7085d1c8afb70b3bb6fd7fe7c728f7b672a9c1844d7e9e6d26827f9",
    "check": {
@@ -46,7 +46,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1993.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1993/all?type=daily_treasury_yield_curve&field_tdr_date_value=1993&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:35:56Z",
+   "retrieved_at_utc": "2026-10-17T19:27:33Z",
    "bytes": 14575,
    "sha256": "c5482e2e88fa8256eb513600c44fbcb8bd317e061a840a429676f4d1330cea3d",
    "check": {
@@ -59,7 +59,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1994.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1994/all?type=daily_treasury_yield_curve&field_tdr_date_value=1994&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:36:15Z",
+   "retrieved_at_utc": "2026-10-17T19:27:52Z",
    "bytes": 15266,
    "sha256": "cea2fce245f7a1be83395a82c4f56e146d2074909255930226551170bf25de18",
    "check": {
@@ -72,7 +72,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1995.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1995/all?type=daily_treasury_yield_curve&field_tdr_date_value=1995&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:36:34Z",
+   "retrieved_at_utc": "2026-10-17T19:28:11Z",
    "bytes": 15327,
    "sha256": "5815b05e0575a6220d84666346c56bc1fa39d0a4212b89bf0f50a3c09579de15",
    "check": {
@@ -85,7 +85,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1996.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1996/all?type=daily_treasury_yield_curve&field_tdr_date_value=1996&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:36:53Z",
+   "retrieved_at_utc": "2026-10-17T19:28:28Z",
    "bytes": 15449,
    "sha256": "656992cb54c922745bb7ccf11a57a3dd5fe2f1653f7d8127d04d25f3e3aaa674",
    "check": {
@@ -98,7 +98,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1997.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1997/all?type=daily_treasury_yield_curve&field_tdr_date_value=1997&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:37:12Z",
+   "retrieved_at_utc": "2026-10-17T19:28:48Z",
    "bytes": 15327,
    "sha256": "3653e22f12846593dc6e0d95a7518acfc2d2f6dd89ec83cc82e2ebeb4586b833",
    "check": {
@@ -111,7 +111,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1998.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1998/all?type=daily_treasury_yield_curve&field_tdr_date_value=1998&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:37:33Z",
+   "retrieved_at_utc": "2026-10-17T19:29:06Z",
    "bytes": 15327,
    "sha256": "3861b3be824744c1c6c616224fd1b87054dfcf2e8106c7551a589b5fedeb7f4a",
    "check": {
@@ -124,7 +124,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_1999.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/1999/all?type=daily_treasury_yield_curve&field_tdr_date_value=1999&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:37:52Z",
+   "retrieved_at_utc": "2026-10-17T19:29:27Z",
    "bytes": 15388,
    "sha256": "36bff57ac81eb582c68e57479c0ad4fbc4ee090e9028886d49b7f1ce434a5aea",
    "check": {
@@ -137,7 +137,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2000.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2000/all?type=daily_treasury_yield_curve&field_tdr_date_value=2000&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:38:11Z",
+   "retrieved_at_utc": "2026-10-17T19:29:46Z",
    "bytes": 15388,
    "sha256": "a8cde4c7a757ac74f7b6257d3778db73a215483002317e19ee9e3f3c524a8a24",
    "check": {
@@ -150,7 +150,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2001.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2001/all?type=daily_treasury_yield_curve&field_tdr_date_value=2001&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:38:29Z",
+   "retrieved_at_utc": "2026-10-17T19:30:04Z",
    "bytes": 15872,
    "sha256": "bc48181de2b452d19b159bc12354653f64ce3b119d7072dbf4aa92fa6998799c",
    "check": {
@@ -163,7 +163,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2002.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2002/all?type=daily_treasury_yield_curve&field_tdr_date_value=2002&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:38:49Z",
+   "retrieved_at_utc": "2026-10-17T19:30:23Z",
    "bytes": 15712,
    "sha256": "33f84b7c6f50bf3ea0ca4703cb51c8d469bbb93dad92f181d42132b7e2359bf7",
    "check": {
@@ -176,7 +176,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2003.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2003/all?type=daily_treasury_yield_curve&field_tdr_date_value=2003&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:39:06Z",
+   "retrieved_at_utc": "2026-10-17T19:30:41Z",
    "bytes": 15326,
    "sha256": "0c255188cf596e5bc42a4e00b9a60649df01fb95a58a3382d7586da83e5cc0e0",
    "check": {
@@ -189,7 +189,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2004.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2004/all?type=daily_treasury_yield_curve&field_tdr_date_value=2004&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:39:23Z",
+   "retrieved_at_utc": "2026-10-17T19:31:00Z",
    "bytes": 15326,
    "sha256": "0f0561773c7a3220fe1eded9a7ba0645790e9239fd3cf569158171fedf2dc969",
    "check": {
@@ -202,7 +202,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2005.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2005/all?type=daily_treasury_yield_curve&field_tdr_date_value=2005&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:39:43Z",
+   "retrieved_at_utc": "2026-10-17T19:31:18Z",
    "bytes": 15326,
    "sha256": "ecf2ab3d1ca1b6ee8e916fee90474028c2d1221b8d236131621ad58020db0552",
    "check": {
@@ -215,7 +215,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2006.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2006/all?type=daily_treasury_yield_curve&field_tdr_date_value=2006&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:40:01Z",
+   "retrieved_at_utc": "2026-10-17T19:31:38Z",
    "bytes": 16480,
    "sha256": "cdbdcd8b32735caa453e00280232ff70c7012c055b7daf7b8cf1d9aaa8c66bfe",
    "check": {
@@ -228,7 +228,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2007.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2007/all?type=daily_treasury_yield_curve&field_tdr_date_value=2007&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:40:20Z",
+   "retrieved_at_utc": "2026-10-17T19:31:55Z",
    "bytes": 16650,
    "sha256": "297f6be4059a605b1ec0f266eb7b8467c3d40504a0dd53341746223276e6e6d8",
    "check": {
@@ -241,7 +241,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2008.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2008/all?type=daily_treasury_yield_curve&field_tdr_date_value=2008&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:40:41Z",
+   "retrieved_at_utc": "2026-10-17T19:32:15Z",
    "bytes": 16638,
    "sha256": "686db01584dd45f67addc243ee0c42339d491171a0e947c8f88ecac78ee0e9ea",
    "check": {
@@ -254,7 +254,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2009.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2009/all?type=daily_treasury_yield_curve&field_tdr_date_value=2009&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:40:57Z",
+   "retrieved_at_utc": "2026-10-17T19:32:31Z",
    "bytes": 16584,
    "sha256": "3c9294cfa71136e1d5330b09a00bf996ecf86c865d593d7ee954d11984a5bdb1",
    "check": {
@@ -267,7 +267,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2010.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2010/all?type=daily_treasury_yield_curve&field_tdr_date_value=2010&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:41:17Z",
+   "retrieved_at_utc": "2026-10-17T19:32:51Z",
    "bytes": 16672,
    "sha256": "f973bd3988989d3e408655cbc7fed89faefbaa8a1c111ec313241fb47fc75e2d",
    "check": {
@@ -280,7 +280,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2011.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2011/all?type=daily_treasury_yield_curve&field_tdr_date_value=2011&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:41:35Z",
+   "retrieved_at_utc": "2026-10-17T19:33:11Z",
    "bytes": 16584,
    "sha256": "224eaf29d6fe7cbccc746c7a8c845f189cf91424bab43f46ca386a74e98d81f7",
    "check": {
@@ -293,7 +293,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2012.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2012/all?type=daily_treasury_yield_curve&field_tdr_date_value=2012&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:41:52Z",
+   "retrieved_at_utc": "2026-10-17T19:33:29Z",
    "bytes": 16584,
    "sha256": "9c889b6e3cb87f40f3760bddb69f05f7525800ac480ef5712b2cf318765fa184",
    "check": {
@@ -306,7 +306,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2013.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2013/all?type=daily_treasury_yield_curve&field_tdr_date_value=2013&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:42:09Z",
+   "retrieved_at_utc": "2026-10-17T19:33:46Z",
    "bytes": 16584,
    "sha256": "1e1a98426d9274afcc68467962f9238104db775b8765e48f45ac7488b33ff338",
    "check": {
@@ -319,7 +319,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2014.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2014/all?type=daily_treasury_yield_curve&field_tdr_date_value=2014&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:42:27Z",
+   "retrieved_at_utc": "2026-10-17T19:34:03Z",
    "bytes": 16584,
    "sha256": "8d560698e03e4c0d8d22ff8be7f5f7c5c0d472b1e33a22b6a75373a57e84aa0f",
    "check": {
@@ -332,7 +332,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2015.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2015/all?type=daily_treasury_yield_curve&field_tdr_date_value=2015&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:42:44Z",
+   "retrieved_at_utc": "2026-10-17T19:34:20Z",
    "bytes": 16650,
    "sha256": "b7665d1ce46d6ed6d08fbda34aae1831de38e274e3c7caed81904042aac9b5bc",
    "check": {
@@ -345,7 +345,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2016.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2016/all?type=daily_treasury_yield_curve&field_tdr_date_value=2016&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:43:03Z",
+   "retrieved_at_utc": "2026-10-17T19:34:39Z",
    "bytes": 16584,
    "sha256": "b4d0a8d86e2734bc64d84d9a9824434d841737621582daeac58f13c7129f325c",
    "check": {
@@ -358,7 +358,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2017.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2017/all?type=daily_treasury_yield_curve&field_tdr_date_value=2017&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:43:19Z",
+   "retrieved_at_utc": "2026-10-17T19:34:58Z",
    "bytes": 16584,
    "sha256": "56074da7c32103a28cf4ba2bdf5eaa12f98fd49852047aef1a6eb16e64bd6e83",
    "check": {
@@ -371,7 +371,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2018.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2018/all?type=daily_treasury_yield_curve&field_tdr_date_value=2018&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:43:39Z",
+   "retrieved_at_utc": "2026-10-17T19:35:15Z",
    "bytes": 16978,
    "sha256": "e8375524a7a8d3e8091bbe7690d0378b9365be09efff5b18b8eefddc25f718d3",
    "check": {
@@ -384,7 +384,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2019.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2019/all?type=daily_treasury_yield_curve&field_tdr_date_value=2019&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:43:58Z",
+   "retrieved_at_utc": "2026-10-17T19:35:36Z",
    "bytes": 17841,
    "sha256": "83fc47c17325e222c45fd3a1eb26c69ae01f62d33b793030b4b8b350ca0a290b",
    "check": {
@@ -397,7 +397,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2020.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2020/all?type=daily_treasury_yield_curve&field_tdr_date_value=2020&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:44:16Z",
+   "retrieved_at_utc": "2026-10-17T19:35:53Z",
    "bytes": 17912,
    "sha256": "edcf1c8be9622f3cd92eb7de1847aefc3977e2118e2ff9af67f46614a5c306a7",
    "check": {
@@ -410,7 +410,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2021.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2021/all?type=daily_treasury_yield_curve&field_tdr_date_value=2021&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:44:36Z",
+   "retrieved_at_utc": "2026-10-17T19:36:11Z",
    "bytes": 17912,
    "sha256": "1be57e49c63a99f6002431a1030c8fbe539b71066c3eaf14f9f58ddc34492cea",
    "check": {
@@ -423,7 +423,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2022.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2022/all?type=daily_treasury_yield_curve&field_tdr_date_value=2022&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:44:54Z",
+   "retrieved_at_utc": "2026-10-17T19:36:29Z",
    "bytes": 18226,
    "sha256": "c33cb2758e5e34c2c23b7ab759d18681091860f3f9e5960112859f64f31cd814",
    "check": {
@@ -436,7 +436,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2023.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2023/all?type=daily_treasury_yield_curve&field_tdr_date_value=2023&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:45:12Z",
+   "retrieved_at_utc": "2026-10-17T19:36:50Z",
    "bytes": 19098,
    "sha256": "edb7f3904e11dcaa502cdcc03ad9b1b16c893802d166ce9bc5fa1118251249d4",
    "check": {
@@ -449,7 +449,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2024.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2024/all?type=daily_treasury_yield_curve&field_tdr_date_value=2024&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:45:30Z",
+   "retrieved_at_utc": "2026-10-17T19:37:07Z",
    "bytes": 19098,
    "sha256": "6775840b76cd7fd41121f61d6f6c60184eca6b2ba49954ec7372c463cbeef34d",
    "check": {
@@ -462,7 +462,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2025.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2025/all?type=daily_treasury_yield_curve&field_tdr_date_value=2025&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:45:49Z",
+   "retrieved_at_utc": "2026-10-17T19:37:27Z",
    "bytes": 20155,
    "sha256": "cf2fa3da7f160384b63d2ead698532b1d76cd9f789ce4911e2304db85b14e6d5",
    "check": {
@@ -475,7 +475,7 @@
    "source": "treasury",
    "path": "treasury/daily_treasury_yield_curve_2026.csv",
    "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/2026/all?type=daily_treasury_yield_curve&field_tdr_date_value=2026&page&_format=csv",
-   "retrieved_at_utc": "2026-10-17T17:46:07Z",
+   "retrieved_at_utc": "2026-10-17T19:37:46Z",
    "bytes": 16229,
    "sha256": "b06702248327bb7aa652e3be1d104649bb7cce199bf04c176e4d62a9ff6803d8",
    "check": {
@@ -488,7 +488,7 @@
    "source": "mof",
    "path": "mof/jgbcm_all.csv",
    "url": "https://www.mof.go.jp/jgbs/reference/interest_rate/data/jgbcm_all.csv",
-   "retrieved_at_utc": "2026-10-17T17:46:10Z",
+   "retrieved_at_utc": "2026-10-17T19:37:48Z",
    "bytes": 1178227,
    "sha256": "3ed93b158ca7abec8c8c17e9b6b7c04df50cd4da276d731c5625bbca6afce951",
    "check": {
@@ -501,7 +501,7 @@
    "source": "mof",
    "path": "mof/jgbcm.csv",
    "url": "https://www.mof.go.jp/jgbs/reference/interest_rate/jgbcm.csv",
-   "retrieved_at_utc": "2026-10-17T17:46:10Z",
+   "retrieved_at_utc": "2026-10-17T19:37:48Z",
    "bytes": 1261,
    "sha256": "4d2d060bbd937f602fdcf8f5d7d0e2c958c2d955df20879ab9744715b8b32248",
    "check": {
@@ -514,7 +514,7 @@
    "source": "cftc",
    "path": "cftc/fin_fut_txt_2006_2016.zip",
    "url": "https://www.cftc.gov/files/dea/history/fin_fut_txt_2006_2016.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:10Z",
+   "retrieved_at_utc": "2026-10-17T19:37:48Z",
    "bytes": 3166765,
    "sha256": "c3a8d01765133a24ce9c082de88933816497d06f1b03eec8c53750bdd818f14b",
    "check": {
@@ -529,7 +529,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2017.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2017.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 395830,
    "sha256": "e6e2dd537efcc57cdd6cdcc4e45e567fd47e65d8afc8369d8383bf09195ae7f5",
    "check": {
@@ -544,7 +544,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2018.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2018.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 458570,
    "sha256": "6843d130a25a17c6248df67463810f02077ef4eeafdd629299d21c18f5125e40",
    "check": {
@@ -559,7 +559,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2019.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2019.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 454803,
    "sha256": "631b31880d513072aa50d63117c896184dd35db3cc8fcdd6debd80197ee7a661",
    "check": {
@@ -574,7 +574,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2020.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2020.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 430721,
    "sha256": "c90d98d94db708772d669f263fb8061c75f8a7f681ba231fb21247e5c9798e6b",
    "check": {
@@ -589,7 +589,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2021.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2021.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 466549,
    "sha256": "5c929991038c70ae2501661b6d442b9e784d3c29d3166ceac2e21b45ac93d56a",
    "check": {
@@ -604,7 +604,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2022.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2022.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 494559,
    "sha256": "94c9c1fdee9dfbe377a09923ddfe26b88d3460605dd076081f221ad367d88601",
    "check": {
@@ -619,7 +619,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2023.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2023.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 506931,
    "sha256": "43c3dbdd4d01fceefad5e457003751cdc0974c7cf46097b322e26e9e2fe44d7a",
    "check": {
@@ -634,7 +634,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2024.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2024.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:49Z",
    "bytes": 563591,
    "sha256": "3f00585741a7cf76c207df640951d644dd91ff22a1106b38ca37a2469c765637",
    "check": {
@@ -649,7 +649,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2025.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2025.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:11Z",
+   "retrieved_at_utc": "2026-10-17T19:37:50Z",
    "bytes": 627068,
    "sha256": "2ea0cda6395f7dd6501c27422be3763e1f2f5b41b768cfd36b871f092a07d438",
    "check": {
@@ -664,7 +664,7 @@
    "source": "cftc",
    "path": "cftc/fut_fin_txt_2026.zip",
    "url": "https://www.cftc.gov/files/dea/history/fut_fin_txt_2026.zip",
-   "retrieved_at_utc": "2026-10-17T17:46:12Z",
+   "retrieved_at_utc": "2026-10-17T19:37:50Z",
    "bytes": 578812,
    "sha256": "6722fc377087c9380d7504345ac7145a891185ea7d57c9ad3f184b29da43aa57",
    "check": {
