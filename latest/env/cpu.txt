@@ -1,2 +1,2 @@
-model name	: AMD EPYC 9V74 80-Core Processor
+model name	: AMD EPYC 9V45 96-Core Processor
 4
