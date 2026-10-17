@@ -14,5 +14,5 @@ def run(seed=13):
         r = S.solve(g)
         xs = [gg.x for gg in g[:50]]; ss = [gg.sigma for gg in g[:50]]
         out[name] = indep.compare(g, r, xs, ss)
-    out["ALL_PASS"] = all(v["pass_UB"] and v["pass_beta"] and v.get("pass_mu", True) for v in out.values() if isinstance(v, dict))
+    out["ALL_PASS"] = all(v["pass_UB"] and v["pass_beta"] and v["pass_gap"] and v.get("pass_mu", True) for v in out.values() if isinstance(v, dict))
     return out

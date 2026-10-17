@@ -37,7 +37,7 @@ class Prob:
         return (2 * k - N) / (N * self.sig[g]), (hi - lo) / (N * self.sig[g])
 
 
-def solve_epigraph(P, tol=1e-12, maxr=200):
+def solve_epigraph(P, tol=1e-13, maxr=200):
     G = len(P.a); cuts = {}
     for g in range(G):
         for mu0 in (P.a[g][0] - 1.0, P.a[g][-1] + 1.0):
@@ -147,10 +147,63 @@ def _vertex_polish(F, cuts, x, bnd, K=8):
     return best[1], best[0]
 
 
-def solve_kelley_fast(P, tol=1e-12, maxit=600, lam=0.5):
-    """Aggregated-cut cutting plane with a different stabilisation (level 0.5, Euclidean-free box step) and
-    scipy's interface; stops on the float LB gap or when the best point repeats."""
+def _det_solve(M, r):
+    """Cramer's rule on a 4x4 Fraction system (own code, different from production's elimination)."""
+    from fractions import Fraction
+
+    def det(A):
+        n = len(A)
+        if n == 1:
+            return A[0][0]
+        return sum(((-1) ** j) * A[0][j] * det([row[:j] + row[j + 1:] for row in A[1:]]) for j in range(n) if A[0][j] != 0)
+    d = det(M)
+    if d == 0:
+        return None
+    out = []
+    for j in range(len(M)):
+        Mj = [row[:j] + [r[i]] + row[j + 1:] for i, row in enumerate(M)]
+        out.append(Fraction(det(Mj)) / d)
+    return out
+
+
+def exact_lb(cuts, bnd, x):
+    """Exact optimal value of the master LP (min theta s.t. s.beta + c <= theta, box) certified by a primal-feasible
+    vertex with nonnegative exact dual multipliers. Returns the exact vertex (beta_1..3, theta) or None."""
+    from fractions import Fraction
+    import itertools
+    rows = [([Fraction(float(v)) for v in s] + [Fraction(-1)], Fraction(-float(c))) for s, c in cuts]
+    for k in range(3):
+        lo, hi = bnd[k]
+        e = [Fraction(0)] * 4; e[k] = Fraction(1); rows.append((e, Fraction(hi)))
+        e = [Fraction(0)] * 4; e[k] = Fraction(-1); rows.append((e, Fraction(-lo)))
+    xf = [float(v) for v in x]
+    act = sorted(range(len(rows)), key=lambda i: (-(sum(float(a) * b for a, b in zip(rows[i][0], xf)) - float(rows[i][1])), i))
+    seen = set()
+    for K in (6, 10, 14):
+        for comb in itertools.combinations(act[:K], 4):
+            if comb in seen:
+                continue
+            seen.add(comb)
+            M = [rows[i][0] for i in comb]
+            v = _det_solve(M, [rows[i][1] for i in comb])
+            if v is None:
+                continue
+            MT = [[M[i][j] for i in range(4)] for j in range(4)]
+            lam = _det_solve(MT, [Fraction(0), Fraction(0), Fraction(0), Fraction(-1)])
+            if lam is None or min(lam) < 0:
+                continue
+            if all(sum(a * b for a, b in zip(r, v)) <= h for r, h in rows):
+                return v
+    return None
+
+
+def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5):
+    """Aggregated-cut cutting plane with a different stabilisation (level 0.5) and scipy's interface. The float LP is
+    used for search; once its gap is within 1e-10 the master is certified exactly every iteration (own Cramer-rule
+    code, exact dual check), the exact vertex becomes the next point, and the run stops when UB - exact LB <= tol
+    (Part 2 §10 criterion 1 for this implementation)."""
     F = FastProb(P); cuts = []; best = (math.inf, None); pts = [np.zeros(3)]; bnd = _bounds(P)
+    lb = -math.inf
     for it in range(maxit):
         for p in pts:
             s, c, v = F.eval(p); cuts.append((s, c))
@@ -159,16 +212,21 @@ def solve_kelley_fast(P, tol=1e-12, maxit=600, lam=0.5):
         A = np.array([np.r_[s, -1.0] for s, _ in cuts]); b = np.array([-c for _, c in cuts])
         res = linprog(np.r_[np.zeros(3), 1.0], A_ub=A, b_ub=b, bounds=bnd + [(None, None)], method="highs-ds", options=OPT)
         lb = res.fun; gap = best[0] - lb
-        if gap <= tol:
-            vb, vv = _vertex_polish(F, cuts, res.x, bnd)
-            if vv < best[0]:
-                best = (vv, vb)
-            return best[1], best[0], lb, it + 1
-        lev = lb + lam * gap
+        xm = res.x[:3]
+        if gap <= 1e-10:                                   # near the end: certify the master exactly every iteration
+            v = exact_lb(cuts, bnd, res.x)
+            if v is not None:
+                lb = float(v[3]); xm = np.array([float(t) for t in v[:3]])
+                if best[0] - lb <= tol:
+                    vb, vv = _vertex_polish(F, cuts, res.x, bnd)
+                    if vb is not None and vv < best[0]:
+                        best = (vv, vb)
+                    return best[1], best[0], lb, it + 1
+        lev = lb + lam * (best[0] - lb)
         A2 = np.array([np.r_[s, 0.0] for s, _ in cuts] + [np.r_[np.eye(3)[j], -1.0] for j in range(3)] + [np.r_[-np.eye(3)[j], -1.0] for j in range(3)])
         b2 = np.r_[[lev - c for _, c in cuts], best[1], -best[1]]
         r2 = linprog(np.r_[np.zeros(3), 1.0], A_ub=A2, b_ub=b2, bounds=bnd + [(0, None)], method="highs-ds", options=OPT)
-        pts = [res.x[:3]] + ([r2.x[:3]] if r2.status == 0 else [])
+        pts = [xm] + ([r2.x[:3]] if r2.status == 0 else [])
     return best[1], best[0], lb, maxit
 
 
@@ -184,7 +242,8 @@ def compare(groups, prod_result, mu_rows=None, sigma_rows=None):
     d_ub = abs(ub - ub_prod)
     d_beta = float(np.max(np.abs(beta - prod_result.beta)))
     out = dict(method=method, iterations=it, indep_gap=float(ub - lb), d_UB=d_ub, d_beta_inf=d_beta,
-               pass_UB=bool(d_ub <= 2e-13), pass_beta=bool(d_beta <= 1e-6))
+               pass_UB=bool(d_ub <= 2e-13), pass_beta=bool(d_beta <= 1e-6),
+               pass_gap=bool(abs(float(ub - lb)) <= 1e-13))          # Part 2 §10 criterion 1 for this implementation
     if mu_rows is not None:
         dmu = max(abs(float(np.dot(x, beta - prod_result.beta))) / s for x, s in zip(mu_rows, sigma_rows))
         out.update(d_mu_over_sigma=dmu, pass_mu=bool(dmu <= 1e-4))

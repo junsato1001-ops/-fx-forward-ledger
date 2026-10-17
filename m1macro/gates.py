@@ -115,7 +115,7 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
                       for p in el]
                 sg = [float(ctx.s0[(p, t, h)]["Sigma_H"]) for p in el]
                 c = indep.compare(E.solver_groups(e, cache[h]), r, xs, sg)
-                pc = abs(r.ub_minus_lb) <= EPS and abs(r.phi2_minus_lb) <= EPS and abs(c["indep_gap"]) <= EPS
+                pc = abs(r.ub_minus_lb) <= EPS and abs(r.phi2_minus_lb) <= EPS and c["pass_gap"]
                 rec.update(indep_method=c["method"], indep_iter=c["iterations"], indep_gap=c["indep_gap"], d_UB=c["d_UB"],
                            d_beta_inf=c["d_beta_inf"], d_mu_over_sigma=c["d_mu_over_sigma"], pass_checks=bool(pc),
                            pass_UB=c["pass_UB"], pass_beta=c["pass_beta"], pass_mu=c["pass_mu"],
