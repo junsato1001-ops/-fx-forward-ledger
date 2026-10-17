@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 def main(outdir):
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
     results = {}
-    for name in ("test_canon", "test_solver", "test_fullscale"):
+    for name in ("test_canon", "test_solver", "test_fullscale", "test_indep"):
         t0 = time.time()
         try:
             mod = __import__(f"m1macro.{name}", fromlist=["run"])

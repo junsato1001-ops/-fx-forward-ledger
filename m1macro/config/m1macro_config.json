@@ -1,0 +1,13 @@
+{
+  "config_version": "candidate-dev",
+  "model": "M1-MACRO-V1",
+  "private_raw_storage": {
+    "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
+    "auth_secret_name": "PRIVATE_RAW_TOKEN",
+    "approved": "むすび 2026-10-17 17:14 JST (connectivity probe run 39016504914 PASS)"
+  },
+  "solver_constants": {"EPS_TIE": 1e-13, "LAMBDA_LEV": 0.3, "BOX_B": 10.0, "CAND_SIZES": [8, 12, 16, 24],
+                       "STAGE1_MAX": 3000, "STAGE2_MAX": 100, "LP_TOL": 1e-10},
+  "pending": ["CFTC exception tables (IMPL-FINDINGS-01 #1)", "production Usable_From guard (IMPL-FINDINGS-01 #2)",
+              "series URLs and column names", "first forward origin (set at implementation freeze)"]
+}
