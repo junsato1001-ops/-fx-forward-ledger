@@ -11,40 +11,91 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 13.7,
+    "build_sec": 20.1,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 3.6,
+    "solve_sec": 5.3,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 13.3,
+    "build_sec": 19.9,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 3.6,
+    "solve_sec": 5.8,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 13.2,
+    "build_sec": 19.8,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 3.7,
+    "solve_sec": 5.3,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 51.18,
+  "sec": 76.18,
+  "status": "PASS"
+ },
+ "test_indep": {
+  "detail": {
+   "ALL_PASS": true,
+   "C_2.5e-9": {
+    "d_UB": 2.220446049250313e-16,
+    "d_beta_inf": 8.881784197001252e-16,
+    "d_mu_over_sigma": 8.881784197001252e-16,
+    "indep_gap": 1.1102230246251565e-16,
+    "iterations": 2,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   },
+   "D_3000x2000": {
+    "d_UB": 2.7977620220553945e-14,
+    "d_beta_inf": 8.95519286329971e-10,
+    "d_mu_over_sigma": 1.105144860887725e-07,
+    "indep_gap": 2.6645352591003757e-15,
+    "iterations": 12,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   },
+   "D_600x800": {
+    "d_UB": 2.220446049250313e-16,
+    "d_beta_inf": 1.9880321347476304e-13,
+    "d_mu_over_sigma": 3.8274139382607144e-11,
+    "indep_gap": 4.440892098500626e-16,
+    "iterations": 10,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   },
+   "E_zero_col": {
+    "d_UB": 0.0,
+    "d_beta_inf": 3.7882934636468413e-13,
+    "d_mu_over_sigma": 5.951126628164051e-11,
+    "indep_gap": -8.881784197001252e-16,
+    "iterations": 11,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_mu": true
+   }
+  },
+  "sec": 35.04,
   "status": "PASS"
  },
  "test_solver": {
@@ -109,7 +160,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 0.9,
+    "sec": 1.4,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -127,7 +178,7 @@
     "ok": true
    }
   },
-  "sec": 3.12,
+  "sec": 4.71,
   "status": "PASS"
  }
 }
