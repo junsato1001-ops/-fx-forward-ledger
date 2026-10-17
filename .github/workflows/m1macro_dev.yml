@@ -35,7 +35,8 @@ jobs:
             "$DIG" sh -c '
               pip install -q --require-hashes -r out/env/requirements.lock &&
               python -c "import numpy,scipy,highspy,tzdata;print(numpy.__version__,scipy.__version__)" > out/env/import_check.txt &&
-              if [ -f m1macro/dev_suite.py ]; then python -I m1macro/dev_suite.py out; else echo "no suite yet" > out/suite.txt; fi' \
+              if [ -f m1macro/dev_suite.py ]; then python -I m1macro/dev_suite.py out; else echo "no suite yet" > out/suite.txt; fi;
+              if [ -f m1macro/data_probe.py ]; then python -I m1macro/data_probe.py out; fi' \
             > out/run_stdout.txt 2>&1 || echo "SUITE_EXIT=$?" >> out/run_stdout.txt
           tail -50 out/run_stdout.txt
       - name: Commit results to m1macro-dev-results
