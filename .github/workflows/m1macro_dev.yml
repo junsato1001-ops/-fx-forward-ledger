@@ -26,6 +26,13 @@ jobs:
           docker pull -q "$DIG" > /dev/null
           docker run --rm "$DIG" python -c "import sys,platform;print(sys.version);print(platform.platform())" > out/env/python.txt
           (grep -m1 'model name' /proc/cpuinfo; nproc) > out/env/cpu.txt
+      - name: TLS chain probe (cftc.gov)
+        run: |
+          set +e
+          mkdir -p out
+          { echo | openssl s_client -connect www.cftc.gov:443 -servername www.cftc.gov -showcerts 2>&1 | grep -E "s:|i:|Verify return" ;
+            DIG=$(cat env/IMAGE_DIGEST); docker run --rm "$DIG" sh -c 'ls -la /etc/ssl/certs | head -3; python -c "import ssl;print(ssl.get_default_verify_paths(), ssl.OPENSSL_VERSION)"' ;
+            python3 -c "import ssl,urllib.request;print('host python', urllib.request.urlopen('https://www.cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule/index.htm',timeout=60).status)" ; } > out/tls_probe.txt 2>&1
       - name: Run dev suite inside pinned image (synthetic only)
         run: |
           set -eu
