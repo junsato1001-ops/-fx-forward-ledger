@@ -5,6 +5,8 @@ import time
 import traceback
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 
 def main(outdir):
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
