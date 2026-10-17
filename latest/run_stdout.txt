@@ -3,4 +3,4 @@ WARNING: Running pip as the 'root' user can result in broken permissions and con
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
 {"test_canon": "PASS", "test_cftc_rules": "PASS", "test_cftc_feature": "PASS", "test_rates": "PASS", "test_s0link": "PASS", "test_forecast": "PASS", "test_solver": "PASS", "test_fullscale": "PASS", "test_indep": "PASS"}
-{"treasury_2026": [200, 16229, null], "treasury_2010": [200, 16672, null], "mof_all": [200, 1178227, null], "mof_current": [200, 1261, null], "cftc_2026": [null, null, "URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)'))"], "cftc_schedule": [null, null, "URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)'))"]}
+{"treasury_2026": [200, 16229, null], "treasury_2010": [200, 16672, null], "mof_all": [200, 1178227, null], "mof_current": [200, 1261, null], "cftc_2026": [200, 578812, null], "cftc_schedule": [200, 48675, null]}

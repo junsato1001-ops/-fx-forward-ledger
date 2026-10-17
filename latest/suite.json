@@ -10,7 +10,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.01,
+  "sec": 0.0,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -25,7 +25,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.05,
+  "sec": 0.02,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -33,40 +33,40 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 22.6,
+    "build_sec": 13.7,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 5.9,
+    "solve_sec": 3.7,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 22.3,
+    "build_sec": 13.4,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.4,
+    "solve_sec": 4.2,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 22.3,
+    "build_sec": 13.3,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 5.8,
+    "solve_sec": 3.6,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 85.32,
+  "sec": 52.02,
   "status": "PASS"
  },
  "test_indep": {
@@ -139,14 +139,14 @@
     "pass_mu": true
    }
   },
-  "sec": 141.23,
+  "sec": 87.63,
   "status": "PASS"
  },
  "test_rates": {
   "detail": {
    "ok": true
   },
-  "sec": 0.02,
+  "sec": 0.01,
   "status": "PASS"
  },
  "test_s0link": {
@@ -155,7 +155,7 @@
    "issued_checked": 800,
    "ok": true
   },
-  "sec": 0.11,
+  "sec": 0.07,
   "status": "PASS"
  },
  "test_solver": {
@@ -220,7 +220,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.7,
+    "sec": 1.1,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -230,7 +230,7 @@
     ],
     "ok": true,
     "phi2_lb": 1.0343952490597432e-16,
-    "sec": 0.3,
+    "sec": 0.2,
     "ub_lb": 1.0343952490597432e-16
    },
    "E": {
@@ -238,7 +238,7 @@
     "ok": true
    }
   },
-  "sec": 5.59,
+  "sec": 3.36,
   "status": "PASS"
  }
 }
