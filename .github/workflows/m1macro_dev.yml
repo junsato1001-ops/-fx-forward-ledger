@@ -1,0 +1,57 @@
+name: m1macro-dev
+# Development CI for the M1-MACRO-V1 implementation candidate.
+# Synthetic tests only. No real data, no beta/mu/forecast/loss output on real data.
+# Results are committed to branch m1macro-dev-results (logs/artifacts are not reachable from the dev sandbox).
+on:
+  push:
+    branches: [m1macro-dev]
+permissions:
+  contents: write
+concurrency:
+  group: m1macro-dev
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve image digest and hash-locked requirements
+        run: |
+          set -eu
+          mkdir -p out/env
+          IMG=$(cat env/IMAGE)
+          docker pull -q "$IMG" > /dev/null
+          docker inspect --format '{{index .RepoDigests 0}}' "$IMG" > out/env/image_digest.txt
+          DIG=$(cat out/env/image_digest.txt)
+          docker run --rm -v "$PWD":/w -w /w "$DIG" sh -c '
+            pip install -q pip-tools==7.4.1 &&
+            pip-compile -q --generate-hashes --allow-unsafe --no-strip-extras --output-file out/env/requirements.lock env/requirements.in' 
+          docker run --rm "$DIG" python -c "import sys,platform;print(sys.version);print(platform.platform())" > out/env/python.txt
+      - name: Run dev suite inside pinned image (synthetic only)
+        run: |
+          set -eu
+          DIG=$(cat out/env/image_digest.txt)
+          docker run --rm -v "$PWD":/w -w /w \
+            -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 \
+            "$DIG" sh -c '
+              pip install -q --require-hashes -r out/env/requirements.lock &&
+              python -c "import numpy,scipy,highspy,tzdata;print(numpy.__version__,scipy.__version__)" > out/env/import_check.txt &&
+              if [ -f m1macro/dev_suite.py ]; then python -I -m m1macro.dev_suite out; else echo "no suite yet" > out/suite.txt; fi' \
+            > out/run_stdout.txt 2>&1 || echo "SUITE_EXIT=$?" >> out/run_stdout.txt
+          tail -50 out/run_stdout.txt
+      - name: Commit results to m1macro-dev-results
+        run: |
+          set -eu
+          SRC=$(git rev-parse HEAD)
+          git config user.name "junsato1001-ops"
+          git config user.email "junsato1001-ops@users.noreply.github.com"
+          git fetch -q origin m1macro-dev-results || true
+          if git rev-parse -q --verify origin/m1macro-dev-results >/dev/null; then
+            git worktree add -q res origin/m1macro-dev-results && (cd res && git checkout -q -B m1macro-dev-results)
+          else
+            git worktree add -q --detach res && (cd res && git checkout -q --orphan m1macro-dev-results && git rm -rq . || true)
+          fi
+          rm -rf res/latest && mkdir -p res/latest && cp -r out/. res/latest/
+          echo "$SRC" > res/latest/source_commit.txt
+          cd res && git add -A && git commit -q -m "dev results for $SRC" && git push -q origin m1macro-dev-results

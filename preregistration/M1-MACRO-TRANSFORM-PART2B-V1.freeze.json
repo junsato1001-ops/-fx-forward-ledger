@@ -1,0 +1,11 @@
+{
+  "spec_id": "M1-MACRO-TRANSFORM-PART2B-V1",
+  "file": "preregistration/M1-MACRO-TRANSFORM-PART2B-V1.md",
+  "sha256": "b10aeb297d6a43c4afda790270a9c109683546de584c258758374b79c0d3602e",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 03:24 JST",
+  "interpretation_notes": [
+    "Section 2: 'beta_US,h is determined only by USDJPY opportunities' and 'USDJPY opportunities also contribute to the shared coefficients' are consistent under joint regression: beta_US,h is identified only from USDJPY observations, while USDJPY observations also contribute to beta_JP,h and beta_POS,h."
+  ],
+  "performance_seal": "INTACT"
+}

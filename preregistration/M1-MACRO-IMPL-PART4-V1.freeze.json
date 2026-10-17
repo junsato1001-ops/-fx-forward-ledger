@@ -1,0 +1,16 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART4-V1",
+  "file": "preregistration/M1-MACRO-IMPL-PART4-V1.md",
+  "sha256": "f5b1571a006debe39a9000a29b3ac9dc1e6602e43c9025d811e76480a101f2ca",
+  "git_blob_sha1": "2985b74b178d53ca956b05748cfe752d2a8593a3",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 16:26 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART4-V1.candidate.md; 0 further change requests)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 2985b74b178d53ca956b05748cfe752d2a8593a3 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 2985b74b178d53ca956b05748cfe752d2a8593a3, SHA-256 f5b1571a006debe39a9000a29b3ac9dc1e6602e43c9025d811e76480a101f2ca)."
+  ],
+  "summary": "Determinism/Replay/Seal: pinned container digest, hash-locked packages, tzdata version, env vars, single thread; canonical serialization (UTF-8, LF, big-endian binary64 hex with +-0 distinct, NaN/Inf fail, integer weights, versioned headers) for POOL_V1 / E_INPUT_V1 / BETA_V1; serialization CPU-independent, computed-result hashes not required to match across CPUs; 9-step transaction with COMPLETE marker and deadline audit (ON_TIME iff Verified_At_UTC <= cutoff, fail-closed); Code_SHA256 manifest and implementation freeze record; gates G1-G9 on one candidate Code_SHA256 (any code change restarts from G1), real-data gates blind; order gates -> implementation freeze -> seal opening record -> development replay (replay/ only, non-confirmatory, never changes V1); no Evidence_Class column in forward rows; holdout never computed; post-freeze changes only as new Version.",
+  "milestone": "With this part, the M1-MACRO-V1 Implementation Specification (Parts 1-4) is complete. Next phase: implementation candidate -> G1-G9 -> audit -> code/config/environment freeze -> seal opening.",
+  "performance_seal": "INTACT",
+  "historical_reserve_holdout": "SEALED"
+}

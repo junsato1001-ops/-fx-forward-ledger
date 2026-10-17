@@ -1,0 +1,12 @@
+{
+  "spec_id": "M1-MACRO-TRANSFORM-PART2A-V1",
+  "file": "preregistration/M1-MACRO-TRANSFORM-PART2A-V1.md",
+  "sha256": "d5ec71c3d21a702fa401ab34d2a40faad1a3909dcc6648bbd20bbbccfe559f46",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 03:17 JST",
+  "interpretation_notes": [
+    "Section 2.3 'normal and holiday weeks: Usable_From = Expected_Release' describes the outcome when the frozen reconstruction assigns the same time for that week; it is not a general identity. Implementations must store and evaluate Usable_From and Expected_Release as two independent fields and must not hard-code their equality."
+  ],
+  "deferred": "Parameter (coefficient) warm-up handling goes to the Model Spec.",
+  "performance_seal": "INTACT"
+}

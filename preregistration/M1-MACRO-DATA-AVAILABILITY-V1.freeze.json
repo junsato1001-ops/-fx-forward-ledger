@@ -1,0 +1,10 @@
+{
+  "spec_id": "M1-MACRO-DATA-AVAILABILITY-V1",
+  "version": "v1.1 FROZEN",
+  "file": "preregistration/M1-MACRO-DATA-AVAILABILITY-V1.md",
+  "sha256": "8c978c35a8f96eda0808d2e0db8d9165347ed58c791185586b9e1e913a945d4c",
+  "frozen_by": "むすび re-audit 2026-10-16 23:36 JST (CONDITIONAL PASS / FREEZE READY AFTER MINOR REVISION), 3 revisions applied by Claude",
+  "decisions": {"T_info": "Origin day 03:00:00 JST", "as_of": "Publication_Timestamp <= T_info", "excluded": {"C5_crude": "DATA_FEASIBILITY_FAIL_POINT_IN_TIME", "C3_VIX": "LICENSE_UNRESOLVED"}},
+  "performance_seal": "maintained; no candidate series values retrieved, no performance computed",
+  "note": "Availability/licensing only. Feature transformations are decided in the separate Transformation Spec."
+}

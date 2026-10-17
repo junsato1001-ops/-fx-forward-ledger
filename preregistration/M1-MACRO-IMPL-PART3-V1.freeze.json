@@ -1,0 +1,19 @@
+{
+  "spec_id": "M1-MACRO-IMPL-PART3-V1",
+  "file": "preregistration/M1-MACRO-IMPL-PART3-V1.md",
+  "sha256": "a6ea20968ec76cfdd485e1c55bda25d5d402f34212ed4cf5a8e68870e4d2a592",
+  "git_blob_sha1": "0f7239d360166df43b86c96893a8c31c3ceacf83",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-17 06:23 JST (full text retrieved independently via GitHub from drafts/M1-MACRO-IMPL-PART3-V1.candidate.md; 0 further change requests)",
+  "verification_chain": [
+    "むすび verified the full text by Git blob SHA 0f7239d360166df43b86c96893a8c31c3ceacf83 (SHA-256 not recomputed by むすび).",
+    "Claude computed both identifiers of the same bytes (blob 0f7239d360166df43b86c96893a8c31c3ceacf83, SHA-256 a6ea20968ec76cfdd485e1c55bda25d5d402f34212ed4cf5a8e68870e4d2a592)."
+  ],
+  "summary": "State/Forecast/Ledger: 10-step decision order (system failures before prerequisites; PARENT_ABSTAIN_SYSTEM added); DA Safety Veto not applied at the issuance layer and no decision policy defined here; point-in-time E_{t,h} from values recorded at origin i (no revision backflow, no gap filling); mu = 0 copies S0 strings; canonical class probabilities in y-space x' = fl(fl(sigma*Z)+mu), b = fl(0.25*sigma); four append-only M1-MACRO ledgers with COMPLETE commit marker; beta/mu/J* written only in forward issuance after implementation freeze; no holdout rows.",
+  "handed_to_part4": [
+    "Full transaction order: row canonicalization -> row/range SHA-256 -> append -> push -> remote reread -> SHA check -> COMPLETE append -> push -> COMPLETE reread on remote main.",
+    "Canonical serialization of pools and E_Input (field order, pair/origin ordering, binary64 or text representation, endianness, delimiter/newline, NaN/+-0, encoding).",
+    "When historical replay beta/mu may be computed and viewed."
+  ],
+  "performance_seal": "INTACT"
+}

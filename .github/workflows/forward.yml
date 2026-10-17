@@ -1,0 +1,62 @@
+name: forward-ledger
+
+on:
+  schedule:
+    # JST 00:40, 02:40, 04:40, 06:40 (issue window; ECB fix of the previous day is published ~23:00-00:00 JST)
+    - cron: "40 15,17,19,21 * * *"
+    # JST 07:55 (last chance before the 08:30 JST cutoff)
+    - cron: "55 22 * * *"
+    # JST 09:15 (after cutoff: record ABSTAIN_SYSTEM for anything not issued, record outcomes)
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "formal = official ledger, dryrun = ledger_dryrun/ only"
+        required: true
+        default: dryrun
+        type: choice
+        options: [dryrun, formal]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forward-ledger
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Reproduction gate (frozen outputs must be reproduced byte for byte)
+        run: python3 tests/test_reproduce_frozen.py
+
+      - name: Issue forecasts / record outcomes
+        run: python3 forward/issue.py --mode "${{ github.event_name == 'schedule' && 'formal' || inputs.mode }}"
+
+      - name: Commit and push (append-only)
+        run: |
+          git config user.name "fx-forward-ledger-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ledger ledger_dryrun data 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "ledger: run ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT} ($(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M JST'))"
+            for i in 1 2 3; do
+              git push origin HEAD:main && break
+              git pull --rebase origin main
+            done
+          fi
+
+      - name: Storage Verification Gate (re-read from remote; SUCCESS only if all rows match)
+        run: python3 forward/verify.py

@@ -1,0 +1,12 @@
+A symmetric about c: s1 ok=True  it=31 gap=0.0e+00 | s2 dJ=0.0e+00 s2 ok=True it=13 beta=[ 0.00399485 -0.00599911  0.00299959] err=5.2e-06
+   Phi(b*)-Phi(c)=0.0e+00  |b*|-|c|=-3.5e-06
+B flat minimum: s1 ok=True  it=4 gap=0.0e+00 | s2 dJ=0.0e+00 s2 ok=True it=2 beta=[ 1.  0. -2.] err=4.4e-16
+C nearly flat unique (tilt=3e-09, min-norm corner worse by 1.4e-08): s1 ok=True  it=8 gap=0.0e+00 | s2 dJ=2.4e-16 s2 ok=True it=1 beta=[ 3.   1.5 -4. ] err=8.9e-16
+C nearly flat unique (tilt=1e-10, min-norm corner worse by 5.5e-10): s1 ok=True  it=9 gap=1.1e-16 | s2 dJ=1.5e-16 s2 ok=True it=1 beta=[ 3.   1.5 -4. ] err=8.9e-16
+C nearly flat unique (tilt=1e-11, min-norm corner worse by 5.5e-11): s1 ok=True  it=8 gap=0.0e+00 | s2 dJ=-7.0e-18 s2 ok=True it=1 beta=[ 3.   1.5 -4. ] err=2.2e-16
+C nearly flat unique (tilt=1e-12, min-norm corner worse by 5.5e-12): s1 ok=True  it=8 gap=1.1e-16 | s2 dJ=1.3e-16 s2 ok=True it=1 beta=[ 3.   1.5 -4. ] err=4.4e-16
+C nearly flat unique (tilt=1e-14, min-norm corner worse by 5.5e-14): s1 ok=True  it=4 gap=2.4e-14 | s2 dJ=6.8e-17 s2 ok=True it=3 beta=[ 3.   1.5 -4. ] err=4.4e-16
+D random G=600 N=800 (1s) shift|b*-bhat|=3.0e-13: s1 ok=True  it=37 gap=0.0e+00 | s2 dJ=1.0e-16 s2 ok=True it=1 beta=[ 0.00473158 -0.00613315  0.00418967]
+D random G=3000 N=2000 (14s) shift|b*-bhat|=9.2e-09: s1 ok=True  it=44 gap=5.2e-14 | s2 dJ=9.7e-14 s2 ok=True it=1 beta=[ 0.00388724 -0.00645303  0.00279571]
+E zero column: s1 ok=True  it=25 gap=0.0e+00 | s2 dJ=4.1e-17 s2 ok=True it=1 beta=[ 0.000000e+00 -6.220559e-03  8.860000e-05]
+   beta_US exactly 0: True
