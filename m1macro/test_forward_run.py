@@ -158,12 +158,19 @@ def run():
             # 5) no second issuance of the same (origin, horizon)
             assert FR.build_rows_for_origin(D, now.astimezone(UTC), rid, manifest.code_sha256(), str(stage), None, ctx=ctx) is None
             assert FR.commit_tx(str(stage), gitrepo.RealGit(root, message="t"))["status"] == "ALREADY_COMPLETE"
-            # 6) after the cutoff, a due origin without COMPLETE gets ABSTAIN_SYSTEM rows (NOT_ISSUED / LATE_ISSUE)
+            # 6) D8: after the deadline, a due origin without COMPLETE -> deadline audit NOT_ISSUED only (no forecast rows)
             FR.CFG["first_forward_origin"] = {"1D": "2026-10-07", "1W": "2026-10-11", "4W": "2026-10-11"}
-            ab = FR.abstain_txs(dt.datetime(2026, 10, 8, 9, 0, tzinfo=JST), rid, "c")
-            assert [(t["origin"], t["horizons"]) for t in ab] == [("2026-10-07", "1D")]
-            rr = base64.b64decode(ab[0]["rows"][L.FORECASTS][0])
-            assert b"NOT_ISSUED" in rr and ab[0]["rows"][L.FEATURES] == []
+            ni = FR.not_issued(dt.datetime(2026, 10, 8, 9, 0, tzinfo=JST))
+            assert [(x["origin"], x["horizons"]) for x in ni] == [("2026-10-07", "1D")]   # 10-08 is COMPLETE
+            before = (root / L.FORECASTS).read_bytes()
+            (stage / "tx.json").write_text(json.dumps({"run_id": "R2", "code_sha256": "x", "status": "AFTER_CUTOFF",
+                                                       "txs": [], "not_issued": ni}))
+            FR.commit_tx(str(stage), gitrepo.RealGit(root, message="t"))
+            FR.commit_tx(str(stage), gitrepo.RealGit(root, message="t"))                       # idempotent
+            dl = (root / L.DEADLINE).read_text().splitlines()
+            assert sum(1 for x in dl if x.endswith(",NOT_ISSUED")) == 1 and "R2,2026-10-07,,,2026-10-06T23:30:00Z,NOT_ISSUED" in dl
+            assert (root / L.FORECASTS).read_bytes() == before                                  # no pseudo-forecast
+            assert L.official_run_ids((root / L.COMMITS).read_bytes(), (root / L.DEADLINE).read_bytes()) == {"R1"}
             out.update(ok=True, parameter_state=er[0]["Parameter_State"], n_warmup=int(er[0]["N_Warmup"]))
         finally:
             FR.ROOT = old_root; FR.FC.ROOT = old_root; FR.CFG.clear(); FR.CFG.update(old_cfg); FR.run_id = old_rid

@@ -422,36 +422,32 @@ def _tx(origin, horizons, fr, er, fc):
                      L.FORECASTS: [base64.b64encode(L.row_bytes(FORECAST_FIELDS, r)).decode() for r in fc]}}
 
 
-def abstain_txs(now, rid, code_sha):
-    """Part 3 §3 step 1 (same rule as the existing forward ledger): every due (origin, horizon) whose cutoff has
-    passed without a COMPLETE run gets ABSTAIN_SYSTEM rows (NOT_ISSUED for past days, LATE_ISSUE for today)."""
+def not_issued(now):
+    """D8 (むすび 2026-10-18): a due (origin, horizon) whose deadline passed without any COMPLETE run is recorded as
+    NOT_ISSUED in the deadline audit only (an issuance/audit state, not a forecast). No prediction rows are written."""
     sys.path.insert(0, str(ROOT / "forward"))
     import ledger_builder as lb
     _, mp, _ = lb.load_frozen()
     first = first_forward(); done = _complete_keys()
-    today = now.astimezone(JST).date()
     d = dt.date.fromisoformat(min(first.values())); out = []
-    while d <= today:
-        if now >= dt.datetime.combine(d, CUTOFF, tzinfo=JST):
+    while d <= now.astimezone(JST).date():
+        dl = dt.datetime.combine(d, CUTOFF, tzinfo=JST)
+        if now >= dl:
             hs = [h for h in HORIZONS if mp.is_formal_origin(d, h) and d.isoformat() >= first[h] and (d.isoformat(), h) not in done]
             if hs:
-                reason = "NOT_ISSUED" if d < today else "LATE_ISSUE"
-                fc = [{"Model": MODEL, "Pair": p, "Origin": d.isoformat(), "Horizon": h, "Cutoff_JST": "08:30",
-                       "Decision_Class": "ABSTAIN_SYSTEM", "Reason_Code": reason, "Issued_At_UTC": utc_s(now),
-                       "Code_SHA256": code_sha, "Run_ID": rid, "Parent": PARENT} for h in hs for p in E.DEV_PAIRS]
-                out.append(_tx(d.isoformat(), ";".join(hs), [], [], fc))
+                out.append({"origin": d.isoformat(), "horizons": ";".join(hs), "deadline_utc": utc_s(dl)})
         d += dt.timedelta(days=1)
     return out
 
 
 def compute(stage, priv_dev_dir, now=None):
     now = _now(now); rid = run_id(); code_sha = manifest.code_sha256()
-    out = {"run_id": rid, "code_sha256": code_sha, "status": "", "txs": []}
+    out = {"run_id": rid, "code_sha256": code_sha, "status": "", "txs": [], "not_issued": []}
     if not _freeze_ok(code_sha) or first_forward() is None:
         out["status"] = "REFUSED_NOT_FROZEN"          # never compute beta/mu on real data before the freeze
     else:
         D = now.astimezone(JST).date()
-        out["txs"] = abstain_txs(now, rid, code_sha)
+        out["not_issued"] = not_issued(now)
         if now < features.tinfo_utc(D):
             out["status"] = "BEFORE_TINFO"
         elif now >= dt.datetime.combine(D, CUTOFF, tzinfo=JST):
@@ -470,7 +466,7 @@ def compute(stage, priv_dev_dir, now=None):
             except Exception as e:                        # unexpected: type name only (messages may quote values)
                 out["status"] = "PIPELINE_FAILURE:" + type(e).__name__
     Path(stage, "tx.json").write_text(json.dumps(out))
-    print(json.dumps({"run_id": rid, "status": out["status"], "n_tx": len(out["txs"])}))          # no values
+    print(json.dumps({"run_id": rid, "status": out["status"], "n_tx": len(out["txs"]), "n_not_issued": len(out["not_issued"])}))          # no values
     return out
 
 

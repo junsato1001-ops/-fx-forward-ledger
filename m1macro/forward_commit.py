@@ -95,10 +95,44 @@ def commit_data(stage, git):
     for rel in sorted(git.touched):
         if git.remote(rel) != (ROOT / rel).read_bytes():
             raise PipelineFailure("DATA_REREAD_MISMATCH")
+def record_not_issued(git, items, rid):
+    """Deadline audit rows with Deadline_Status = NOT_ISSUED (one per Origin, never duplicated; never written for an
+    Origin that has a COMPLETE run for the horizon). Committed_At_UTC / Verified_At_UTC stay empty."""
+    have = {r["Origin"] for r in read_csv(L.DEADLINE) if r.get("Deadline_Status") == "NOT_ISSUED"}
+    done = _complete_keys(); n = 0
+    for it in items:
+        if it["origin"] in have or any((it["origin"], h) in done for h in it["horizons"].split(";")):
+            continue
+        git.ensure_header(L.DEADLINE, L.header_bytes(L.DEADLINE_FIELDS))
+        git.append(L.DEADLINE, L.row_bytes(L.DEADLINE_FIELDS, {"Run_ID": rid, "Origin": it["origin"], "Committed_At_UTC": "",
+                                                              "Verified_At_UTC": "", "Deadline_UTC": it["deadline_utc"],
+                                                              "Deadline_Status": "NOT_ISSUED"}))
+        have.add(it["origin"]); n += 1
+    if n:
+        for i in range(L.PUSH_RETRIES):
+            try:
+                git.push(); break
+            except Exception:
+                if i == L.PUSH_RETRIES - 1:
+                    raise PipelineFailure("AUDIT_PUSH_FAILED")
+        if git.remote(L.DEADLINE) != (ROOT / L.DEADLINE).read_bytes():
+            raise PipelineFailure("AUDIT_REREAD_MISMATCH")
+    return n
+
+
 def commit_tx(stage, git, now_fn=None):
     tx = json.loads(Path(stage, "tx.json").read_text())
+    res = []
+    if tx.get("txs"):
+        res = _commit_txs(tx, git, now_fn)
+    if tx.get("not_issued"):
+        print(json.dumps({"not_issued_recorded": record_not_issued(git, tx["not_issued"], tx["run_id"])}))
     if not tx.get("txs"):
         print(json.dumps({"status": tx["status"]})); return None
+    return res[-1] if len(res) == 1 else res
+
+
+def _commit_txs(tx, git, now_fn):
     if manifest.code_sha256() != tx["code_sha256"] or not _freeze_ok(tx["code_sha256"]):
         raise PipelineFailure("CODE_SHA_CHANGED")
     fields = {L.FEATURES: FEATURE_FIELDS, L.ESTIMATION: ESTIMATION_FIELDS, L.FORECASTS: FORECAST_FIELDS}
@@ -112,7 +146,7 @@ def commit_tx(stage, git, now_fn=None):
                                now_fn or (lambda: utc_s(dt.datetime.now(UTC))))
         res.append({"origin": t["origin"], **{k: st.get(k) for k in ("run_id", "status", "deadline_status", "failed_step")}})
     print(json.dumps(res))
-    return res[-1] if len(res) == 1 else res
+    return res
 
 
 def main(argv):
