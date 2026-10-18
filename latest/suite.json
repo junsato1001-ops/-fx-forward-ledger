@@ -18,7 +18,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.04,
+  "sec": 0.03,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -41,7 +41,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.75,
+  "sec": 0.73,
   "status": "PASS"
  },
  "test_estimation": {
@@ -73,7 +73,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.12,
+  "sec": 0.11,
   "status": "PASS"
  },
  "test_forward_run": {
@@ -82,7 +82,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 118.44,
+  "sec": 116.1,
   "status": "PASS"
  },
  "test_freeze_gate": {
@@ -99,7 +99,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 2.05,
+  "sec": 2.01,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -107,47 +107,47 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 25.1,
+    "build_sec": 25.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.4,
+    "solve_sec": 5.9,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.2,
+    "build_sec": 25.4,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.7,
+    "solve_sec": 6.5,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.1,
+    "build_sec": 25.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.0,
+    "solve_sec": 5.9,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 94.57,
+  "sec": 94.63,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.6,
+  "sec": 1.57,
   "status": "PASS"
  },
  "test_indep": {
@@ -226,7 +226,7 @@
     "pass_mu": true
    }
   },
-  "sec": 159.08,
+  "sec": 157.65,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -265,7 +265,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 13.41,
+  "sec": 13.35,
   "status": "PASS"
  },
  "test_s0link": {
@@ -339,7 +339,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.7,
+    "sec": 1.6,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -357,7 +357,7 @@
     "ok": true
    }
   },
-  "sec": 5.9,
+  "sec": 5.78,
   "status": "PASS"
  }
 }
