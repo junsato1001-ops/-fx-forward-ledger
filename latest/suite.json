@@ -41,7 +41,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.75,
+  "sec": 0.74,
   "status": "PASS"
  },
  "test_estimation": {
@@ -52,7 +52,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.82,
+  "sec": 0.81,
   "status": "PASS"
  },
  "test_features": {
@@ -82,7 +82,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 118.69,
+  "sec": 116.56,
   "status": "PASS"
  },
  "test_freeze_gate": {
@@ -99,7 +99,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 2.78,
+  "sec": 2.75,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -114,33 +114,49 @@
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.2,
+    "solve_sec": 5.8,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.5,
+    "build_sec": 25.4,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.7,
+    "solve_sec": 6.2,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.5,
+    "build_sec": 25.4,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.1,
+    "solve_sec": 5.7,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 95.54,
+  "sec": 93.98,
+  "status": "PASS"
+ },
+ "test_gate_unique": {
+  "detail": {
+   "cases": {
+    "g6_duplicate_and_missing": "G6.th_rows_unique=FAIL",
+    "g6_foreign_key": "G6.th_keyset_equals_universe=FAIL",
+    "g6_keyset_missing": "G6.th_rows_unique=FAIL",
+    "g7_row_duplicate": "G7.no_duplicate_rows=FAIL",
+    "g7_rows_missing": "G7.no_duplicate_rows=FAIL",
+    "universe_duplicate": "G5.th_universe_unique=FAIL",
+    "universe_missing": "G5.th_universe_unique=FAIL"
+   },
+   "ok": true
+  },
+  "sec": 0.01,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
@@ -232,7 +248,7 @@
     "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
    }
   },
-  "sec": 223.8,
+  "sec": 220.77,
   "status": "PASS"
  },
  "test_indep_stall": {
@@ -242,7 +258,7 @@
    "ok": true,
    "stalled_gap": 0.0
   },
-  "sec": 3.48,
+  "sec": 3.43,
   "status": "PASS"
  },
  "test_indep_structured": {
@@ -253,7 +269,7 @@
     "d_beta_inf": 3.9992144109670356e-10,
     "indep_gap": 3.3306690738754696e-15,
     "iterations": 83,
-    "sec_indep": 19.1,
+    "sec_indep": 19.0,
     "sec_prod": 0.9,
     "termination": "EPIGRAPH_STALLED_EXACT_CERT+MINNORM_OK"
    },
@@ -263,13 +279,13 @@
     "d_beta_inf": 5.090516990144183e-07,
     "indep_gap": 8.881784197001252e-15,
     "iterations": 46,
-    "sec_indep": 42.9,
+    "sec_indep": 42.5,
     "sec_prod": 5.2,
     "termination": "KELLEY_CERTIFIED+MINNORM_OK"
    },
    "ok": true
   },
-  "sec": 91.77,
+  "sec": 91.35,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -281,7 +297,7 @@
  },
  "test_manifest_gate": {
   "detail": {
-   "n_entries": 75,
+   "n_entries": 76,
    "ok": true,
    "workflows": [
     ".github/workflows/m1macro_dev.yml",
@@ -308,7 +324,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 13.31,
+  "sec": 13.22,
   "status": "PASS"
  },
  "test_s0link": {
@@ -400,7 +416,7 @@
     "ok": true
    }
   },
-  "sec": 5.83,
+  "sec": 5.81,
   "status": "PASS"
  }
 }
