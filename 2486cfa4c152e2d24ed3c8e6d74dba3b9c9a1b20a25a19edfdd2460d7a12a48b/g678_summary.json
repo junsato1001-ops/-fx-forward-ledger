@@ -1,21 +1,19 @@
 {
  "G6": {
-  "error_types": [
-   "RuntimeError"
-  ],
-  "errors": 240,
+  "error_types": [],
+  "errors": 0,
   "max_abs_phi2_minus_lb": 9.9897380045284e-14,
   "max_abs_ub_minus_lb": 9.998816011600024e-14,
-  "max_d_UB": 1.1879386363489175e-13,
-  "max_d_beta_inf": 4.483562880798833e-07,
-  "max_d_mu_over_sigma": 6.570116386315384e-06,
-  "max_indep_gap": 1.6364687382974807e-12,
+  "max_d_UB": 9.636735853746359e-14,
+  "max_d_beta_inf": 4.4772326291287606e-07,
+  "max_d_mu_over_sigma": 6.603146794560125e-06,
+  "max_indep_gap": 9.992007221626409e-15,
   "max_stage1_iter": 55,
   "max_stage2_iter": 12,
   "min_phi2_minus_lb": -1.6640818676876665e-16,
   "min_ub_minus_lb": -1.6640818676876665e-16,
   "n_estimated": 4756,
-  "n_pass_all": 4449,
+  "n_pass_all": 4756,
   "n_th": 10007,
   "state_counts": {
    "1D/DEFAULT_PARENT": 251,
@@ -29,7 +27,7 @@
    "4W/NOT_EVALUATED": 650
   },
   "subreasons": [],
-  "total_sec": 223213.0
+  "total_sec": 85764.4
  },
  "G7": {
   "beta_sha_or_state_mismatch": 0,
@@ -37,7 +35,7 @@
   "n_keys": 10007,
   "n_run_A": 10007,
   "n_run_B": 10007,
-  "n_shards": 20
+  "n_shards": 40
  },
  "G8": {
   "n_match": 1962,

@@ -1,0 +1,87 @@
+{
+ "G1": {
+  "checks": {
+   "all_ok": true,
+   "suite_present": true,
+   "tests_pass": true
+  },
+  "pass": true
+ },
+ "G2": {
+  "checks": {
+   "margin_ok": true,
+   "tests_pass": true
+  },
+  "pass": true
+ },
+ "G3": {
+  "checks": {
+   "all_pass": true,
+   "tests_pass": true
+  },
+  "pass": true
+ },
+ "G4": {
+  "checks": {
+   "tests_pass": true
+  },
+  "pass": true
+ },
+ "G5": {
+  "checks": {
+   "every_origin_has_three_statuses": true,
+   "n_origins_positive": true,
+   "summary_present": true
+  },
+  "pass": true
+ },
+ "G6": {
+  "checks": {
+   "all_estimated_pass": true,
+   "all_th_covered": true,
+   "no_errors": true,
+   "phi2_minus_lb_le_eps": true,
+   "summary_present": true,
+   "ub_minus_lb_le_eps": true
+  },
+  "pass": true
+ },
+ "G7": {
+  "checks": {
+   "all_shards": true,
+   "beta_identical": true,
+   "both_runs_complete": true,
+   "e_input_identical": true
+  },
+  "pass": true
+ },
+ "G8": {
+  "checks": {
+   "all_match": true,
+   "no_mismatch": true,
+   "summary_present": true
+  },
+  "pass": true
+ },
+ "G9": {
+  "checks": {
+   "holdout_rows_zero": true,
+   "no_holdout_breach": true
+  },
+  "pass": true
+ },
+ "RUN": {
+  "checks": {
+   "exits_file_present": true,
+   "no_job_exit_codes": true
+  },
+  "pass": true
+ },
+ "SUITE_ALL": {
+  "checks": {
+   "n_tests": 24
+  },
+  "pass": true
+ },
+ "all_pass": true
+}
