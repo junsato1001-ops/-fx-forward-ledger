@@ -19,6 +19,10 @@ G3_TESTS = ("test_indep",)
 G4_TESTS = ("test_ledger_tx", "test_gitrepo_tx", "test_forward_commit", "test_deadline_gate")
 
 
+def _hex64(v):
+    return isinstance(v, str) and len(v) == 64 and all(c in "0123456789abcdef" for c in v)
+
+
 def _load(d, name):
     p = Path(d, name)
     return json.loads(p.read_text("utf-8")) if p.exists() else None
@@ -49,6 +53,7 @@ def verdict(d) -> dict:
     gate("G5", {"summary_present": g5 is not None, "n_origins_positive": bool(g5 and g5.get("n_origins", 0) > 0),
                 "th_universe_unique": n_th5 is not None and U.get("n") == n_th5 == U.get("n_unique")
                 and U.get("n_duplicate") == 0 and bool(U.get("sha256")),
+                "snapshot_identified": _hex64((g5 or {}).get("snapshot_manifest_sha256")),
                 "every_origin_has_three_statuses": bool(g5) and all(sum(c.values()) == g5["n_origins"]
                                                                        for c in g5.get("status_counts", {}).values())
                 and set(g5.get("status_counts", {})) == {"F_US", "F_JP", "F_POS"}})
@@ -66,6 +71,8 @@ def verdict(d) -> dict:
     gate("G7", {"all_shards": G7.get("n_shards") == N_SHARDS,
                 "both_runs_complete": n_th5 is not None and G7.get("n_keys") == G7.get("n_run_A") == G7.get("n_run_B") == n_th5,
                 "no_duplicate_rows": n_th5 is not None and G7.get("n_rows_A") == G7.get("n_rows_B") == n_th5,
+                "same_snapshot_as_g5": _hex64((g5 or {}).get("snapshot_manifest_sha256"))
+                and G7.get("snapshot_manifest_sha256") == [g5["snapshot_manifest_sha256"]],
                 "e_input_identical": G7.get("e_input_sha_mismatch") == 0, "beta_identical": G7.get("beta_sha_or_state_mismatch") == 0})
     gate("G8", {"summary_present": bool(G8), "no_mismatch": G8.get("n_mismatch") == 0,
                 "all_match": num(G8.get("n_match")) is not None and G8.get("n_match") == G8.get("n_mu_zero_rows")})

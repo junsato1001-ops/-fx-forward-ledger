@@ -92,7 +92,7 @@ jobs:
               A='data/m1macro/dev_snapshot/manifest.json data/m1macro/dev_snapshot priv/m1macro_dev_snapshot' &&
               python -I m1macro/gates.py g678 /tmp/g \$A $S $N_SHARDS A &&
               python -I m1macro/gates.py g678 /tmp/g \$A $S $N_SHARDS B &&
-              python -I m1macro/gates.py shardsum /tmp/g out $S" > /dev/null 2>&1 || echo "SHARD_EXIT=$?" > out/exit_${{ matrix.shard }}.txt
+              python -I m1macro/gates.py shardsum /tmp/g out $S data/m1macro/dev_snapshot/manifest.json" > /dev/null 2>&1 || echo "SHARD_EXIT=$?" > out/exit_${{ matrix.shard }}.txt
           rm -rf priv
       - uses: actions/upload-artifact@v4
         with: { name: "g678-${{ matrix.shard }}", path: out/, retention-days: 7 }
@@ -116,6 +116,9 @@ jobs:
           cat arts/g5/g5_exit.txt shards/exit_*.txt > res/exits.txt 2>/dev/null || true
           git rev-parse HEAD > res/source_commit.txt
           echo "$RUN_CLASS" > res/run_class.txt
+          # F8-c: which workflow run produced these results (checked against the Actions API at freeze)
+          printf '{"ref_name": "%s", "run_attempt": "%s", "run_id": "%s", "sha": "%s"}\n' \
+            "$GITHUB_REF_NAME" "$GITHUB_RUN_ATTEMPT" "$GITHUB_RUN_ID" "$GITHUB_SHA" > res/run_provenance.json
           touch res/exits.txt
           python3 -I m1macro/gate_verdict.py res res/gates_verdict.json        # machine-readable G1-G9 verdict (F1-d)
           git fetch -q origin "$RESULTS_BRANCH" || true

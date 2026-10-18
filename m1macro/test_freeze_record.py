@@ -14,6 +14,7 @@ from m1macro.test_gitrepo_tx import _hook, _repo
 
 FIRST = {"1D": "2026-11-10", "1W": "2026-11-15", "4W": "2026-11-15"}
 UTC = dt.timezone.utc
+SNAP = "5" * 64
 
 
 def _rec(code="c" * 64, first=FIRST):
@@ -49,7 +50,7 @@ def write_final(root, code_sha, first=FIRST):
         (root / p).parent.mkdir(parents=True, exist_ok=True); (root / p).write_bytes(b)
 
 
-def _tx(td, name, run_start, clock, push=None, reject=(), fail_remote=(), first=FIRST):
+def _tx(td, name, run_start, clock, push=None, reject=(), fail_remote=(), first=FIRST, parent_fail=False):
     """push: None -> server push time = 2 s after the marker reread clock value; a string -> that server time;
     'MISSING' -> no push event."""
     bare, work = _repo(td, name)
@@ -64,15 +65,17 @@ def _tx(td, name, run_start, clock, push=None, reject=(), fail_remote=(), first=
     ids = {"Run_ID": "R9", "Run_Attempt": "1", "Code_SHA256": "c" * 64}
     head = lambda: subprocess.run(["git", "rev-parse", "HEAD"], cwd=work, capture_output=True).stdout.decode().strip()
     seen = {}
-    def push_time(commit):
-        seen["commit"] = commit
+    def push_time(commit, parent=None):
+        seen["commit"] = commit; seen["parent"] = parent
         if push == "MISSING":
             raise F.PushNotFound("PUSH_EVENT_NOT_FOUND")
-        remote_main = subprocess.run(["git", "--git-dir", str(bare), "rev-parse", "main"], capture_output=True).stdout.decode().strip()
-        assert commit == remote_main                       # the commit queried is the one that is on the remote
+        rp = lambda r: subprocess.run(["git", "--git-dir", str(bare), "rev-parse", r], capture_output=True).stdout.decode().strip()
+        assert commit == rp("main") and parent == rp("main^")   # the commit queried is on the remote; F8-a its parent
         return "4242", _t(push)
+    parent_of = lambda c: subprocess.run(["git", "rev-parse", c + ("^^^^^^^^^" if parent_fail else "^")], cwd=work,
+                                         capture_output=True, check=True).stdout.decode().strip()
     try:
-        out = F.transaction(g, _rec(first=first), ids, _t(run_start), F.a_first(first, 6), clock, head, push_time)
+        out = F.transaction(g, _rec(first=first), ids, _t(run_start), F.a_first(first, 6), clock, head, push_time, parent_of)
     except F.FreezeRefused as e:
         out = {"refused": str(e)}
     rd = lambda p: subprocess.run(["git", "--git-dir", str(bare), "show", f"main:{p}"], capture_output=True).stdout
@@ -82,7 +85,8 @@ def _tx(td, name, run_start, clock, push=None, reject=(), fail_remote=(), first=
 
 def unit_find_push():
     c = "a" * 40
-    ev = lambda **k: {"id": 1, "activity_type": "push", "ref": "refs/heads/main", "after": c, "timestamp": "2026-10-20T00:00:14Z", **k}
+    ev = lambda **k: {"id": 1, "activity_type": "push", "ref": "refs/heads/main", "after": c, "before": "p" * 40,
+                      "actor": {"login": F.ACTIONS_ACTOR}, "timestamp": "2026-10-20T00:00:14Z", **k}
     assert F.find_push([ev(), ev(after="b" * 40, id=2)], c) == ("1", _t("2026-10-20T00:00:14"))
     for evs, code in (([], "PUSH_EVENT_NOT_FOUND"), ([ev(after="b" * 40)], "PUSH_EVENT_NOT_FOUND"),
                       ([ev(ref="refs/heads/x")], "PUSH_EVENT_NOT_FOUND"), ([ev(activity_type="force_push")], "PUSH_EVENT_NOT_FOUND"),
@@ -91,10 +95,18 @@ def unit_find_push():
             F.find_push(evs, c); raise AssertionError(code)
         except F.PushNotFound as e:
             assert str(e) == code
+    # F8-a: parent (`before`) and pusher must match when required
+    assert F.find_push([ev()], c, parent="p" * 40, actor=F.ACTIONS_ACTOR) == ("1", _t("2026-10-20T00:00:14"))
+    for kw, code in (({"parent": "q" * 40}, "PUSH_EVENT_PARENT_MISMATCH"), ({"actor": "someone"}, "PUSH_EVENT_ACTOR_MISMATCH")):
+        try:
+            F.find_push([ev()], c, **kw); raise AssertionError(code)
+        except F.PushNotFound as e:
+            assert str(e) == code
     # activity_lookup: fixed polling (the event appears on the 3rd poll), then fail closed after ACTIVITY_POLLS
     import urllib.request
     calls = {"n": 0, "sleep": []}
     class Resp(io.BytesIO):
+        headers = {}
         def __enter__(self): return self
         def __exit__(self, *a): return False
     def fake(req, timeout=30):
@@ -109,6 +121,43 @@ def unit_find_push():
             pt(c); raise AssertionError("not found accepted")
         except F.PushNotFound as e:
             assert str(e) == "PUSH_EVENT_NOT_FOUND"
+        # F8-a: the event is on page 3 of the activity list (Link rel="next" followed); other pushes on pages 1-2
+        pages = {"p1": ([ev(after="x" * 40)] * 100, "p2"), "p2": ([ev(after="y" * 40)] * 100, "p3"), "p3": ([ev()], None)}
+        def paged(req, timeout=30):
+            key = req.full_url.rsplit("cur=", 1)[1] if "cur=" in req.full_url else "p1"
+            body, nxt = pages[key]
+            r = Resp(json.dumps(body).encode())
+            r.headers = {"Link": f'<https://api.github.com/x?cur={nxt}>; rel="next"'} if nxt else {}
+            return r
+        urllib.request.urlopen = paged
+        assert F.activity_lookup("o/r", "t", sleep=lambda s: None)(c, "p" * 40) == ("1", _t("2026-10-20T00:00:14"))
+        for kw, code in ((("q" * 40,), "PUSH_EVENT_PARENT_MISMATCH"),):
+            try:
+                F.activity_lookup("o/r", "t", sleep=lambda s: (_ for _ in ()).throw(AssertionError("retried")))(c, *kw)
+                raise AssertionError(code)
+            except F.PushNotFound as e:
+                assert str(e) == code                      # final at once, no polling
+        try:
+            F.activity_lookup("o/r", "t", sleep=lambda s: None, actor="other")(c)
+            raise AssertionError("actor")
+        except F.PushNotFound as e:
+            assert str(e) == "PUSH_EVENT_ACTOR_MISMATCH"
+        # endless pagination -> fail closed (never a partial list)
+        def endless(req, timeout=30):
+            r = Resp(b"[]"); r.headers = {"Link": '<https://api.github.com/x?cur=z>; rel="next"'}; return r
+        urllib.request.urlopen = endless
+        try:
+            F.activity_lookup("o/r", "t", sleep=lambda s: None)(c); raise AssertionError("pages")
+        except F.PushNotFound as e:
+            assert str(e) == "ACTIVITY_PAGES_EXCEEDED"
+        # API down for the whole fixed wait -> fail closed
+        def down(req, timeout=30):
+            raise OSError("down")
+        urllib.request.urlopen = down; n_sleep = []
+        try:
+            F.activity_lookup("o/r", "t", sleep=n_sleep.append)(c); raise AssertionError("down")
+        except F.PushNotFound as e:
+            assert str(e) == "ACTIVITY_API_FAILED" and len(n_sleep) == F.ACTIVITY_POLLS - 1
     finally:
         urllib.request.urlopen = orig
     assert F.ACTIVITY_POLLS * F.ACTIVITY_POLL_SEC == 180
@@ -131,6 +180,7 @@ def run():
         out, final, work, bare, seen = _tx(td, "ok", "2026-10-20T00:00:00", ok_clock(), push=P)
         assert out["Freeze_Status"] == "FINAL" and final and out["Reject_Reason"] == "", out
         assert out["Marker_Push_At_Server_UTC"] == "2026-10-20T00:00:14Z" and out["Marker_Commit"] == seen["commit"]
+        fresh_audit_git(work, out, seen)
         # 2) a second freeze on the same tree is refused before writing (no automatic second freeze)
         g = gitrepo.RealGit(work, message="again")
         try:
@@ -144,6 +194,10 @@ def run():
         assert out["Anchor_Status"] == "FAIL" and out["Reject_Reason"] == "ANCHOR_ORDER" and not final
         out, final, *_ = _tx(td, "pushbefore", "2026-10-20T00:00:00", ok_clock(), push="2026-10-20T00:00:05")
         assert out["Anchor_Status"] == "FAIL" and not final
+        # 3b) F8-a: the marker commit's parent cannot be determined -> REJECTED, the push event is not even queried
+        out, final, _, _, seen2 = _tx(td, "noparent", "2026-10-20T00:00:00", ok_clock(), push=P, parent_fail=True)
+        assert out["Freeze_Status"] == "REJECTED" and out["Reject_Reason"] == "MARKER_PARENT_UNKNOWN" and not final
+        assert "commit" not in seen2
         # 4) no push event (or not unique) within the fixed wait -> REJECTED, fail closed
         out, final, *_ = _tx(td, "missing", "2026-10-20T00:00:00", ok_clock(), push="MISSING")
         assert out["Freeze_Status"] == "REJECTED" and out["Reject_Reason"] == "PUSH_EVENT_NOT_FOUND" and not final
@@ -185,16 +239,44 @@ def run():
             assert not F.is_final_tree(td, "c" * 64), (path, new[-200:])
             (p / path).write_bytes(orig[path])
         assert F.is_final_tree(td, "c" * 64)
-        # fresh audit re-queries the server anchor: match -> pass; different time or missing -> not pass
+        # F8-b: three FINAL files that are not bound to a git history never pass the fresh audit
         a = F._rows(orig[F.AUDIT])[0]
-        rs = F.fresh_audit(td, "o/r", "t", push_time=lambda c: ("77", F.parse_utc(a["Marker_Push_At_Server_UTC"])))
-        assert rs["pass"] and rs["three_files_final"] and rs["server_anchor_matches"], rs
-        rs = F.fresh_audit(td, "o/r", "t", push_time=lambda c: ("77", F.parse_utc(a["Marker_Push_At_Server_UTC"]) + dt.timedelta(seconds=1)))
-        assert not rs["pass"]
-        def gone(c):
-            raise F.PushNotFound("PUSH_EVENT_NOT_FOUND")
-        assert not F.fresh_audit(td, "o/r", "t", push_time=gone)["pass"]
+        rs = F.fresh_audit(td, "o/r", "t", push_time=lambda c, parent=None: ("77", F.parse_utc(a["Marker_Push_At_Server_UTC"])))
+        assert rs["three_files_final"] and not rs["git_binding"] and not rs["pass"], rs
     return {"ok": True}
+
+
+def fresh_audit_git(work, out, seen):
+    """F8-a/F8-b: fresh audit of a real FINAL freeze on a git checkout. Pass only with the three files FINAL, bound to
+    the git history, and the server push re-queried (after = Marker_Commit, before = its parent) equal to the record."""
+    P = F.parse_utc(out["Marker_Push_At_Server_UTC"])
+    q = {}
+    def pt(commit, parent=None):
+        q["c"], q["p"] = commit, parent
+        return "4242", P
+    rs = F.fresh_audit(work, "o/r", "t", push_time=pt)
+    assert rs["pass"] and rs["git_binding"] and rs["server_anchor_matches"], rs
+    assert q == {"c": seen["commit"], "p": seen["parent"]}
+    for bad in (lambda c, parent=None: ("4243", P), lambda c, parent=None: ("4242", P + dt.timedelta(seconds=1))):
+        assert not F.fresh_audit(work, "o/r", "t", push_time=bad)["pass"]
+    def gone(c, parent=None):
+        raise F.PushNotFound("PUSH_EVENT_NOT_FOUND")
+    r = F.fresh_audit(work, "o/r", "t", push_time=gone)
+    assert not r["pass"] and r["reason"] == "PUSH_EVENT_NOT_FOUND"
+    git = lambda *a: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@e", *a], cwd=work, check=True,
+                                    capture_output=True)
+    m, au = Path(work, F.MARKER), Path(work, F.AUDIT)
+    m0, a0 = m.read_bytes(), au.read_bytes()
+    # audit row names a different commit (the record commit): not the commit that carries the marker
+    rc = F._rows(m0)[0]["Record_Main_Commit"]
+    au.write_bytes(a0.replace(out["Marker_Commit"].encode(), rc.encode()))
+    assert not F.fresh_audit(work, "o/r", "t", push_time=pt)["git_binding"]
+    au.write_bytes(a0)
+    # marker rewritten in a later commit: the current marker is not the one in Marker_Commit
+    m.write_bytes(m0.replace(b"COMPLETE", b"COMPLETE ")); git("commit", "-qam", "edit")
+    assert not F.fresh_audit(work, "o/r", "t", push_time=pt)["pass"]
+    git("reset", "-q", "--hard", "HEAD^")
+    assert F.fresh_audit(work, "o/r", "t", push_time=pt)["pass"]
 
 
 def _passing_results():
@@ -207,9 +289,11 @@ def _passing_results():
           "status_counts": {"F_US": {"OK": 10}, "F_JP": {"OK": 10}, "F_POS": {"OK": 7, "X": 3}}}
     keys = [(f"2020-01-{d:02d}", "1D") for d in range(1, 7)] + [(f"2020-02-{d:02d}", h) for d in (1, 2) for h in ("1W", "4W")]
     g5["th_universe"] = gates.th_keyset(keys)                              # F7-a
+    g5["snapshot_manifest_sha256"] = SNAP                                  # F8-d
     g678 = {"G6": {"n_th": 10, "th_keyset": gates.th_keyset(keys), "errors": 0, "error_types": [], "n_estimated": 4, "n_pass_all": 4,
                    "max_abs_ub_minus_lb": 9e-14, "max_abs_phi2_minus_lb": 8e-14},
             "G7": {"n_shards": gate_verdict.N_SHARDS, "n_keys": 10, "n_run_A": 10, "n_run_B": 10, "n_rows_A": 10, "n_rows_B": 10,
+                   "snapshot_manifest_sha256": [SNAP],
                    "e_input_sha_mismatch": 0,
                    "beta_sha_or_state_mismatch": 0},
             "G8": {"n_mu_zero_rows": 3, "n_match": 3, "n_mismatch": 0}}
@@ -239,8 +323,12 @@ def gate_results_negative():
         return work
     rf, v, g678 = _passing_results()
     vb = json.dumps(v).encode()
+    prov = lambda **k: json.dumps({"ref_name": "m1macro-gates", "run_attempt": "1", "run_id": "555", "sha": cand, **k}).encode()
     base = {"code_sha256.txt": (cs + "\n").encode(), "source_commit.txt": (cand + "\n").encode(),
-            "manifest_gate.json": b'{"pass": true}', "run_class.txt": b"FORMAL\n", **rf, "gates_verdict.json": vb}
+            "manifest_gate.json": b'{"pass": true}', "run_class.txt": b"FORMAL\n", **rf, "gates_verdict.json": vb,
+            "run_provenance.json": prov()}
+    RUN = {"id": 555, "run_attempt": 1, "path": F.GATES_WORKFLOW, "head_branch": "m1macro-gates", "head_sha": cand,
+           "event": "push", "status": "completed", "conclusion": "success"}
     bad6 = json.loads(json.dumps(g678)); bad6["G6"]["errors"] = 3; bad6["G6"]["error_types"] = ["RuntimeError"]
     with tempfile.TemporaryDirectory() as td:
         for n, b in rf.items():
@@ -259,16 +347,55 @@ def gate_results_negative():
              ({**base, "g678_summary.json": json.dumps(bad6).encode()}, "GATE_VERDICT_INCONSISTENT"),   # stored says PASS
              ({**base, "g678_summary.json": json.dumps(bad6).encode(), "gates_verdict.json": json.dumps(v_bad).encode()},
               "GATE_VERDICT_NOT_ALL_PASS"),
-             ({**base, "exits.txt": b"SHARD_EXIT=1\n"}, "GATE_VERDICT_INCONSISTENT")]
+             ({**base, "exits.txt": b"SHARD_EXIT=1\n"}, "GATE_VERDICT_INCONSISTENT"),
+             # F8-c provenance
+             (no("run_provenance.json"), "GATE_PROVENANCE_MISSING"),
+             ({**base, "run_provenance.json": b"{}"}, "GATE_PROVENANCE_MISSING"),
+             ({**base, "run_provenance.json": prov(ref_name="m1macro-devblind")}, "GATE_RUN_MISMATCH"),
+             ({**base, "run_provenance.json": prov(sha="b" * 40)}, "GATE_RUN_MISMATCH")]
+    api_cases = [({}, None, "GATE_RUN_MISMATCH", "head_branch", "m1macro-devblind"),
+                 ({}, None, "GATE_RUN_MISMATCH", "head_sha", "b" * 40),
+                 ({}, None, "GATE_RUN_MISMATCH", "path", ".github/workflows/other.yml"),
+                 ({}, None, "GATE_RUN_MISMATCH", "conclusion", "failure"),
+                 ({}, None, "GATE_RUN_MISMATCH", "status", "in_progress"),
+                 ({}, None, "GATE_RUN_MISMATCH", "run_attempt", 2),
+                 ({}, "RUN_DOWN", "GATE_RUN_LOOKUP_FAILED", None, None),
+                 ({}, "PUSH_EVENT_NOT_FOUND", "GATE_RESULTS_PUSH_EVENT_NOT_FOUND", None, None),
+                 ({}, "PUSH_EVENT_ACTOR_MISMATCH", "GATE_RESULTS_PUSH_EVENT_ACTOR_MISMATCH", None, None)]
+    def api(err=None, field=None, value=None):
+        def run(i, a):
+            if err == "RUN_DOWN":
+                raise OSError("down")
+            assert (i, a) == ("555", "1")
+            return {**RUN, **({field: value} if field else {})}
+        def push(commit, parent=None):
+            if err and err != "RUN_DOWN":
+                raise F.PushNotFound(err)
+            return "9", F.parse_utc("2026-10-20T00:00:00Z")
+        return {"run": run, "push": push}
     with tempfile.TemporaryDirectory() as td:
         for i, (files, want) in enumerate(cases):
             work = results(td, f"g{i}", files)
             try:
-                r = F.gate_results(str(work), cs, cand); got = None
+                r = F.gate_results(str(work), cs, cand, SNAP, api()); got = None
                 assert r["Results_Dir"] == cs and set(r["Files_SHA256"]) == set(files)
+                assert r["Gates_Run"] == {"Run_ID": "555", "Run_Attempt": "1"}
             except F.FreezeRefused as e:
                 got = str(e)
             assert got == want, (i, got, want)
+        work = results(td, "gapi", base)
+        for j, (_, err, want, field, value) in enumerate(api_cases):
+            try:
+                F.gate_results(str(work), cs, cand, SNAP, api(err, field, value)); got = None
+            except F.FreezeRefused as e:
+                got = str(e)
+            assert got == want, (j, got, want)
+        # F8-d: results from another snapshot (or none named) are refused
+        for snap in ("6" * 64, None):
+            try:
+                F.gate_results(str(work), cs, cand, snap, api()); raise AssertionError("snapshot")
+            except F.FreezeRefused as e:
+                assert str(e) == "GATE_SNAPSHOT_MISMATCH"
 
 
 if __name__ == "__main__":

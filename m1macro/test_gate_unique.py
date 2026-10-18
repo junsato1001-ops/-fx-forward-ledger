@@ -1,4 +1,5 @@
-"""IMPL-FINDINGS-07 F7-a (むすび 2026-10-19): fail-closed uniqueness of the (t, h) universe and of the G6/G7 rows.
+"""IMPL-FINDINGS-07 F7-a (むすび 2026-10-19): fail-closed uniqueness of the (t, h) universe and of the G6/G7 rows;
+IMPL-FINDINGS-08 F8-d: one development snapshot for G5 and every G6-G8 shard.
 
 A duplicate anywhere fails the gate. Nothing is deduplicated or repaired: equal counts with a duplicate on one side
 and a missing key on the other must FAIL. Synthetic numbers only."""
@@ -61,6 +62,13 @@ def run():
     cases.append(("g7_row_duplicate", None, b6, ("G7", "no_duplicate_rows")))
     b6 = cp(g678); del b6["G7"]["n_rows_B"]
     cases.append(("g7_rows_missing", None, b6, ("G7", "no_duplicate_rows")))
+    # F8-d: every G6-G8 shard read the snapshot G5 read
+    b6 = cp(g678); b6["G7"]["snapshot_manifest_sha256"] = sorted([g5["snapshot_manifest_sha256"], "6" * 64])
+    cases.append(("g7_two_snapshots", None, b6, ("G7", "same_snapshot_as_g5")))
+    b6 = cp(g678); b6["G7"]["snapshot_manifest_sha256"] = ["6" * 64]
+    cases.append(("g7_other_snapshot", None, b6, ("G7", "same_snapshot_as_g5")))
+    b5 = cp(g5); del b5["snapshot_manifest_sha256"]
+    cases.append(("g5_snapshot_missing", b5, None, ("G5", "snapshot_identified")))
     out = {}
     for name, b5, b6, (gate, check) in cases:
         r = _verdict(files, b5, b6)

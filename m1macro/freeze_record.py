@@ -49,6 +49,12 @@ UTC = dt.timezone.utc
 PUSH_RETRIES = 5
 ACTIVITY_POLLS = 12                  # fixed before the candidate (F1-e): 12 polls x 15 s = up to 180 s for the push
 ACTIVITY_POLL_SEC = 15               # event to appear in the activity API; not a statistical parameter
+ACTIVITY_MAX_PAGES = 100             # F8-a: every page of the activity list is read (100 x 100 events); more -> fail closed
+ACTIONS_ACTOR = "github-actions[bot]"   # F8-a/F8-c: pushes made by a workflow with GITHUB_TOKEN
+GATES_WORKFLOW = ".github/workflows/m1macro_gates.yml"
+GATES_BRANCH = "m1macro-gates"
+GATES_RESULTS_BRANCH = "m1macro-gates-results"
+SNAPSHOT_MANIFEST = "data/m1macro/dev_snapshot/manifest.json"
 
 
 class FreezeRefused(Exception):
@@ -101,32 +107,62 @@ def d2_ok(marker_push, af: dict) -> bool:
     return all(marker_push < af[h] for h in HORIZONS)
 
 
-def find_push(events, commit):
-    """events: activity API records for refs/heads/main. Exactly one push whose `after` is commit -> (id, time)."""
-    hits = [e for e in events if e.get("activity_type") == "push" and e.get("ref") == "refs/heads/main"
-            and e.get("after") == commit]
+def find_push(events, commit, ref="refs/heads/main", parent=None, actor=None):
+    """events: activity API records. Exactly one push to ref whose `after` is commit -> (id, time).
+    F8-a: if parent is given, that push must have moved ref from parent (`before`); if actor is given, it must be the
+    pusher. Any other outcome raises PushNotFound (fail closed)."""
+    hits = [e for e in events if e.get("activity_type") == "push" and e.get("ref") == ref and e.get("after") == commit]
     if len(hits) != 1:
         raise PushNotFound("PUSH_EVENT_NOT_UNIQUE" if hits else "PUSH_EVENT_NOT_FOUND")
-    return str(hits[0]["id"]), parse_utc(hits[0]["timestamp"])
+    e = hits[0]
+    if parent is not None and e.get("before") != parent:
+        raise PushNotFound("PUSH_EVENT_PARENT_MISMATCH")
+    if actor is not None and (e.get("actor") or {}).get("login") != actor:
+        raise PushNotFound("PUSH_EVENT_ACTOR_MISMATCH")
+    return str(e["id"]), parse_utc(e["timestamp"])
 
 
-def activity_lookup(repo, token, sleep=None):
-    """Returns push_time(commit) -> (activity_id, server time); polls the activity API with the fixed wait."""
+def _next_link(resp):
+    h = getattr(resp, "headers", None)
+    link = h.get("Link") if h is not None else None
+    for part in (link or "").split(","):
+        if 'rel="next"' in part:
+            return part[part.index("<") + 1:part.index(">")]
+    return None
+
+
+def _activity_all(repo, token, ref):
+    """F8-a: every page of the push activity of ref (oldest pushes included); a missing page or more than
+    ACTIVITY_MAX_PAGES pages raises (fail closed)."""
+    from urllib.parse import quote
+    url = f"https://api.github.com/repos/{repo}/activity?ref={quote(ref, safe='')}&activity_type=push&per_page=100"
+    out = []
+    for _ in range(ACTIVITY_MAX_PAGES):
+        req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            page = json.loads(r.read()); url = _next_link(r)
+        if not isinstance(page, list):
+            raise ValueError("activity page")
+        out += page
+        if not url:
+            return out
+    raise PushNotFound("ACTIVITY_PAGES_EXCEEDED")
+
+
+def activity_lookup(repo, token, sleep=None, ref="refs/heads/main", actor=ACTIONS_ACTOR):
+    """Returns push_time(commit, parent=None) -> (activity_id, server time); polls the full activity list of ref with
+    the fixed wait. A non-unique, parent-mismatched or actor-mismatched event is final at once (no retry)."""
     import time
     sleep = sleep or time.sleep
 
-    def push_time(commit):
+    def push_time(commit, parent=None):
         last = None
         for i in range(ACTIVITY_POLLS):
-            req = urllib.request.Request(f"https://api.github.com/repos/{repo}/activity?ref=refs/heads/main"
-                                         f"&activity_type=push&per_page=100",
-                                         headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
             try:
-                with urllib.request.urlopen(req, timeout=30) as r:
-                    return find_push(json.loads(r.read()), commit)
+                return find_push(_activity_all(repo, token, ref), commit, ref, parent, actor)
             except PushNotFound as e:
                 last = e
-                if str(e) == "PUSH_EVENT_NOT_UNIQUE":
+                if str(e) != "PUSH_EVENT_NOT_FOUND":
                     raise
             except Exception:
                 last = PushNotFound("ACTIVITY_API_FAILED")
@@ -149,10 +185,11 @@ def _push(git, code):
                 raise FreezeRefused(code)
 
 
-def transaction(git, rec_b: bytes, ids: dict, run_start, af: dict, now, head_commit, push_time) -> dict:
+def transaction(git, rec_b: bytes, ids: dict, run_start, af: dict, now, head_commit, push_time, parent_of=None) -> dict:
     """git: RealGit-like adapter on a main worktree (create/append/ensure_header/push/remote). ids: Run_ID, Run_Attempt,
-    Code_SHA256. now() -> aware datetime. head_commit() -> current main commit sha. push_time(commit) -> (activity id,
-    server time) or raises PushNotFound. Returns the audit row (dict)."""
+    Code_SHA256. now() -> aware datetime. head_commit() -> current main commit sha. push_time(commit, parent) ->
+    (activity id, server time) or raises PushNotFound. parent_of(commit) -> its first parent (F8-a: the push event
+    must have moved main from exactly that commit). Returns the audit row (dict)."""
     for p in (RECORD, MARKER, AUDIT):
         if (git.dir / p).exists():
             raise FreezeRefused("FREEZE_ALREADY_RECORDED")
@@ -182,9 +219,16 @@ def transaction(git, rec_b: bytes, ids: dict, run_start, af: dict, now, head_com
     t_mark = now()
     mcommit = head_commit()                              # after B's push: main == the commit that carries the marker
     try:
-        act_id, t_push = push_time(mcommit); reject = ""
-    except PushNotFound as e:
-        act_id, t_push, reject = "", None, str(e)
+        parent = parent_of(mcommit) if parent_of else None
+    except Exception:
+        parent = False
+    if parent is False:
+        act_id, t_push, reject = "", None, "MARKER_PARENT_UNKNOWN"
+    else:
+        try:
+            act_id, t_push = push_time(mcommit, parent); reject = ""
+        except PushNotFound as e:
+            act_id, t_push, reject = "", None, str(e)
     # second-resolution strings are what is recorded; the gates compare exactly those values
     rs, tr, rc, tm = (parse_utc(utc_s(x)) for x in (run_start, t_rec, recorded, t_mark))
     if t_push is None:
@@ -276,8 +320,20 @@ def server_run_start(repo, run_id, attempt, token, head_sha):
     return parse_utc(j["run_started_at"])
 
 
-def gate_results(cand_root, code_sha, cand_sha):
-    """Formal gate results for this Code_SHA256 on branch m1macro-gates-results (reference + minimal sanity checks)."""
+def gates_run(repo, token, run_id, attempt):
+    req = urllib.request.Request(f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/attempts/{attempt}",
+                                 headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read())
+
+
+def gate_results(cand_root, code_sha, cand_sha, snapshot_sha=None, api=None):
+    """Formal gate results for this Code_SHA256 on branch m1macro-gates-results.
+    F1-d: FORMAL run class, this Code_SHA256 and candidate commit, and an all-PASS G1-G9 verdict equal to the one
+    recomputed here. F8-c: provenance - the results commit was pushed by a workflow (unique push event, actor
+    github-actions[bot]) and names a completed, successful m1macro_gates.yml run attempt on branch m1macro-gates for
+    the candidate commit. F8-d: G5 ran on the development snapshot whose manifest SHA-256 is snapshot_sha.
+    api: {"run": f(run_id, attempt) -> run json, "push": f(commit) -> (id, time)}; None -> GitHub API from the env."""
     _sh("git", "fetch", "-q", "origin", "m1macro-gates-results", cwd=cand_root)
     commit = _sh("git", "rev-parse", "FETCH_HEAD", cwd=cand_root).decode().strip()
     names = _sh("git", "ls-tree", "--name-only", f"FETCH_HEAD:{code_sha}", cwd=cand_root).decode().split()
@@ -306,7 +362,42 @@ def gate_results(cand_root, code_sha, cand_sha):
         raise FreezeRefused("GATE_VERDICT_INCONSISTENT")
     if not recomputed.get("all_pass"):
         raise FreezeRefused("GATE_VERDICT_NOT_ALL_PASS")
-    return {"Results_Branch": "m1macro-gates-results", "Results_Commit": commit, "Results_Dir": code_sha,
+    # F8-d: the formal gates read the development snapshot the record names
+    g5s = json.loads(show("g5_summary.json"))
+    if snapshot_sha is None or g5s.get("snapshot_manifest_sha256") != snapshot_sha:
+        raise FreezeRefused("GATE_SNAPSHOT_MISMATCH")
+    # F8-c: provenance of the results
+    if "run_provenance.json" not in names:
+        raise FreezeRefused("GATE_PROVENANCE_MISSING")
+    try:
+        pv = json.loads(show("run_provenance.json"))
+        rid, att = str(int(pv["run_id"])), str(int(pv["run_attempt"]))
+    except (ValueError, KeyError, TypeError):
+        raise FreezeRefused("GATE_PROVENANCE_MISSING")
+    if pv.get("sha") != cand_sha or pv.get("ref_name") != GATES_BRANCH:
+        raise FreezeRefused("GATE_RUN_MISMATCH")
+    if api is None:
+        repo, tok = os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_TOKEN"]
+        api = {"run": lambda i, a: gates_run(repo, tok, i, a),
+               "push": activity_lookup(repo, tok, ref=f"refs/heads/{GATES_RESULTS_BRANCH}")}
+    try:
+        j = api["run"](rid, att)
+    except Exception:
+        raise FreezeRefused("GATE_RUN_LOOKUP_FAILED")
+    if (str(j.get("id")) != rid or str(j.get("run_attempt")) != att or j.get("path") != GATES_WORKFLOW
+            or j.get("head_branch") != GATES_BRANCH or j.get("head_sha") != cand_sha or j.get("event") != "push"
+            or j.get("status") != "completed" or j.get("conclusion") != "success"):
+        raise FreezeRefused("GATE_RUN_MISMATCH")
+    try:
+        parent = _sh("git", "rev-parse", "FETCH_HEAD^", cwd=cand_root).decode().strip() \
+            if _sh("git", "rev-list", "--count", "FETCH_HEAD", cwd=cand_root).decode().strip() != "1" else None
+        api["push"](commit, parent)
+    except PushNotFound as e:
+        raise FreezeRefused("GATE_RESULTS_" + str(e))
+    except FreezeRefused:
+        raise FreezeRefused("GATE_RESULTS_PARENT_UNKNOWN")
+    return {"Results_Branch": GATES_RESULTS_BRANCH, "Results_Commit": commit, "Results_Dir": code_sha,
+            "Gates_Run": {"Run_ID": rid, "Run_Attempt": att},
             "Files_SHA256": {n: hashlib.sha256(show(n)).hexdigest() for n in sorted(names)}}
 
 
@@ -335,45 +426,78 @@ def run(cout, main_wt, cand_sha):
     now = lambda: dt.datetime.now(UTC)
     if not now() < min(af.values()):
         raise FreezeRefused("PAST_A_FIRST")
-    snap = json.loads(_sh("git", "show", "origin/main:data/m1macro/dev_snapshot/manifest.json", cwd=main_wt))
+    snap_b = _sh("git", "show", f"origin/main:{SNAPSHOT_MANIFEST}", cwd=main_wt); snap = json.loads(snap_b)
     rec = {"Spec": "M1-MACRO-IMPL-CODE-V1", "Code_SHA256": code_sha, "Candidate_Commit": cand_sha,
            "CODE_MANIFEST_V1": manifest.manifest_bytes().decode("utf-8"),
            "Image_Digest": (ROOT / "env/IMAGE_DIGEST").read_text().strip(),
            "Requirements_Lock_SHA256": hashlib.sha256((ROOT / "env/requirements.lock").read_bytes()).hexdigest(),
            "Dev_Snapshot": {"Main_Commit": _sh("git", "log", "-1", "--format=%H", "origin/main", "--",
                                               "data/m1macro/dev_snapshot", cwd=main_wt).decode().strip(),
+                            "Manifest_SHA256": hashlib.sha256(snap_b).hexdigest(),
                             "Files": {f["source"] + ":" + f["path"]: f["sha256"] for f in snap["files"]}},
            "First_Forward_Origin": first, "CFTC_Snapshot_Window_Hours": win,
-           "Gate_Results": gate_results(str(ROOT), code_sha, cand_sha),
+           "Gate_Results": gate_results(str(ROOT), code_sha, cand_sha, hashlib.sha256(snap_b).hexdigest()),
            "Run": {"Run_ID": rid, "Run_Attempt": att, "Workflow": os.environ.get("GITHUB_WORKFLOW", "")}}
     git = gitrepo.RealGit(main_wt, message=f"preregistration: M1-MACRO implementation freeze (run {rid})")
     head = lambda: _sh("git", "rev-parse", "HEAD", cwd=main_wt).decode().strip()
+    parent_of = lambda c: _sh("git", "rev-parse", f"{c}^", cwd=main_wt).decode().strip()
     arow = transaction(git, record_bytes(rec), {"Run_ID": rid, "Run_Attempt": att, "Code_SHA256": code_sha},
-                       run_start, af, now, head, activity_lookup(os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_TOKEN"]))
+                       run_start, af, now, head, activity_lookup(os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_TOKEN"]),
+                       parent_of)
     print(json.dumps({k: arow[k] for k in ("Anchor_Status", "D2_Status", "Freeze_Status", "Reject_Reason")}))
     return arow["Freeze_Status"] == "FINAL"
 
 
+def git_binding(root, rec_b, marker_b, audit_row, marker_row) -> bool:
+    """F8-b: the audit row's Marker_Commit is a commit of this checkout's history (ancestor of HEAD) that carries
+    exactly the current record and marker bytes, and its parent does not yet carry the marker; the marker's
+    Record_Main_Commit carries the record bytes. Read-only git."""
+    def g(*a):
+        r = subprocess.run(["git", *a], cwd=root, capture_output=True)
+        return r.returncode, r.stdout
+    mc, rc = audit_row.get("Marker_Commit", ""), marker_row.get("Record_Main_Commit", "")
+    if len(mc) != 40 or len(rc) != 40:
+        return False
+    if g("merge-base", "--is-ancestor", mc, "HEAD")[0] != 0 or g("merge-base", "--is-ancestor", rc, mc)[0] != 0:
+        return False
+    if g("show", f"{mc}:{MARKER}") != (0, marker_b) or g("show", f"{mc}:{RECORD}") != (0, rec_b) \
+            or g("show", f"{rc}:{RECORD}") != (0, rec_b):
+        return False
+    return g("cat-file", "-e", f"{mc}^:{MARKER}")[0] != 0
+
+
 def fresh_audit(root, repo, token, push_time=None) -> dict:
-    """Fresh audit of a freeze on a main checkout: the canonical three files (is_final) AND the server anchor
-    re-queried now (the recorded push id/time must equal the activity API's record for Marker_Commit). Read-only."""
+    """Fresh audit of a freeze on a main checkout (git clone): the canonical three files (is_final), their binding to
+    the git history (F8-b), AND the server anchor re-queried now over the full activity list (F8-a): the push whose
+    `after` is Marker_Commit, `before` its parent and actor github-actions[bot] must have the recorded id and time.
+    Read-only."""
     sys.path.insert(0, str(ROOT))
     from m1macro import manifest
     rd = lambda p: (Path(root) / p).read_bytes() if (Path(root) / p).exists() else b""
-    res = {"three_files_final": False, "server_anchor_matches": False}
+    res = {"three_files_final": False, "git_binding": False, "server_anchor_matches": False, "pass": False}
     rec_b = rd(RECORD)
     if not rec_b:
         res["reason"] = "NO_FREEZE_RECORD"; return res
-    code = json.loads(rec_b).get("Code_SHA256")
+    try:
+        code = json.loads(rec_b).get("Code_SHA256")
+    except ValueError:
+        res["reason"] = "RECORD_NOT_JSON"; return res
     res["code_sha256_record"] = code; res["code_sha256_checkout"] = manifest.code_sha256()
     res["three_files_final"] = is_final(rec_b, rd(MARKER), rd(AUDIT), code)
-    a = (_rows(rd(AUDIT)) or [{}])[0]
-    try:
-        aid, t = (push_time or activity_lookup(repo, token))(a.get("Marker_Commit", ""))
-        res["server_anchor_matches"] = (aid == a.get("Marker_Push_Activity_ID") and utc_s(t) == a.get("Marker_Push_At_Server_UTC"))
-    except PushNotFound as e:
-        res["reason"] = str(e)
-    res["pass"] = res["three_files_final"] and res["server_anchor_matches"]
+    a = (_rows(rd(AUDIT)) or [{}])[0]; m = (_rows(rd(MARKER)) or [{}])[0]
+    res["git_binding"] = git_binding(root, rec_b, rd(MARKER), a, m)
+    pr = subprocess.run(["git", "rev-parse", a.get("Marker_Commit", "") + "^"], cwd=root, capture_output=True)
+    parent = pr.stdout.decode().strip() if pr.returncode == 0 else None
+    if parent is None:
+        res["reason"] = "MARKER_PARENT_UNKNOWN"
+    else:
+        try:
+            aid, t = (push_time or activity_lookup(repo, token))(a.get("Marker_Commit", ""), parent)
+            res["server_anchor_matches"] = (aid == a.get("Marker_Push_Activity_ID")
+                                            and utc_s(t) == a.get("Marker_Push_At_Server_UTC"))
+        except PushNotFound as e:
+            res["reason"] = str(e)
+    res["pass"] = res["three_files_final"] and res["git_binding"] and res["server_anchor_matches"]
     return res
 
 

@@ -49,6 +49,11 @@ def _ctx(manifest, pub, priv, td):
     return pipeline.Context(td, us, jp, reports), (us, jp, reports)
 
 
+def _sha_file(p):
+    import hashlib
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
 def g5(out, manifest, pub, priv):
     """Features and calendars (values allowed, Part 1 §9)."""
     from m1macro import features, pipeline, rates, jpcal, uscal
@@ -85,6 +90,7 @@ def g5(out, manifest, pub, priv):
            "anomalies_us_sample": [str(a) for a in an_us[:40]], "anomalies_jp_sample": [str(a) for a in an_jp[:40]],
            "n_th": {h: sum(1 for x in ctx.th if x[1] == h) for h in pipeline.HORIZONS},
            "th_universe": th_keyset((x[0], x[1]) for x in ctx.th),       # F7-a: expected universe itself unique
+           "snapshot_manifest_sha256": _sha_file(manifest),                # F8-d: which snapshot was read
            "n_static_groups": {h: len(v) for h, v in ctx.recs.items()},
            "holdout_rows": sum(1 for k in list(ctx.opp) + list(ctx.s0) if k[0] in HOLDOUT_PAIRS)}
     Path(out, "g5_summary.json").write_text(json.dumps(res, indent=1, sort_keys=True), encoding="utf-8")
@@ -152,7 +158,7 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
         f.close()
 
 
-def shardsum(tmp, out, shard):
+def shardsum(tmp, out, shard, manifest):
     """Inside the container: G7 counts from the two runs' hashes (hash files stay in the container's /tmp)."""
     tmp = Path(tmp); out = Path(out); out.mkdir(parents=True, exist_ok=True)
     ra = [json.loads(l) for l in open(tmp / f"hash_A_{shard}.jsonl")]
@@ -162,6 +168,7 @@ def shardsum(tmp, out, shard):
     keys = set(ha) | set(hb)
     res = {"shard": int(shard), "n_keys": len(keys), "n_run_A": len(ha), "n_run_B": len(hb),
            "n_rows_A": len(ra), "n_rows_B": len(rb),                    # F7-a: rows, before any keying
+           "snapshot_manifest_sha256": _sha_file(manifest),                # F8-d
            "e_input_sha_mismatch": sum(1 for k in keys if k not in ha or k not in hb or ha[k]["e_sha256"] != hb[k]["e_sha256"]),
            "beta_sha_or_state_mismatch": sum(1 for k in keys if k not in ha or k not in hb
                                              or ha[k]["beta_sha256"] != hb[k]["beta_sha256"] or ha[k]["state"] != hb[k]["state"])}
@@ -200,6 +207,7 @@ def aggregate(out, d):
            "G7": {"n_shards": len(g7), "n_keys": sum(x["n_keys"] for x in g7), "n_run_A": sum(x["n_run_A"] for x in g7),
                   "n_run_B": sum(x["n_run_B"] for x in g7),
                   "n_rows_A": sum(x["n_rows_A"] for x in g7), "n_rows_B": sum(x["n_rows_B"] for x in g7),
+                  "snapshot_manifest_sha256": sorted({x["snapshot_manifest_sha256"] for x in g7}),
                   "e_input_sha_mismatch": sum(x["e_input_sha_mismatch"] for x in g7),
                   "beta_sha_or_state_mismatch": sum(x["beta_sha_or_state_mismatch"] for x in g7)},
            "G8": {"n_mu_zero_rows": sum(r["n_mu_zero_rows"] for r in g8), "n_match": sum(r["n_match"] for r in g8),
