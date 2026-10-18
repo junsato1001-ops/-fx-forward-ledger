@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from m1macro import freeze_record as F, gate_verdict, gitrepo
+from m1macro import freeze_record as F, gate_verdict, gates, gitrepo
 from m1macro.test_gitrepo_tx import _hook, _repo
 
 FIRST = {"1D": "2026-11-10", "1W": "2026-11-15", "4W": "2026-11-15"}
@@ -205,9 +205,12 @@ def _passing_results():
          **{t: {"status": "PASS", "detail": {}} for t in gate_verdict.G4_TESTS}}
     g5 = {"n_origins": 10, "n_th": {"1D": 6, "1W": 2, "4W": 2}, "holdout_rows": 0,
           "status_counts": {"F_US": {"OK": 10}, "F_JP": {"OK": 10}, "F_POS": {"OK": 7, "X": 3}}}
-    g678 = {"G6": {"n_th": 10, "errors": 0, "error_types": [], "n_estimated": 4, "n_pass_all": 4,
+    keys = [(f"2020-01-{d:02d}", "1D") for d in range(1, 7)] + [(f"2020-02-{d:02d}", h) for d in (1, 2) for h in ("1W", "4W")]
+    g5["th_universe"] = gates.th_keyset(keys)                              # F7-a
+    g678 = {"G6": {"n_th": 10, "th_keyset": gates.th_keyset(keys), "errors": 0, "error_types": [], "n_estimated": 4, "n_pass_all": 4,
                    "max_abs_ub_minus_lb": 9e-14, "max_abs_phi2_minus_lb": 8e-14},
-            "G7": {"n_shards": gate_verdict.N_SHARDS, "n_keys": 10, "n_run_A": 10, "n_run_B": 10, "e_input_sha_mismatch": 0,
+            "G7": {"n_shards": gate_verdict.N_SHARDS, "n_keys": 10, "n_run_A": 10, "n_run_B": 10, "n_rows_A": 10, "n_rows_B": 10,
+                   "e_input_sha_mismatch": 0,
                    "beta_sha_or_state_mismatch": 0},
             "G8": {"n_mu_zero_rows": 3, "n_match": 3, "n_mismatch": 0}}
     files = {"suite.json": json.dumps(s).encode(), "g5_summary.json": json.dumps(g5).encode(),

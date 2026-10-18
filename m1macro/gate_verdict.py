@@ -42,7 +42,13 @@ def verdict(d) -> dict:
     out["SUITE_ALL"] = {"pass": bool(suite) and all(v.get("status") == "PASS" for v in suite.values()),
                         "checks": {"n_tests": len(suite or {})}}
     n_th5 = sum((g5 or {}).get("n_th", {}).values()) if g5 else None
+    U = (g5 or {}).get("th_universe") or {}
+    K6 = ((g678 or {}).get("G6") or {}).get("th_keyset") or {}
+    # F7-a (むすび 2026-10-19): the expected (t, h) universe and the G6 rows must each be duplicate-free and must be
+    # the same key set. Any duplicate fails the gate; nothing is deduplicated or repaired.
     gate("G5", {"summary_present": g5 is not None, "n_origins_positive": bool(g5 and g5.get("n_origins", 0) > 0),
+                "th_universe_unique": n_th5 is not None and U.get("n") == n_th5 == U.get("n_unique")
+                and U.get("n_duplicate") == 0 and bool(U.get("sha256")),
                 "every_origin_has_three_statuses": bool(g5) and all(sum(c.values()) == g5["n_origins"]
                                                                        for c in g5.get("status_counts", {}).values())
                 and set(g5.get("status_counts", {})) == {"F_US", "F_JP", "F_POS"}})
@@ -50,12 +56,16 @@ def verdict(d) -> dict:
     num = lambda v: v if isinstance(v, (int, float)) else None
     le = lambda v: num(v) is not None and abs(v) <= EPS_TIE
     gate("G6", {"summary_present": bool(G6), "all_th_covered": n_th5 is not None and G6.get("n_th") == n_th5,
+                "th_rows_unique": n_th5 is not None and K6.get("n") == G6.get("n_th") == K6.get("n_unique") == n_th5
+                and K6.get("n_duplicate") == 0,
+                "th_keyset_equals_universe": bool(K6.get("sha256")) and K6.get("sha256") == U.get("sha256"),
                 "no_errors": G6.get("errors") == 0 and not G6.get("error_types"),
                 "all_estimated_pass": num(G6.get("n_estimated")) is not None and G6.get("n_pass_all") == G6.get("n_estimated"),
                 "ub_minus_lb_le_eps": G6.get("n_estimated") == 0 or (le(G6.get("max_abs_ub_minus_lb"))),
                 "phi2_minus_lb_le_eps": G6.get("n_estimated") == 0 or (le(G6.get("max_abs_phi2_minus_lb")))})
     gate("G7", {"all_shards": G7.get("n_shards") == N_SHARDS,
                 "both_runs_complete": n_th5 is not None and G7.get("n_keys") == G7.get("n_run_A") == G7.get("n_run_B") == n_th5,
+                "no_duplicate_rows": n_th5 is not None and G7.get("n_rows_A") == G7.get("n_rows_B") == n_th5,
                 "e_input_identical": G7.get("e_input_sha_mismatch") == 0, "beta_identical": G7.get("beta_sha_or_state_mismatch") == 0})
     gate("G8", {"summary_present": bool(G8), "no_mismatch": G8.get("n_mismatch") == 0,
                 "all_match": num(G8.get("n_match")) is not None and G8.get("n_match") == G8.get("n_mu_zero_rows")})

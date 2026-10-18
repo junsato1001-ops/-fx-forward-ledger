@@ -25,6 +25,17 @@ ALLOWED_G8 = {"t", "h", "n_mu_zero_rows", "n_match", "n_mismatch"}
 EPS = 1e-13
 
 
+def th_keyset(keys):
+    """F7-a (むすび 2026-10-19): uniqueness of the (t, h) universe, checked without deduplication or repair.
+    keys: every (t, h) occurrence, duplicates included. Returns counts and the SHA-256 of the sorted distinct keys
+    (dates and horizons only)."""
+    import hashlib
+    ks = [(str(t), str(h)) for t, h in keys]
+    u = sorted(set(ks))
+    return {"n": len(ks), "n_unique": len(u), "n_duplicate": len(ks) - len(u),
+            "sha256": hashlib.sha256("".join(f"{t}|{h}\n" for t, h in u).encode("utf-8")).hexdigest()}
+
+
 def _emit(fh, rec, allowed):
     bad = set(rec) - allowed
     if bad:
@@ -73,6 +84,7 @@ def g5(out, manifest, pub, priv):
            "calendar_anomalies_us_since_2010": len(an_us), "calendar_anomalies_jp_since_2026": len(an_jp),
            "anomalies_us_sample": [str(a) for a in an_us[:40]], "anomalies_jp_sample": [str(a) for a in an_jp[:40]],
            "n_th": {h: sum(1 for x in ctx.th if x[1] == h) for h in pipeline.HORIZONS},
+           "th_universe": th_keyset((x[0], x[1]) for x in ctx.th),       # F7-a: expected universe itself unique
            "n_static_groups": {h: len(v) for h, v in ctx.recs.items()},
            "holdout_rows": sum(1 for k in list(ctx.opp) + list(ctx.s0) if k[0] in HOLDOUT_PAIRS)}
     Path(out, "g5_summary.json").write_text(json.dumps(res, indent=1, sort_keys=True), encoding="utf-8")
@@ -143,10 +155,13 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
 def shardsum(tmp, out, shard):
     """Inside the container: G7 counts from the two runs' hashes (hash files stay in the container's /tmp)."""
     tmp = Path(tmp); out = Path(out); out.mkdir(parents=True, exist_ok=True)
-    ha = {(r["t"], r["h"]): r for r in map(json.loads, open(tmp / f"hash_A_{shard}.jsonl"))}
-    hb = {(r["t"], r["h"]): r for r in map(json.loads, open(tmp / f"hash_B_{shard}.jsonl"))}
+    ra = [json.loads(l) for l in open(tmp / f"hash_A_{shard}.jsonl")]
+    rb = [json.loads(l) for l in open(tmp / f"hash_B_{shard}.jsonl")]
+    ha = {(r["t"], r["h"]): r for r in ra}
+    hb = {(r["t"], r["h"]): r for r in rb}
     keys = set(ha) | set(hb)
     res = {"shard": int(shard), "n_keys": len(keys), "n_run_A": len(ha), "n_run_B": len(hb),
+           "n_rows_A": len(ra), "n_rows_B": len(rb),                    # F7-a: rows, before any keying
            "e_input_sha_mismatch": sum(1 for k in keys if k not in ha or k not in hb or ha[k]["e_sha256"] != hb[k]["e_sha256"]),
            "beta_sha_or_state_mismatch": sum(1 for k in keys if k not in ha or k not in hb
                                              or ha[k]["beta_sha256"] != hb[k]["beta_sha256"] or ha[k]["state"] != hb[k]["state"])}
@@ -170,7 +185,7 @@ def aggregate(out, d):
     def mn(k):
         v = [r[k] for r in est if k in r]
         return min(v) if v else None
-    res = {"G6": {"n_th": len(g6), "state_counts": {f"{h}/{s}": n for (h, s), n in sorted(st.items())},
+    res = {"G6": {"n_th": len(g6), "th_keyset": th_keyset((r["t"], r["h"]) for r in g6), "state_counts": {f"{h}/{s}": n for (h, s), n in sorted(st.items())},
                   "errors": sum(1 for r in g6 if "error_type" in r),
                   "error_types": sorted({r["error_type"] for r in g6 if "error_type" in r}),
                   "subreasons": sorted({r["subreason"] for r in g6 if r.get("subreason")}),
@@ -184,6 +199,7 @@ def aggregate(out, d):
                   "total_sec": round(sum(r.get("sec", 0) for r in g6), 1)},
            "G7": {"n_shards": len(g7), "n_keys": sum(x["n_keys"] for x in g7), "n_run_A": sum(x["n_run_A"] for x in g7),
                   "n_run_B": sum(x["n_run_B"] for x in g7),
+                  "n_rows_A": sum(x["n_rows_A"] for x in g7), "n_rows_B": sum(x["n_rows_B"] for x in g7),
                   "e_input_sha_mismatch": sum(x["e_input_sha_mismatch"] for x in g7),
                   "beta_sha_or_state_mismatch": sum(x["beta_sha_or_state_mismatch"] for x in g7)},
            "G8": {"n_mu_zero_rows": sum(r["n_mu_zero_rows"] for r in g8), "n_match": sum(r["n_match"] for r in g8),
