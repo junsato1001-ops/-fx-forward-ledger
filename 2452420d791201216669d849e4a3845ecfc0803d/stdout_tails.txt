@@ -4,34 +4,34 @@
 [notice] To update, run: pip install --upgrade pip
 
 ==> arts/stress-1/stdout_1.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-10/stdout_10.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-11/stdout_11.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-12/stdout_12.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-13/stdout_13.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-14/stdout_14.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-15/stdout_15.txt <==
 
@@ -39,19 +39,19 @@ EXIT=124
 [notice] To update, run: pip install --upgrade pip
 
 ==> arts/stress-16/stdout_16.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-17/stdout_17.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-18/stdout_18.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-19/stdout_19.txt <==
 
@@ -59,9 +59,9 @@ EXIT=124
 [notice] To update, run: pip install --upgrade pip
 
 ==> arts/stress-2/stdout_2.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-3/stdout_3.txt <==
 
@@ -69,11 +69,16 @@ EXIT=124
 [notice] To update, run: pip install --upgrade pip
 
 ==> arts/stress-4/stdout_4.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
 
 ==> arts/stress-5/stdout_5.txt <==
+
+[notice] A new release of pip is available: 24.2 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+
+==> arts/stress-6/stdout_6.txt <==
 
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
@@ -89,6 +94,6 @@ EXIT=124
 [notice] To update, run: pip install --upgrade pip
 
 ==> arts/stress-9/stdout_9.txt <==
+
 [notice] A new release of pip is available: 24.2 -> 26.2.1
 [notice] To update, run: pip install --upgrade pip
-EXIT=124
