@@ -41,15 +41,17 @@ def solve_epigraph(P, tol=1e-13, maxr=200):
     """Per-group epigraph LP with lazily added group pieces (search), then a lower bound.
 
     Clean convergence (no group piece above its epigraph variable by more than tol): LB = the LP value, as before.
-    STALL (IMPL-FINDINGS-06): every violating piece is already in the model, so the violation is the LP's own
-    feasibility tolerance (1e-10) and no further cut can change the LP; looping only repeats the same cut until maxr.
+    STALL (IMPL-FINDINGS-06): a round re-adds only cuts that are already in the model with the same key and value,
+    so the cut set, the next LP and (deterministic solver) its solution are identical: the loop would repeat until
+    maxr. The violation is the LP's own feasibility tolerance (1e-10) against the separation tolerance (1e-13). The
+    cut rule and the LP path before this point are exactly the original ones.
     The search then stops and the lower bound is certified exactly by the aggregated-cut master (solve_kelley_fast,
     own Cramer-rule certificate, criterion UB - exact LB <= tol), started from the epigraph point. Returns
     (beta, UB, LB, rounds, termination) with termination in EPIGRAPH_CONVERGED / EPIGRAPH_STALLED_EXACT_CERT."""
-    G = len(P.a); cuts = {}; have = [set() for _ in range(G)]
+    G = len(P.a); cuts = {}
     for g in range(G):
         for mu0 in (P.a[g][0] - 1.0, P.a[g][-1] + 1.0):
-            pc = P.group_piece(g, mu0); cuts[(g, round(mu0, 15))] = pc; have[g].add(pc)
+            cuts[(g, round(mu0, 15))] = P.group_piece(g, mu0)
     for r in range(maxr):
         keys = sorted(cuts); m = len(keys)
         A = np.zeros((m, 3 + G)); b = np.zeros(m)
@@ -60,16 +62,17 @@ def solve_epigraph(P, tol=1e-13, maxr=200):
                       method="highs-ds", options=OPT)
         if res.status != 0:
             raise RuntimeError(res.message)
-        beta = res.x[:3]; t = res.x[3:]; m_ = P.mu(beta); added = 0; violated = 0
+        beta = res.x[:3]; t = res.x[3:]; m_ = P.mu(beta); added = 0; changed = False
         for g in range(G):
             s, c = P.group_piece(g, m_[g])
-            if s * m_[g] + c - t[g] > tol:
-                violated += 1
-                if (s, c) not in have[g]:                          # a piece the model does not have yet
-                    cuts[(g, round(m_[g], 15))] = (s, c); have[g].add((s, c)); added += 1
-        if violated == 0:
+            if s * m_[g] + c - t[g] > tol:                         # cut rule unchanged (same LP path as before)
+                key = (g, round(m_[g], 15))
+                if cuts.get(key) != (s, c):
+                    changed = True
+                cuts[key] = (s, c); added += 1
+        if added == 0:
             return beta, P.phi(beta), res.fun, r + 1, "EPIGRAPH_CONVERGED"
-        if added == 0:                                             # stalled: certify exactly instead of looping
+        if not changed:          # fixed point: the cut set (hence the next LP and its solution) is identical -> certify
             kb, kub, klb, kit, kterm = solve_kelley_fast(P, start=[np.array(beta, float)], return_termination=True)
             if kterm != "KELLEY_CERTIFIED":
                 raise RuntimeError("epigraph stalled; exact certification failed: " + kterm)
@@ -183,35 +186,115 @@ def _det_solve(M, r):
     return out
 
 
-def exact_lb(cuts, bnd, x):
-    """Exact optimal value of the master LP (min theta s.t. s.beta + c <= theta, box) certified by a primal-feasible
-    vertex with nonnegative exact dual multipliers. Returns the exact vertex (beta_1..3, theta) or None."""
+def _exact_rows(cuts, bnd):
     from fractions import Fraction
-    import itertools
     rows = [([Fraction(float(v)) for v in s] + [Fraction(-1)], Fraction(-float(c))) for s, c in cuts]
     for k in range(3):
         lo, hi = bnd[k]
         e = [Fraction(0)] * 4; e[k] = Fraction(1); rows.append((e, Fraction(hi)))
         e = [Fraction(0)] * 4; e[k] = Fraction(-1); rows.append((e, Fraction(-lo)))
+    return rows
+
+
+def _basis_check(rows, comb):
+    """(vertex, dual-feasible, primal-feasible) of a 4-row basis, exactly."""
+    from fractions import Fraction
+    M = [rows[i][0] for i in comb]
+    v = _det_solve(M, [rows[i][1] for i in comb])
+    if v is None:
+        return None, False, False
+    MT = [[M[i][j] for i in range(4)] for j in range(4)]
+    lam = _det_solve(MT, [Fraction(0), Fraction(0), Fraction(0), Fraction(-1)])
+    if lam is None or min(lam) < 0:
+        return v, False, False
+    return v, True, all(sum(a * b for a, b in zip(r, v)) <= h for r, h in rows)
+
+
+def exact_lb(cuts, bnd, x, prefer=()):
+    """Exact optimal value of the master LP (min theta s.t. s.beta + c <= theta, box) certified by a primal-feasible
+    vertex with nonnegative exact dual multipliers. Returns the exact vertex (beta_1..3, theta) or None.
+
+    Stage 1 (original, unchanged): 4-row bases among the 6 / 10 / 14 rows that are most active at the float point.
+    Stage 2 (IMPL-FINDINGS-06, only if stage 1 finds nothing): near a degenerate optimum the float LP's basis can be
+    exactly infeasible by 1e-13..1e-12 (far below its 1e-10 feasibility tolerance), so no basis among the top rows is
+    exactly optimal. Starting from the LP-binding rows (prefer) and then from the dual-feasible bases met in stage 1,
+    an exact dual simplex (_exact_dual_simplex) walks to the exact optimum. The certificate (exact primal feasibility
+    of every row, exact duals >= 0) is the same in both stages; stage 2 only finds the basis.
+    Row order: cuts 0..m-1, then for k = 0..2 the upper box row m+2k and the lower box row m+2k+1."""
+    import itertools
+    rows = _exact_rows(cuts, bnd)
     xf = [float(v) for v in x]
     act = sorted(range(len(rows)), key=lambda i: (-(sum(float(a) * b for a, b in zip(rows[i][0], xf)) - float(rows[i][1])), i))
-    seen = set()
-    for K in (6, 10, 14):
+    seen = set(); dual_ok = []
+    for K in (6, 10, 14):                                   # stage 1: original search
         for comb in itertools.combinations(act[:K], 4):
             if comb in seen:
                 continue
             seen.add(comb)
-            M = [rows[i][0] for i in comb]
-            v = _det_solve(M, [rows[i][1] for i in comb])
-            if v is None:
-                continue
-            MT = [[M[i][j] for i in range(4)] for j in range(4)]
-            lam = _det_solve(MT, [Fraction(0), Fraction(0), Fraction(0), Fraction(-1)])
-            if lam is None or min(lam) < 0:
-                continue
-            if all(sum(a * b for a, b in zip(r, v)) <= h for r, h in rows):
+            v, dfeas, pfeas = _basis_check(rows, comb)
+            if pfeas:
                 return v
+            if dfeas and len(dual_ok) < MAX_WALKS:
+                dual_ok.append(list(comb))
+    pre = []                                                # stage 2: exact walk to the optimum
+    for i in prefer:
+        if 0 <= i < len(rows) and i not in pre:
+            pre.append(i)
+    starts = ([pre] if len(pre) == 4 and _basis_check(rows, pre)[1] else []) + dual_ok
+    for b0 in starts[:MAX_WALKS]:
+        w = _exact_dual_simplex(rows, list(b0))
+        if w is not None:
+            return w
     return None
+
+
+MAX_WALKS = 3            # dual-simplex walks tried per certification attempt (search effort only; not a criterion)
+MAX_PIVOTS = 400
+
+
+def _exact_dual_simplex(rows, basis):
+    """Exact dual simplex on the 4-variable master (min theta s.t. rows), started from a dual-feasible basis
+    (IMPL-FINDINGS-06). Fractions only, own Cramer-rule solves, Bland's rule (smallest index enters and, on ties,
+    leaves), so it cannot cycle. Returns the exact optimal vertex (primal feasible, exact duals >= 0) or None."""
+    from fractions import Fraction
+    c_neg = [Fraction(0), Fraction(0), Fraction(0), Fraction(-1)]
+    for _ in range(MAX_PIVOTS):
+        M = [rows[i][0] for i in basis]
+        v = _det_solve(M, [rows[i][1] for i in basis])
+        MT = [[M[i][j] for i in range(4)] for j in range(4)]
+        lam = _det_solve(MT, c_neg)
+        if v is None or lam is None or min(lam) < 0:
+            return None
+        enter = next((i for i, (r, h) in enumerate(rows) if sum(a * b for a, b in zip(r, v)) > h), None)
+        if enter is None:
+            return v                                  # primal feasible + dual feasible: exact optimum
+        d = _det_solve(MT, rows[enter][0])            # A_B^T d = a_enter
+        if d is None:
+            return None
+        cand = [(lam[k] / d[k], basis[k], k) for k in range(4) if d[k] > 0]
+        if not cand:
+            return None                               # cannot happen for a bounded master; fail closed
+        _, _, k = min(cand)
+        basis = basis[:k] + [enter] + basis[k + 1:]
+    return None
+
+
+def _binding_rows(res, m, bnd):
+    """Rows the float master LP reports as binding (nonzero dual multipliers), in exact_lb's row order."""
+    out = []
+    try:
+        out += [i for i, v in enumerate(res.ineqlin.marginals) if v != 0.0]
+        for k in range(3):
+            if bnd[k][0] == bnd[k][1]:
+                out += [m + 2 * k, m + 2 * k + 1]
+                continue
+            if res.upper.marginals[k] != 0.0:
+                out.append(m + 2 * k)
+            if res.lower.marginals[k] != 0.0:
+                out.append(m + 2 * k + 1)
+    except (AttributeError, IndexError, TypeError):
+        return []
+    return out
 
 
 def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termination=False):
@@ -233,7 +316,7 @@ def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termi
         lb = res.fun; gap = best[0] - lb
         xm = res.x[:3]
         if gap <= 1e-10:                                   # near the end: certify the master exactly every iteration
-            v = exact_lb(cuts, bnd, res.x)
+            v = exact_lb(cuts, bnd, res.x, _binding_rows(res, len(cuts), bnd))
             if v is not None:
                 lb = float(v[3]); xm = np.array([float(t) for t in v[:3]])
                 if best[0] - lb <= tol:
