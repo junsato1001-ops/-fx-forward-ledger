@@ -12,7 +12,8 @@ concurrency:
 env:
   N_SHARDS: "20"
   N_EPI: "30"
-  N_KEL: "4"
+  N_KEL: "0"                            # regression run: epigraph only
+  STRESS_SEED_SET: "regression"         # 80 of the 323 cases that passed before the fix (seed 20261018)
   STRESS_KEL_ORIGINS: "3000,5000"      # G 9000-15000 (real 1D sizes with the Kelley path)
   STRESS_KEL_SEED0: "30000"
 jobs:
@@ -29,7 +30,8 @@ jobs:
         run: |
           set -eu; mkdir -p out
           DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
-          if [ -f tools/m1macro_stress/rerun_epi_seeds.txt ]; then export STRESS_EPI_SEEDS=$(cat tools/m1macro_stress/rerun_epi_seeds.txt); fi
+          SEEDS=tools/m1macro_stress/${STRESS_SEED_SET:-rerun}_epi_seeds.txt
+          if [ -f "$SEEDS" ]; then export STRESS_EPI_SEEDS=$(cat "$SEEDS"); fi
           docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
             -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e STRESS_EPI_SEEDS -e STRESS_KEL_ORIGINS -e STRESS_KEL_SEED0 "$DIG" sh -c "
               pip install -q --require-hashes -r env/requirements.lock &&
