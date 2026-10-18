@@ -12,9 +12,9 @@ concurrency:
 env:
   N_SHARDS: "20"
   N_EPI: "30"
-  N_KEL: "0"
-  STRESS_SEED_SET: "betadiag"           # the 5 epigraph cases with d_beta > 1e-6 in run 39136148525
-  STRESS_BETA_DIAG: "1"
+  N_KEL: "4"                            # 80 Kelley cases (seeds 30000-30079, G 9000-15000)
+  STRESS_SEED_SET: "validation"         # 167 previously failing + 80 previously passing epigraph cases
+  STRESS_BETA_DIAG: "0"                 # every case: production solve + indep.compare (full §10 comparison)
   STRESS_KEL_ORIGINS: "3000,5000"      # G 9000-15000 (real 1D sizes with the Kelley path)
   STRESS_KEL_SEED0: "30000"
 jobs:

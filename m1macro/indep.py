@@ -407,13 +407,24 @@ def _exact_min_norm(G, h, x0, max_iter=5000):
     return None
 
 
-def min_norm_stage(P, st, tol=1e-13, max_rounds=200):
+REFINE_TOL = 1e-14       # internal refinement target of the independent §6 stage (IMPL-FINDINGS-06); the acceptance
+                         # criterion stays eps_tie = 1e-13 (Part 2 §7, §10) and CERT_INCONSISTENT stays at -eps_tie
+
+
+def min_norm_stage(P, st, tol=1e-13, max_rounds=200, refine=REFINE_TOL):
     """Impl Part 2 §6 for the independent implementation (IMPL-FINDINGS-06): over F = {beta : L_r(beta) <= LB for
-    every aggregated cut r, box}, LB the EXACT model minimum, take the exact minimum-norm point beta2 and accept it iff
-    |Phi(beta2) - LB| <= tol (Phi by direct fsum). Phi(beta2) < LB - tol -> CERT_INCONSISTENT. Phi(beta2) > LB + tol
-    -> add the aggregated cut at beta2, certify the new model minimum exactly, repeat. Returns (beta2, Phi, LB, rounds)."""
+    every aggregated cut r, box}, LB the EXACT model minimum, take the exact minimum-norm point beta2 (Phi by direct
+    fsum). Phi(beta2) < LB - tol -> CERT_INCONSISTENT. Phi(beta2) > LB + refine -> add the aggregated cut at beta2,
+    certify the new model minimum exactly, repeat. Stops when -tol <= Phi(beta2) - LB <= refine.
+    Why refine < tol: stopping as soon as Phi(beta2) - LB <= tol leaves beta2 anywhere in the eps_tie band of a nearly
+    flat minimum; on synthetic data that was 1e-6..2.2e-6 away from the min-norm point, while continuing to 1e-14
+    converged (1e-14 and 3e-15 gave the same point) and production's beta* lay within 9.4e-7 of it. A reference
+    implementation should approximate the defined point as closely as it can; the criterion is unchanged.
+    If refine is not reached within max_rounds, the last beta2 is returned only if it satisfies the criterion
+    (|Phi - LB| <= tol). Returns (beta2, Phi, LB, rounds, refined)."""
     from fractions import Fraction
     F, cuts, bnd, v = st["F"], list(st["cuts"]), st["bnd"], st["v"]
+    last = None
     for rnd in range(max_rounds):
         LBq = v[3]
         G = [[Fraction(float(t)) for t in s] for s, _ in cuts]; h = [LBq - Fraction(float(c)) for _, c in cuts]
@@ -425,16 +436,21 @@ def min_norm_stage(P, st, tol=1e-13, max_rounds=200):
         if x is None:
             raise RuntimeError("MINNORM_QP_FAILED")
         b2 = np.array([float(t) for t in x]); phi2 = P.phi(b2); lbf = float(LBq)
-        if abs(phi2 - lbf) <= tol:
-            return b2, phi2, lbf, rnd + 1
         if phi2 < lbf - tol:
             raise RuntimeError("CERT_INCONSISTENT")
+        if phi2 - lbf <= refine:
+            return b2, phi2, lbf, rnd + 1, True
+        last = (b2, phi2, lbf, rnd + 1, False) if phi2 - lbf <= tol else None
         s, c, _ = F.eval(b2); cuts.append((s, c))
         A = np.array([np.r_[ss, -1.0] for ss, _ in cuts]); b = np.array([-cc for _, cc in cuts])
         res = linprog(np.r_[np.zeros(3), 1.0], A_ub=A, b_ub=b, bounds=bnd + [(None, None)], method="highs-ds", options=OPT)
         v = exact_lb(cuts, bnd, res.x, _binding_rows(res, len(cuts), bnd)) if res.status == 0 else None
         if v is None:
+            if last is not None:
+                return last
             raise RuntimeError("MINNORM_RECERT_FAILED")
+    if last is not None:
+        return last
     raise RuntimeError("MINNORM_NOT_CONVERGED")
 
 
@@ -455,8 +471,8 @@ def compare(groups, prod_result, mu_rows=None, sigma_rows=None):
         if kterm != "KELLEY_CERTIFIED":
             st = None; term += "+CERT_" + kterm
     if st is not None:                                # Impl Part 2 §6: exact minimum-norm tie-break
-        beta, _, lb, rounds = min_norm_stage(P, st)
-        it += rounds; term += "+MINNORM_OK"
+        beta, _, lb, rounds, refined = min_norm_stage(P, st)
+        it += rounds; term += "+MINNORM_OK" if refined else "+MINNORM_OK_UNREFINED"
     else:
         term += "+NO_MINNORM"
     ub = P.phi(beta)                      # both UBs by the same direct |mu - a| evaluation
@@ -467,7 +483,7 @@ def compare(groups, prod_result, mu_rows=None, sigma_rows=None):
     # point accepted with |Phi(beta2) - LB| <= tol); without the §6 stage it cannot pass.
     out = dict(method=method, iterations=it, termination=term, indep_gap=float(ub - lb), d_UB=d_ub, d_beta_inf=d_beta,
                pass_UB=bool(d_ub <= 2e-13), pass_beta=bool(d_beta <= 1e-6),
-               pass_gap=bool(abs(float(ub - lb)) <= 1e-13 and term.endswith("+MINNORM_OK")))          # Part 2 §10 criterion 1 for this implementation
+               pass_gap=bool(abs(float(ub - lb)) <= 1e-13 and "+MINNORM_OK" in term))          # Part 2 §10 criterion 1 for this implementation
     if mu_rows is not None:
         dmu = max(abs(float(np.dot(x, beta - prod_result.beta))) / s for x, s in zip(mu_rows, sigma_rows))
         out.update(d_mu_over_sigma=dmu, pass_mu=bool(dmu <= 1e-4))

@@ -156,7 +156,7 @@ def beta_diag(g, r):
     refs = {}
     for tol in (1e-13, 1e-14, 3e-15):
         try:
-            b2, phi2, lb2, rounds = indep.min_norm_stage(P, st, tol=tol, max_rounds=1000)
+            b2, phi2, lb2, rounds, _ = indep.min_norm_stage(P, st, tol=1e-13, refine=tol, max_rounds=1000)
             refs[tol] = (b2, phi2, lb2, rounds)
         except Exception as e:
             out[f"ref_{tol:g}_error"] = str(e)[:60]
