@@ -73,7 +73,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.12,
+  "sec": 0.11,
   "status": "PASS"
  },
  "test_forward_run": {
@@ -82,7 +82,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 117.68,
+  "sec": 117.45,
   "status": "PASS"
  },
  "test_freeze_gate": {
@@ -99,7 +99,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 2.89,
+  "sec": 2.82,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -114,18 +114,18 @@
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.0,
+    "solve_sec": 6.4,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.4,
+    "build_sec": 25.5,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.5,
+    "solve_sec": 7.0,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
@@ -136,18 +136,18 @@
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 5.9,
+    "solve_sec": 6.5,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 94.99,
+  "sec": 96.48,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.61,
+  "sec": 1.59,
   "status": "PASS"
  },
  "test_indep": {
@@ -232,18 +232,22 @@
     "termination": "EPIGRAPH_CONVERGED"
    }
   },
-  "sec": 159.2,
+  "sec": 158.14,
   "status": "PASS"
  },
  "test_indep_stall": {
   "detail": {
    "d_UB_vs_production": 0.0,
-   "iterations": 36,
+   "iterations": 37,
    "ok": true,
    "stalled_gap": 0.0
   },
-  "sec": 2.84,
+  "sec": 2.97,
   "status": "PASS"
+ },
+ "test_indep_structured": {
+  "status": "FAIL",
+  "trace": "Traceback (most recent call last):\n  File \"/w/m1macro/dev_suite.py\", line 18, in main\n    results[name] = {\"status\": \"PASS\", \"detail\": mod.run(), \"sec\": round(time.time() - t0, 2)}\n                                                 ^^^^^^^^^\n  File \"/w/m1macro/test_indep_structured.py\", line 29, in run\n    \"kel_30074\": _one(\"kel\", 30074, \"KELLEY_CERTIFIED\")}\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/w/m1macro/test_indep_structured.py\", line 21, in _one\n    assert c[\"pass_gap\"] and c[\"pass_UB\"] and c[\"pass_beta\"] and c[\"pass_mu\"], (kind, seed, c)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ('kel', 30074, {'method': 'kelley_fast_longdouble', 'iterations': 38, 'termination': 'KELLEY_CERTIFIED', 'indep_gap': 8.149037000748649e-14, 'd_UB': 2.4424906541753444e-14, 'd_beta_inf': 1.1504565962702881e-06, 'pass_UB': True, 'pass_beta': False, 'pass_gap': True, 'd_mu_over_sigma': 1.963269389491703e-06, 'pass_mu': True})\n"
  },
  "test_ledger_tx": {
   "detail": {
@@ -254,7 +258,7 @@
  },
  "test_manifest_gate": {
   "detail": {
-   "n_entries": 74,
+   "n_entries": 75,
    "ok": true,
    "workflows": [
     ".github/workflows/m1macro_dev.yml",
@@ -264,7 +268,7 @@
     ".github/workflows/m1macro_snapshot_acquire.yml"
    ]
   },
-  "sec": 0.04,
+  "sec": 0.05,
   "status": "PASS"
  },
  "test_rates": {
@@ -281,7 +285,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 13.36,
+  "sec": 13.55,
   "status": "PASS"
  },
  "test_s0link": {
@@ -373,7 +377,7 @@
     "ok": true
    }
   },
-  "sec": 5.8,
+  "sec": 5.85,
   "status": "PASS"
  }
 }
