@@ -104,10 +104,12 @@ def kelley_traced(P, tol=1e-13, maxit=600, lam=0.5):
 
 def case(kind, seed):
     rng = np.random.default_rng(seed)
+    import os
     if kind == "epi":
         n = int(rng.integers(250, 1334)); pool0 = int(rng.integers(2500, 4500))
     else:
-        n = int(rng.integers(1400, 2600)); pool0 = int(rng.integers(4000, 6500))
+        lo, hi = (int(v) for v in os.environ.get("STRESS_KEL_ORIGINS", "1400,2600").split(","))
+        n = int(rng.integers(lo, hi)); pool0 = int(rng.integers(4000, 6500))
     gs = gen.problem(rng, n, pool0=pool0, zero_frac=float(rng.choice([0.0, 0.03])), pin=bool(rng.integers(0, 2)))
     return gs, {"kind": kind, "seed": seed, "n_origins": n, "G": len(gs), "N_min": pool0, "N_max": pool0 + n - 1}
 
@@ -117,11 +119,11 @@ def run_one(kind, seed):
     P = indep.Prob.from_groups(gs); out = dict(meta); t0 = time.time()
     try:
         if kind == "epi":
-            beta, ub, lb, it = indep.solve_epigraph(P); method = "epigraph"
+            beta, ub, lb, it, term = indep.solve_epigraph(P); method = "epigraph"
         else:
-            beta, ub, lb, it = indep.solve_kelley_fast(P); method = "kelley_fast_longdouble"
+            beta, ub, lb, it, term = indep.solve_kelley_fast(P, return_termination=True); method = "kelley_fast_longdouble"
         g = float(P.phi(beta) - lb)
-        out.update(indep_outcome="RETURNED", method=method, iterations=it, gap=g, pass_gap=abs(g) <= 1e-13)
+        out.update(indep_outcome="RETURNED", method=method, iterations=it, termination=term, gap=g, pass_gap=abs(g) <= 1e-13)
     except Exception as e:
         out.update(indep_outcome="EXCEPTION", exc_type=type(e).__name__, exc_msg=str(e)[:160])
     out["sec_indep"] = round(time.time() - t0, 1)
@@ -139,7 +141,11 @@ def main(outdir, shard, n_shards, n_epi, n_kel):
     shard, n_shards = int(shard), int(n_shards)
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
     f = open(out / f"stress_{shard}.jsonl", "w")
-    jobs = [("epi", 10000 + i) for i in range(int(n_epi) * n_shards)] + [("kel", 20000 + i) for i in range(int(n_kel) * n_shards)]
+    import os
+    seeds = os.environ.get("STRESS_EPI_SEEDS", "")
+    epi = [int(x) for x in seeds.split(",") if x] if seeds else [10000 + i for i in range(int(n_epi) * n_shards)]
+    k0 = int(os.environ.get("STRESS_KEL_SEED0", "20000"))
+    jobs = [("epi", s) for s in epi] + [("kel", k0 + i) for i in range(int(n_kel) * n_shards)]
     for i, (k, s) in enumerate(jobs):
         if i % n_shards == shard:
             f.write(json.dumps(run_one(k, s), sort_keys=True) + "\n"); f.flush()

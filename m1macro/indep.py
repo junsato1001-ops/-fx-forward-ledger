@@ -38,10 +38,18 @@ class Prob:
 
 
 def solve_epigraph(P, tol=1e-13, maxr=200):
-    G = len(P.a); cuts = {}
+    """Per-group epigraph LP with lazily added group pieces (search), then a lower bound.
+
+    Clean convergence (no group piece above its epigraph variable by more than tol): LB = the LP value, as before.
+    STALL (IMPL-FINDINGS-06): every violating piece is already in the model, so the violation is the LP's own
+    feasibility tolerance (1e-10) and no further cut can change the LP; looping only repeats the same cut until maxr.
+    The search then stops and the lower bound is certified exactly by the aggregated-cut master (solve_kelley_fast,
+    own Cramer-rule certificate, criterion UB - exact LB <= tol), started from the epigraph point. Returns
+    (beta, UB, LB, rounds, termination) with termination in EPIGRAPH_CONVERGED / EPIGRAPH_STALLED_EXACT_CERT."""
+    G = len(P.a); cuts = {}; have = [set() for _ in range(G)]
     for g in range(G):
         for mu0 in (P.a[g][0] - 1.0, P.a[g][-1] + 1.0):
-            cuts[(g, round(mu0, 15))] = P.group_piece(g, mu0)
+            pc = P.group_piece(g, mu0); cuts[(g, round(mu0, 15))] = pc; have[g].add(pc)
     for r in range(maxr):
         keys = sorted(cuts); m = len(keys)
         A = np.zeros((m, 3 + G)); b = np.zeros(m)
@@ -52,13 +60,22 @@ def solve_epigraph(P, tol=1e-13, maxr=200):
                       method="highs-ds", options=OPT)
         if res.status != 0:
             raise RuntimeError(res.message)
-        beta = res.x[:3]; t = res.x[3:]; m_ = P.mu(beta); added = 0
+        beta = res.x[:3]; t = res.x[3:]; m_ = P.mu(beta); added = 0; violated = 0
         for g in range(G):
             s, c = P.group_piece(g, m_[g])
             if s * m_[g] + c - t[g] > tol:
-                cuts[(g, round(m_[g], 15))] = (s, c); added += 1
-        if added == 0:
-            return beta, P.phi(beta), res.fun, r + 1
+                violated += 1
+                if (s, c) not in have[g]:                          # a piece the model does not have yet
+                    cuts[(g, round(m_[g], 15))] = (s, c); have[g].add((s, c)); added += 1
+        if violated == 0:
+            return beta, P.phi(beta), res.fun, r + 1, "EPIGRAPH_CONVERGED"
+        if added == 0:                                             # stalled: certify exactly instead of looping
+            kb, kub, klb, kit, kterm = solve_kelley_fast(P, start=[np.array(beta, float)], return_termination=True)
+            if kterm != "KELLEY_CERTIFIED":
+                raise RuntimeError("epigraph stalled; exact certification failed: " + kterm)
+            pb = P.phi(np.array(beta, float))
+            bb, bub = (np.array(beta, float), pb) if pb <= kub else (kb, kub)
+            return bb, bub, klb, r + 1 + kit, "EPIGRAPH_STALLED_EXACT_CERT"
     raise RuntimeError("epigraph not converged")
 
 
@@ -197,12 +214,14 @@ def exact_lb(cuts, bnd, x):
     return None
 
 
-def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5):
+def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termination=False):
     """Aggregated-cut cutting plane with a different stabilisation (level 0.5) and scipy's interface. The float LP is
     used for search; once its gap is within 1e-10 the master is certified exactly every iteration (own Cramer-rule
     code, exact dual check), the exact vertex becomes the next point, and the run stops when UB - exact LB <= tol
     (Part 2 §10 criterion 1 for this implementation)."""
-    F = FastProb(P); cuts = []; best = (math.inf, None); pts = [np.zeros(3)]; bnd = _bounds(P)
+    F = FastProb(P); cuts = []; best = (math.inf, None); bnd = _bounds(P)
+    pts = [np.zeros(3)] + [np.array(p, float) for p in (start or [])]
+    ret = (lambda *v, term: (*v, term) if return_termination else v)
     lb = -math.inf
     for it in range(maxit):
         for p in pts:
@@ -221,27 +240,27 @@ def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5):
                     vb, vv = _vertex_polish(F, cuts, res.x, bnd)
                     if vb is not None and vv < best[0]:
                         best = (vv, vb)
-                    return best[1], best[0], lb, it + 1
+                    return ret(best[1], best[0], lb, it + 1, term="KELLEY_CERTIFIED")
         lev = lb + lam * (best[0] - lb)
         A2 = np.array([np.r_[s, 0.0] for s, _ in cuts] + [np.r_[np.eye(3)[j], -1.0] for j in range(3)] + [np.r_[-np.eye(3)[j], -1.0] for j in range(3)])
         b2 = np.r_[[lev - c for _, c in cuts], best[1], -best[1]]
         r2 = linprog(np.r_[np.zeros(3), 1.0], A_ub=A2, b_ub=b2, bounds=bnd + [(0, None)], method="highs-ds", options=OPT)
         pts = [xm] + ([r2.x[:3]] if r2.status == 0 else [])
-    return best[1], best[0], lb, maxit
+    return ret(best[1], best[0], lb, maxit, term="KELLEY_MAXIT")
 
 
 def compare(groups, prod_result, mu_rows=None, sigma_rows=None):
     """Part 2 §10 criteria. Returns dict of differences and pass flags (no beta values)."""
     P = Prob.from_groups(groups)
     if len(groups) <= 4000:
-        beta, ub, lb, it = solve_epigraph(P); method = "epigraph"
+        beta, ub, lb, it, term = solve_epigraph(P); method = "epigraph"
     else:
-        beta, ub, lb, it = solve_kelley_fast(P); method = "kelley_fast_longdouble"
+        beta, ub, lb, it, term = solve_kelley_fast(P, return_termination=True); method = "kelley_fast_longdouble"
     ub = P.phi(beta)                      # both UBs by the same direct |mu - a| evaluation
     ub_prod = P.phi(prod_result.beta)
     d_ub = abs(ub - ub_prod)
     d_beta = float(np.max(np.abs(beta - prod_result.beta)))
-    out = dict(method=method, iterations=it, indep_gap=float(ub - lb), d_UB=d_ub, d_beta_inf=d_beta,
+    out = dict(method=method, iterations=it, termination=term, indep_gap=float(ub - lb), d_UB=d_ub, d_beta_inf=d_beta,
                pass_UB=bool(d_ub <= 2e-13), pass_beta=bool(d_beta <= 1e-6),
                pass_gap=bool(abs(float(ub - lb)) <= 1e-13))          # Part 2 §10 criterion 1 for this implementation
     if mu_rows is not None:
