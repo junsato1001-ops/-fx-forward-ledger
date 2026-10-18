@@ -8,6 +8,7 @@ usage: python -I tools/m1macro_stress/stress_indep.py <out_dir> <shard> <n_shard
 """
 import json
 import math
+import os
 import sys
 import time
 import traceback
@@ -138,6 +139,34 @@ def run_one(kind, seed):
     except Exception as e:
         out.update(indep_outcome="EXCEPTION", exc_type=type(e).__name__, exc_msg=str(e)[:160])
     out["sec_indep"] = round(time.time() - t1, 1)
+    if os.environ.get("STRESS_BETA_DIAG") == "1":
+        out["beta_diag"] = beta_diag(g, r)
+    return out
+
+
+def beta_diag(g, r):
+    """Synthetic only: where do production beta* and the independent beta2 sit relative to a tighter reference of
+    the exact minimum-norm point (independent §6 continued with a smaller internal tolerance)? Values allowed
+    (synthetic data)."""
+    P = indep.Prob.from_groups(g)
+    _, _, _, _, kterm, st = indep.solve_kelley_fast(P, return_termination=True, return_state=True)
+    c = indep.compare(g, r, [x.x for x in g[:5]], [x.sigma for x in g[:5]])
+    b_ind = None
+    out = {"kelley": kterm}
+    refs = {}
+    for tol in (1e-13, 1e-14, 3e-15):
+        try:
+            b2, phi2, lb2, rounds = indep.min_norm_stage(P, st, tol=tol, max_rounds=1000)
+            refs[tol] = (b2, phi2, lb2, rounds)
+        except Exception as e:
+            out[f"ref_{tol:g}_error"] = str(e)[:60]
+    bp = np.asarray(r.beta, float)
+    for tol, (b2, phi2, lb2, rounds) in refs.items():
+        out[f"ref_{tol:g}"] = {"beta": [float(v) for v in b2], "phi_minus_lb": float(phi2 - lb2), "rounds": rounds,
+                               "norm": float(np.linalg.norm(b2)),
+                               "d_prod": float(np.max(np.abs(bp - b2)))}
+    out["prod"] = {"beta": [float(v) for v in bp], "norm": float(np.linalg.norm(bp)), "phi": float(P.phi(bp))}
+    out["lb_exact"] = float(st["v"][3]) if st else None
     return out
 
 

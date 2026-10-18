@@ -12,9 +12,9 @@ concurrency:
 env:
   N_SHARDS: "20"
   N_EPI: "30"
-  N_KEL: "4"                            # 80 Kelley cases (seeds 30000-30079, G 9000-15000), same as run 39127455032
-                                        # every case: production solve + indep.compare (full §10 comparison)
-  STRESS_SEED_SET: "validation"         # 167 previously failing + 80 previously passing epigraph cases
+  N_KEL: "0"
+  STRESS_SEED_SET: "betadiag"           # the 5 epigraph cases with d_beta > 1e-6 in run 39136148525
+  STRESS_BETA_DIAG: "1"
   STRESS_KEL_ORIGINS: "3000,5000"      # G 9000-15000 (real 1D sizes with the Kelley path)
   STRESS_KEL_SEED0: "30000"
 jobs:
@@ -34,7 +34,7 @@ jobs:
           SEEDS=tools/m1macro_stress/${STRESS_SEED_SET:-rerun}_epi_seeds.txt
           if [ -f "$SEEDS" ]; then export STRESS_EPI_SEEDS=$(cat "$SEEDS"); fi
           docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
-            -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e STRESS_EPI_SEEDS -e STRESS_KEL_ORIGINS -e STRESS_KEL_SEED0 "$DIG" sh -c "
+            -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e STRESS_EPI_SEEDS -e STRESS_KEL_ORIGINS -e STRESS_KEL_SEED0 -e STRESS_BETA_DIAG "$DIG" sh -c "
               pip install -q --require-hashes -r env/requirements.lock &&
               timeout 280m python -I tools/m1macro_stress/stress_indep.py out ${{ matrix.shard }} $N_SHARDS $N_EPI $N_KEL" \
             > out/stdout_${{ matrix.shard }}.txt 2>&1 || echo "EXIT=$?" >> out/stdout_${{ matrix.shard }}.txt
