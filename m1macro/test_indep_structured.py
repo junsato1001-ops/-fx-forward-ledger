@@ -5,6 +5,8 @@ implementation reproduced in the pinned image, now certified and in agreement wi
       feasibility tolerance). Now: EPIGRAPH_STALLED_EXACT_CERT.
   kel seed 30074 (G 9147): before the fix KELLEY_MAXIT at 600 iterations, gap 1.2394529846915248e-12 (the float LP basis
       was exactly infeasible by 1e-13..3e-12, so stage 1 never found an exact basis). Now: KELLEY_CERTIFIED.
+  Both now also pass Impl Part 2 §6 in the independent implementation (exact minimum-norm tie-break, min_norm_stage):
+  without it, seed 30074 certified but its beta differed from production's min-norm beta* by 1.15e-6 > 1e-6.
 Production solver, criterion 1e-13 and iteration caps unchanged."""
 import time
 
@@ -25,8 +27,8 @@ def _one(kind, seed, want_term):
 
 def run():
     return {"ok": True,
-            "epi_10140": _one("epi", 10140, "EPIGRAPH_STALLED_EXACT_CERT"),
-            "kel_30074": _one("kel", 30074, "KELLEY_CERTIFIED")}
+            "epi_10140": _one("epi", 10140, "EPIGRAPH_STALLED_EXACT_CERT+MINNORM_OK"),
+            "kel_30074": _one("kel", 30074, "KELLEY_CERTIFIED+MINNORM_OK")}
 
 
 if __name__ == "__main__":

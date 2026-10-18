@@ -19,7 +19,7 @@ def run(seed=7):
         return res
     indep.linprog = perturbed
     try:
-        beta, ub, lb, it, term = indep.solve_epigraph(P)
+        beta, ub, lb, it, term = indep.solve_epigraph(P)[:5]
     finally:
         indep.linprog = orig
     gap = float(P.phi(beta) - lb)
@@ -29,7 +29,7 @@ def run(seed=7):
     c = indep.compare(g, r, [x.x for x in g[:50]], [x.sigma for x in g[:50]])
     assert c["pass_gap"] and c["pass_UB"] and c["pass_beta"] and c["pass_mu"], c
     # unperturbed: unchanged behaviour (clean convergence)
-    b2, u2, l2, it2, t2 = indep.solve_epigraph(P)
+    b2, u2, l2, it2, t2 = indep.solve_epigraph(P)[:5]
     assert t2 == "EPIGRAPH_CONVERGED" and abs(P.phi(b2) - l2) <= 1e-13
     return {"ok": True, "stalled_gap": gap, "iterations": it, "d_UB_vs_production": c["d_UB"]}
 

@@ -37,7 +37,7 @@ class Prob:
         return (2 * k - N) / (N * self.sig[g]), (hi - lo) / (N * self.sig[g])
 
 
-def solve_epigraph(P, tol=1e-13, maxr=200):
+def solve_epigraph(P, tol=1e-13, maxr=200, return_state=False):
     """Per-group epigraph LP with lazily added group pieces (search), then a lower bound.
 
     Clean convergence (no group piece above its epigraph variable by more than tol): LB = the LP value, as before.
@@ -71,14 +71,17 @@ def solve_epigraph(P, tol=1e-13, maxr=200):
                     changed = True
                 cuts[key] = (s, c); added += 1
         if added == 0:
-            return beta, P.phi(beta), res.fun, r + 1, "EPIGRAPH_CONVERGED"
+            out = (beta, P.phi(beta), res.fun, r + 1, "EPIGRAPH_CONVERGED")
+            return out + (None,) if return_state else out
         if not changed:          # fixed point: the cut set (hence the next LP and its solution) is identical -> certify
-            kb, kub, klb, kit, kterm = solve_kelley_fast(P, start=[np.array(beta, float)], return_termination=True)
+            kb, kub, klb, kit, kterm, kst = solve_kelley_fast(P, start=[np.array(beta, float)], return_termination=True,
+                                                               return_state=True)
             if kterm != "KELLEY_CERTIFIED":
                 raise RuntimeError("epigraph stalled; exact certification failed: " + kterm)
             pb = P.phi(np.array(beta, float))
             bb, bub = (np.array(beta, float), pb) if pb <= kub else (kb, kub)
-            return bb, bub, klb, r + 1 + kit, "EPIGRAPH_STALLED_EXACT_CERT"
+            out = (bb, bub, klb, r + 1 + kit, "EPIGRAPH_STALLED_EXACT_CERT")
+            return out + (kst,) if return_state else out
     raise RuntimeError("epigraph not converged")
 
 
@@ -297,14 +300,16 @@ def _binding_rows(res, m, bnd):
     return out
 
 
-def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termination=False):
+def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termination=False, return_state=False):
     """Aggregated-cut cutting plane with a different stabilisation (level 0.5) and scipy's interface. The float LP is
     used for search; once its gap is within 1e-10 the master is certified exactly every iteration (own Cramer-rule
     code, exact dual check), the exact vertex becomes the next point, and the run stops when UB - exact LB <= tol
     (Part 2 §10 criterion 1 for this implementation)."""
     F = FastProb(P); cuts = []; best = (math.inf, None); bnd = _bounds(P)
     pts = [np.zeros(3)] + [np.array(p, float) for p in (start or [])]
-    ret = (lambda *v, term: (*v, term) if return_termination else v)
+    def ret(*v, term, state=None):
+        out = v + ((term,) if return_termination else ())
+        return out + (state,) if return_state else out
     lb = -math.inf
     for it in range(maxit):
         for p in pts:
@@ -323,7 +328,8 @@ def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termi
                     vb, vv = _vertex_polish(F, cuts, res.x, bnd)
                     if vb is not None and vv < best[0]:
                         best = (vv, vb)
-                    return ret(best[1], best[0], lb, it + 1, term="KELLEY_CERTIFIED")
+                    return ret(best[1], best[0], lb, it + 1, term="KELLEY_CERTIFIED",
+                               state={"F": F, "cuts": cuts, "bnd": bnd, "v": v})
         lev = lb + lam * (best[0] - lb)
         A2 = np.array([np.r_[s, 0.0] for s, _ in cuts] + [np.r_[np.eye(3)[j], -1.0] for j in range(3)] + [np.r_[-np.eye(3)[j], -1.0] for j in range(3)])
         b2 = np.r_[[lev - c for _, c in cuts], best[1], -best[1]]
@@ -332,20 +338,136 @@ def solve_kelley_fast(P, tol=1e-13, maxit=600, lam=0.5, start=None, return_termi
     return ret(best[1], best[0], lb, maxit, term="KELLEY_MAXIT")
 
 
+def _solve_small(M, r):
+    """Exact solve of a k x k (k <= 3) Fraction system by Gaussian elimination (own code). None if singular."""
+    k = len(M)
+    A = [list(M[i]) + [r[i]] for i in range(k)]
+    for c in range(k):
+        p = next((i for i in range(c, k) if A[i][c] != 0), None)
+        if p is None:
+            return None
+        A[c], A[p] = A[p], A[c]
+        for i in range(k):
+            if i != c and A[i][c] != 0:
+                f = A[i][c] / A[c][c]
+                A[i] = [a - f * b for a, b in zip(A[i], A[c])]
+    return [A[i][k] / A[i][i] for i in range(k)]
+
+
+def _exact_min_norm(G, h, x0, max_iter=5000):
+    """argmin ||x||^2 s.t. G x <= h (3 variables), exact primal active-set method in Fractions from the feasible
+    point x0 (IMPL-FINDINGS-06; Impl Part 2 §6 step 2, written independently of production). Bland-type choices
+    (smallest row index) for blocking and for dropping. Returns the exact minimiser or None."""
+    from fractions import Fraction
+    dot = lambda a, b: sum(p * q for p, q in zip(a, b))
+    x = list(x0)
+    if any(dot(g, x) > hh for g, hh in zip(G, h)):
+        return None
+    W = []
+    for i, (g, hh) in enumerate(zip(G, h)):                  # active, linearly independent rows at x0
+        if len(W) < 3 and dot(g, x) == hh:
+            cand = W + [i]
+            gram = [[dot(G[a], G[b]) for b in cand] for a in cand]
+            if _det_solve(gram, [Fraction(0)] * len(cand)) is not None:     # nonsingular Gram matrix
+                W.append(i)
+    for _ in range(max_iter):
+        if W:
+            GW = [G[i] for i in W]
+            y = _solve_small([[dot(a, b) for b in GW] for a in GW], [h[i] for i in W])
+            if y is None:
+                return None
+            xs = [sum(y[j] * GW[j][k] for j in range(len(W))) for k in range(3)]
+        else:
+            xs = [Fraction(0)] * 3
+        p = [a - b for a, b in zip(xs, x)]
+        if all(v == 0 for v in p):
+            if not W:
+                return x
+            GW = [G[i] for i in W]
+            lam = _solve_small([[dot(a, b) for b in GW] for a in GW], [-dot(g, x) for g in GW])
+            if lam is None:
+                return None
+            neg = [W[j] for j in range(len(W)) if lam[j] < 0]
+            if not neg:
+                return x
+            W.remove(min(neg))
+            continue
+        alpha, blk = Fraction(1), None
+        for i, (g, hh) in enumerate(zip(G, h)):
+            if i in W:
+                continue
+            gp = dot(g, p)
+            if gp > 0:
+                a = (hh - dot(g, x)) / gp
+                if a < alpha or (a == alpha and blk is not None and i < blk):
+                    alpha, blk = a, i
+        x = [a + alpha * b for a, b in zip(x, p)]
+        if blk is not None:
+            W.append(blk)
+    return None
+
+
+def min_norm_stage(P, st, tol=1e-13, max_rounds=200):
+    """Impl Part 2 §6 for the independent implementation (IMPL-FINDINGS-06): over F = {beta : L_r(beta) <= LB for
+    every aggregated cut r, box}, LB the EXACT model minimum, take the exact minimum-norm point beta2 and accept it iff
+    |Phi(beta2) - LB| <= tol (Phi by direct fsum). Phi(beta2) < LB - tol -> CERT_INCONSISTENT. Phi(beta2) > LB + tol
+    -> add the aggregated cut at beta2, certify the new model minimum exactly, repeat. Returns (beta2, Phi, LB, rounds)."""
+    from fractions import Fraction
+    F, cuts, bnd, v = st["F"], list(st["cuts"]), st["bnd"], st["v"]
+    for rnd in range(max_rounds):
+        LBq = v[3]
+        G = [[Fraction(float(t)) for t in s] for s, _ in cuts]; h = [LBq - Fraction(float(c)) for _, c in cuts]
+        for k in range(3):
+            lo, hi = bnd[k]
+            e = [Fraction(0)] * 3; e[k] = Fraction(1); G.append(e); h.append(Fraction(hi))
+            e = [Fraction(0)] * 3; e[k] = Fraction(-1); G.append(e); h.append(Fraction(-lo))
+        x = _exact_min_norm(G, h, list(v[:3]))
+        if x is None:
+            raise RuntimeError("MINNORM_QP_FAILED")
+        b2 = np.array([float(t) for t in x]); phi2 = P.phi(b2); lbf = float(LBq)
+        if abs(phi2 - lbf) <= tol:
+            return b2, phi2, lbf, rnd + 1
+        if phi2 < lbf - tol:
+            raise RuntimeError("CERT_INCONSISTENT")
+        s, c, _ = F.eval(b2); cuts.append((s, c))
+        A = np.array([np.r_[ss, -1.0] for ss, _ in cuts]); b = np.array([-cc for _, cc in cuts])
+        res = linprog(np.r_[np.zeros(3), 1.0], A_ub=A, b_ub=b, bounds=bnd + [(None, None)], method="highs-ds", options=OPT)
+        v = exact_lb(cuts, bnd, res.x, _binding_rows(res, len(cuts), bnd)) if res.status == 0 else None
+        if v is None:
+            raise RuntimeError("MINNORM_RECERT_FAILED")
+    raise RuntimeError("MINNORM_NOT_CONVERGED")
+
+
 def compare(groups, prod_result, mu_rows=None, sigma_rows=None):
     """Part 2 §10 criteria. Returns dict of differences and pass flags (no beta values)."""
     P = Prob.from_groups(groups)
     if len(groups) <= 4000:
-        beta, ub, lb, it, term = solve_epigraph(P); method = "epigraph"
+        beta, ub, lb, it, term, st = solve_epigraph(P, return_state=True); method = "epigraph"
     else:
-        beta, ub, lb, it, term = solve_kelley_fast(P, return_termination=True); method = "kelley_fast_longdouble"
+        beta, ub, lb, it, term, st = solve_kelley_fast(P, return_termination=True, return_state=True)
+        method = "kelley_fast_longdouble"
+    if method == "epigraph":
+        # §6 needs the exact model minimum of an aggregated-cut model that bounds the region around the optimum: a
+        # Kelley model built from scratch (a warm start at an exact minimiser can certify with one flat cut, leaving
+        # F almost the whole box). The epigraph result stays the search result recorded in `iterations`.
+        _, _, _, kit, kterm, st = solve_kelley_fast(P, return_termination=True, return_state=True)
+        it += kit
+        if kterm != "KELLEY_CERTIFIED":
+            st = None; term += "+CERT_" + kterm
+    if st is not None:                                # Impl Part 2 §6: exact minimum-norm tie-break
+        beta, _, lb, rounds = min_norm_stage(P, st)
+        it += rounds; term += "+MINNORM_OK"
+    else:
+        term += "+NO_MINNORM"
     ub = P.phi(beta)                      # both UBs by the same direct |mu - a| evaluation
     ub_prod = P.phi(prod_result.beta)
     d_ub = abs(ub - ub_prod)
     d_beta = float(np.max(np.abs(beta - prod_result.beta)))
+    # pass_gap = §10 criterion 1 for this implementation: §5 (search certified, |UB - LB| <= tol) and §6 (min-norm
+    # point accepted with |Phi(beta2) - LB| <= tol); without the §6 stage it cannot pass.
     out = dict(method=method, iterations=it, termination=term, indep_gap=float(ub - lb), d_UB=d_ub, d_beta_inf=d_beta,
                pass_UB=bool(d_ub <= 2e-13), pass_beta=bool(d_beta <= 1e-6),
-               pass_gap=bool(abs(float(ub - lb)) <= 1e-13))          # Part 2 §10 criterion 1 for this implementation
+               pass_gap=bool(abs(float(ub - lb)) <= 1e-13 and term.endswith("+MINNORM_OK")))          # Part 2 §10 criterion 1 for this implementation
     if mu_rows is not None:
         dmu = max(abs(float(np.dot(x, beta - prod_result.beta))) / s for x, s in zip(mu_rows, sigma_rows))
         out.update(d_mu_over_sigma=dmu, pass_mu=bool(dmu <= 1e-4))

@@ -115,25 +115,29 @@ def case(kind, seed):
 
 
 def run_one(kind, seed):
-    gs, meta = case(kind, seed)
-    P = indep.Prob.from_groups(gs); out = dict(meta); t0 = time.time()
+    """Full Impl Part 2 §10 comparison as in gate G6: production solve, then indep.compare (independent search,
+    exact certification, exact §6 minimum-norm tie-break, UB / beta / mu agreement). Problem from synth.structured_case
+    (bit-identical to case())."""
+    import os
+    from m1macro import solver as S, synth
+    lo, hi = (int(v) for v in os.environ.get("STRESS_KEL_ORIGINS", "1400,2600").split(","))
+    g = synth.structured_case(kind, seed, kel_origins=(lo, hi))
+    _, meta = None, {"kind": kind, "seed": seed, "G": len(g), "N_min": min(len(x.a) for x in g), "N_max": max(len(x.a) for x in g)}
+    out = dict(meta); t0 = time.time()
     try:
-        if kind == "epi":
-            beta, ub, lb, it, term = indep.solve_epigraph(P); method = "epigraph"
-        else:
-            beta, ub, lb, it, term = indep.solve_kelley_fast(P, return_termination=True); method = "kelley_fast_longdouble"
-        g = float(P.phi(beta) - lb)
-        out.update(indep_outcome="RETURNED", method=method, iterations=it, termination=term, gap=g, pass_gap=abs(g) <= 1e-13)
+        r = S.solve(g); out["prod"] = "OK"
+    except Exception as e:
+        out.update(prod="EXCEPTION", prod_exc=type(e).__name__ + ":" + str(e)[:80]); return out
+    out["sec_prod"] = round(time.time() - t0, 1); t1 = time.time()
+    try:
+        c = indep.compare(g, r, [x.x for x in g[:60]], [x.sigma for x in g[:60]])
+        out.update(indep_outcome="RETURNED", **{k: c[k] for k in ("method", "iterations", "termination", "indep_gap",
+                   "d_UB", "d_beta_inf", "d_mu_over_sigma", "pass_gap", "pass_UB", "pass_beta", "pass_mu")})
+        out["gap"] = c["indep_gap"]
+        out["pass_all"] = bool(c["pass_gap"] and c["pass_UB"] and c["pass_beta"] and c["pass_mu"])
     except Exception as e:
         out.update(indep_outcome="EXCEPTION", exc_type=type(e).__name__, exc_msg=str(e)[:160])
-    out["sec_indep"] = round(time.time() - t0, 1)
-    if out.get("indep_outcome") == "EXCEPTION" or not out.get("pass_gap", False):
-        t1 = time.time()
-        try:
-            out["trace"] = epigraph_traced(P) if kind == "epi" else kelley_traced(P)
-        except Exception:
-            out["trace_error"] = traceback.format_exc()[-600:]
-        out["sec_trace"] = round(time.time() - t1, 1)
+    out["sec_indep"] = round(time.time() - t1, 1)
     return out
 
 
