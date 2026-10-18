@@ -41,7 +41,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.73,
+  "sec": 0.75,
   "status": "PASS"
  },
  "test_estimation": {
@@ -52,7 +52,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.81,
+  "sec": 0.83,
   "status": "PASS"
  },
  "test_features": {
@@ -82,7 +82,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 116.1,
+  "sec": 118.21,
   "status": "PASS"
  },
  "test_freeze_gate": {
@@ -99,7 +99,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 2.01,
+  "sec": 2.81,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -107,47 +107,47 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 25.4,
+    "build_sec": 25.2,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 5.9,
+    "solve_sec": 6.8,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.4,
+    "build_sec": 25.2,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.5,
+    "solve_sec": 7.2,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.4,
+    "build_sec": 25.2,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 5.9,
+    "solve_sec": 6.6,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 94.63,
+  "sec": 96.26,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.57,
+  "sec": 1.61,
   "status": "PASS"
  },
  "test_indep": {
@@ -226,7 +226,7 @@
     "pass_mu": true
    }
   },
-  "sec": 157.65,
+  "sec": 160.21,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -238,7 +238,7 @@
  },
  "test_manifest_gate": {
   "detail": {
-   "n_entries": 72,
+   "n_entries": 73,
    "ok": true,
    "workflows": [
     ".github/workflows/m1macro_dev.yml",
@@ -265,7 +265,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 13.35,
+  "sec": 13.42,
   "status": "PASS"
  },
  "test_s0link": {
@@ -357,7 +357,7 @@
     "ok": true
    }
   },
-  "sec": 5.78,
+  "sec": 5.85,
   "status": "PASS"
  }
 }
