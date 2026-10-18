@@ -207,7 +207,7 @@ def _passing_results():
           "status_counts": {"F_US": {"OK": 10}, "F_JP": {"OK": 10}, "F_POS": {"OK": 7, "X": 3}}}
     g678 = {"G6": {"n_th": 10, "errors": 0, "error_types": [], "n_estimated": 4, "n_pass_all": 4,
                    "max_abs_ub_minus_lb": 9e-14, "max_abs_phi2_minus_lb": 8e-14},
-            "G7": {"n_shards": 20, "n_keys": 10, "n_run_A": 10, "n_run_B": 10, "e_input_sha_mismatch": 0,
+            "G7": {"n_shards": gate_verdict.N_SHARDS, "n_keys": 10, "n_run_A": 10, "n_run_B": 10, "e_input_sha_mismatch": 0,
                    "beta_sha_or_state_mismatch": 0},
             "G8": {"n_mu_zero_rows": 3, "n_match": 3, "n_mismatch": 0}}
     files = {"suite.json": json.dumps(s).encode(), "g5_summary.json": json.dumps(g5).encode(),

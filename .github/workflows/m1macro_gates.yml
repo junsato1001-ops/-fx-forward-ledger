@@ -17,7 +17,7 @@ env:
   # formal results only from branch m1macro-gates; development blind results never reach m1macro-gates-results
   RESULTS_BRANCH: ${{ github.ref_name == 'm1macro-gates' && 'm1macro-gates-results' || 'm1macro-devblind-results' }}
   RUN_CLASS: ${{ github.ref_name == 'm1macro-gates' && 'FORMAL' || 'DEVELOPMENT_BLIND' }}
-  N_SHARDS: "20"
+  N_SHARDS: "40"                       # F5-b (むすび 2026-10-19): 40 shards; every shard must complete (gate_verdict)
 jobs:
   suite:            # G1-G4 (+ unit tests) inside the pinned image
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }

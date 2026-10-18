@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 EPS_TIE = 1e-13
-N_SHARDS = 20
+N_SHARDS = 40            # = m1macro_gates.yml N_SHARDS (F5-b, むすび 2026-10-19); infrastructure only
 G1_TESTS = ("test_solver",)
 G2_TESTS = ("test_fullscale",)
 G3_TESTS = ("test_indep",)
