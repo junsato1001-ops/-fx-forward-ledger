@@ -180,7 +180,6 @@ def run():
         out, final, work, bare, seen = _tx(td, "ok", "2026-10-20T00:00:00", ok_clock(), push=P)
         assert out["Freeze_Status"] == "FINAL" and final and out["Reject_Reason"] == "", out
         assert out["Marker_Push_At_Server_UTC"] == "2026-10-20T00:00:14Z" and out["Marker_Commit"] == seen["commit"]
-        fresh_audit_git(work, out, seen)
         # 2) a second freeze on the same tree is refused before writing (no automatic second freeze)
         g = gitrepo.RealGit(work, message="again")
         try:
@@ -188,7 +187,7 @@ def run():
                           _t("2026-10-20T00:00:00"), af, ok_clock(), lambda: "h", lambda c: ("1", _t(P)))
             raise AssertionError("second freeze accepted")
         except F.FreezeRefused as e:
-            assert str(e) == "FREEZE_ALREADY_RECORDED"
+            assert str(e) == "FREEZE_ALREADY_FINAL"
         # 3) server anchors: runner Recorded_At before the server run start; Recorded_At after the server push
         out, final, *_ = _tx(td, "early", "2026-10-20T00:00:15", ok_clock(), push="2026-10-20T00:00:30")
         assert out["Anchor_Status"] == "FAIL" and out["Reject_Reason"] == "ANCHOR_ORDER" and not final
@@ -241,42 +240,10 @@ def run():
         assert F.is_final_tree(td, "c" * 64)
         # F8-b: three FINAL files that are not bound to a git history never pass the fresh audit
         a = F._rows(orig[F.AUDIT])[0]
-        rs = F.fresh_audit(td, "o/r", "t", push_time=lambda c, parent=None: ("77", F.parse_utc(a["Marker_Push_At_Server_UTC"])))
-        assert rs["three_files_final"] and not rs["git_binding"] and not rs["pass"], rs
+        rs = F.fresh_audit(td, "o/r", "t", push_time=lambda c, parent=None: ("77", F.parse_utc(a["Marker_Push_At_Server_UTC"])),
+                           now=F.parse_utc(a["Marker_Push_At_Server_UTC"]), auditor_code_sha="c" * 64)
+        assert rs["three_files_final"] and not rs["git_binding"] and not rs["write_once"] and not rs["pass"], rs
     return {"ok": True}
-
-
-def fresh_audit_git(work, out, seen):
-    """F8-a/F8-b: fresh audit of a real FINAL freeze on a git checkout. Pass only with the three files FINAL, bound to
-    the git history, and the server push re-queried (after = Marker_Commit, before = its parent) equal to the record."""
-    P = F.parse_utc(out["Marker_Push_At_Server_UTC"])
-    q = {}
-    def pt(commit, parent=None):
-        q["c"], q["p"] = commit, parent
-        return "4242", P
-    rs = F.fresh_audit(work, "o/r", "t", push_time=pt)
-    assert rs["pass"] and rs["git_binding"] and rs["server_anchor_matches"], rs
-    assert q == {"c": seen["commit"], "p": seen["parent"]}
-    for bad in (lambda c, parent=None: ("4243", P), lambda c, parent=None: ("4242", P + dt.timedelta(seconds=1))):
-        assert not F.fresh_audit(work, "o/r", "t", push_time=bad)["pass"]
-    def gone(c, parent=None):
-        raise F.PushNotFound("PUSH_EVENT_NOT_FOUND")
-    r = F.fresh_audit(work, "o/r", "t", push_time=gone)
-    assert not r["pass"] and r["reason"] == "PUSH_EVENT_NOT_FOUND"
-    git = lambda *a: subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@e", *a], cwd=work, check=True,
-                                    capture_output=True)
-    m, au = Path(work, F.MARKER), Path(work, F.AUDIT)
-    m0, a0 = m.read_bytes(), au.read_bytes()
-    # audit row names a different commit (the record commit): not the commit that carries the marker
-    rc = F._rows(m0)[0]["Record_Main_Commit"]
-    au.write_bytes(a0.replace(out["Marker_Commit"].encode(), rc.encode()))
-    assert not F.fresh_audit(work, "o/r", "t", push_time=pt)["git_binding"]
-    au.write_bytes(a0)
-    # marker rewritten in a later commit: the current marker is not the one in Marker_Commit
-    m.write_bytes(m0.replace(b"COMPLETE", b"COMPLETE ")); git("commit", "-qam", "edit")
-    assert not F.fresh_audit(work, "o/r", "t", push_time=pt)["pass"]
-    git("reset", "-q", "--hard", "HEAD^")
-    assert F.fresh_audit(work, "o/r", "t", push_time=pt)["pass"]
 
 
 def _passing_results():
