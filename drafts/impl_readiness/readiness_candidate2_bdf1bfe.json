@@ -1,0 +1,131 @@
+{
+ "candidate_commit": "bdf1bfe9a089240083670eb5315dab892794275a",
+ "checks": {
+  "activity_retry_fixed_12x15s": true,
+  "all_fixes_are_ancestors": true,
+  "code_sha_bound_in_gates_and_freeze": true,
+  "dev_workflow_only_on_dev_branch": true,
+  "f11a_kind_from_topology": true,
+  "first_forward_origin_concrete": true,
+  "formal_results_only_from_formal_branch": true,
+  "formal_workflows_no_dev_paths": true,
+  "forty_shards_everywhere": true,
+  "frozen_spec_hashes_match_main": true,
+  "incomplete_and_rejected_terminal": true,
+  "indep_criteria_unchanged": true,
+  "indep_refine_1e-14_fixed": true,
+  "manifest_covers_code_config_workflows": true,
+  "manifest_gate_pass": true,
+  "no_debug_env_switches": true,
+  "now_not_past_window": true,
+  "pre_freeze_gate_passable_in_window": true,
+  "server_reverify_window_14d": true,
+  "snapshot_one_shot_on_main": true,
+  "snapshot_reacquire_guard": true,
+  "solver_constants_frozen": true,
+  "verdict_eps_tie_1e-13": true,
+  "worktree_clean": true
+ },
+ "code_sha256": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+ "freeze_window_utc": {
+  "from_inclusive": "2026-10-20T12:00:00Z",
+  "until_exclusive": "2026-10-21T12:00:00Z"
+ },
+ "info": {
+  "all_fixes_are_ancestors": {
+   "missing": [],
+   "required": {
+    "15bb31d": "F8-a..F8-d",
+    "4f21436": "F8-f, 14-day window, F8-e",
+    "5045178": "independent \u00a76 internal refine 1e-14 (F6-a)",
+    "5abe8aa": "independent \u00a76 exact min-norm stage",
+    "6f9e09d": "candidate-1: F10-a Part 3 \u00a72 lower bound, F10-b debug path removed",
+    "83f5025": "independent exact LB certification (IMPL-FINDINGS-03)",
+    "9cfd825": "epigraph stall exact certification / Kelley exact dual simplex (F5-a)",
+    "e72e2d8": "F7-a (t, h) uniqueness",
+    "f2aa130": "40 shards, full completion required (F5-b)",
+    "fb5e415": "F11-a activity type from git topology (root -> branch_creation, else push)"
+   }
+  },
+  "first_forward_origin_concrete": {
+   "first_forward_origin": {
+    "1D": "2026-10-22",
+    "1W": "2026-10-25",
+    "4W": "2026-10-25"
+   }
+  },
+  "formal_workflows_no_dev_paths": {
+   "found": []
+  },
+  "frozen_spec_hashes_match_main": {
+   "specs": {
+    "M1-MACRO-IMPL-PART1-V1.2": true,
+    "M1-MACRO-IMPL-PART2-V1": true,
+    "M1-MACRO-IMPL-PART3-V1": true,
+    "M1-MACRO-IMPL-PART4-V1": true
+   }
+  },
+  "incomplete_and_rejected_terminal": {
+   "refused": "VERSION_INCOMPLETE_PRIOR_TRANSACTION",
+   "states": {
+    "incomplete": "INCOMPLETE",
+    "none": "NONE",
+    "rejected": "REJECTED"
+   }
+  },
+  "manifest_covers_code_config_workflows": {
+   "missing": []
+  },
+  "manifest_gate_pass": {
+   "workflows": null
+  },
+  "no_debug_env_switches": {
+   "found": []
+  },
+  "pre_freeze_gate_passable_in_window": {
+   "now": {
+    "a_first_utc": {
+     "1D": "2026-10-21T12:00:00Z",
+     "1W": "2026-10-24T12:00:00Z",
+     "4W": "2026-10-24T12:00:00Z"
+    },
+    "a_previous_utc": {
+     "1D": "2026-10-20T12:00:00Z",
+     "1W": "2026-10-17T12:00:00Z",
+     "4W": "2026-10-17T12:00:00Z"
+    },
+    "check_times_utc": [
+     "2026-10-19T09:16:17Z"
+    ],
+    "first_forward_origin": {
+     "1D": "2026-10-22",
+     "1W": "2026-10-25",
+     "4W": "2026-10-25"
+    },
+    "gate": "D2_PRE_FREEZE",
+    "pass": false,
+    "previous_origin": {
+     "1D": "2026-10-21",
+     "1W": "2026-10-18",
+     "4W": "2026-10-18"
+    },
+    "violations": [
+     "CHECK_TIME_BEFORE_PREVIOUS_ORIGIN:1D"
+    ]
+   },
+   "window_end": [],
+   "window_start": []
+  },
+  "snapshot_one_shot_on_main": {
+   "commits": [
+    "8ed83c23c42566fe5d91364ba035f750c5754041"
+   ],
+   "manifest_sha256": "310e84757cbb3d8f81450d7c6210f076635af4ea3f2676e75c02fa83e4df2769"
+  },
+  "solver_constants_frozen": {
+   "solver": "{'EPS_TIE': 1e-13, 'LAMBDA_LEV': 0.3, 'BOX_B': 10.0, 'CAND_SIZES': (8, 12, 16, 24), 'STAGE1_MAX': 3000, 'STAGE2_MAX': 100, 'LP_TOL': 1e-10}"
+  }
+ },
+ "n_manifest_entries": 78,
+ "pass": true
+}
