@@ -4,7 +4,7 @@
    "np_path_equal": true,
    "pool_sha256_example": "20584438fa2bda2d8e72130ff3f7c9605a6c45e31e3ae4e2ae3bc4a85d4ea920"
   },
-  "sec": 0.09,
+  "sec": 0.1,
   "status": "PASS"
  },
  "test_cftc_feature": {
@@ -18,7 +18,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.04,
+  "sec": 0.03,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -41,7 +41,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.68,
+  "sec": 0.75,
   "status": "PASS"
  },
  "test_estimation": {
@@ -52,7 +52,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.69,
+  "sec": 0.83,
   "status": "PASS"
  },
  "test_features": {
@@ -66,7 +66,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.04,
+  "sec": 0.05,
   "status": "PASS"
  },
  "test_forward_commit": {
@@ -82,7 +82,7 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 98.73,
+  "sec": 118.85,
   "status": "PASS"
  },
  "test_freeze_audit": {
@@ -116,13 +116,15 @@
    },
    "ok": true
   },
-  "sec": 1.65,
+  "sec": 2.05,
   "status": "PASS"
  },
  "test_freeze_gate": {
   "detail": {
    "current_config_pre_freeze": [
-    "FIRST_FORWARD_ORIGIN_NOT_SET"
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:1D",
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:1W",
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:4W"
    ],
    "ok": true
   },
@@ -133,7 +135,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 3.34,
+  "sec": 3.73,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -141,40 +143,40 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 20.9,
+    "build_sec": 26.0,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.4,
+    "solve_sec": 6.2,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 20.9,
+    "build_sec": 26.0,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 6.9,
+    "solve_sec": 6.7,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 20.9,
+    "build_sec": 26.0,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.2,
+    "solve_sec": 6.1,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 82.36,
+  "sec": 97.12,
   "status": "PASS"
  },
  "test_gate_unique": {
@@ -200,7 +202,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 1.43,
+  "sec": 1.58,
   "status": "PASS"
  },
  "test_indep": {
@@ -285,7 +287,7 @@
     "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
    }
   },
-  "sec": 195.73,
+  "sec": 222.94,
   "status": "PASS"
  },
  "test_indep_stall": {
@@ -295,7 +297,7 @@
    "ok": true,
    "stalled_gap": 0.0
   },
-  "sec": 3.14,
+  "sec": 3.5,
   "status": "PASS"
  },
  "test_indep_structured": {
@@ -303,26 +305,26 @@
    "epi_10140": {
     "G": 1308,
     "d_UB": 4.440892098500626e-16,
-    "d_beta_inf": 3.9992144182854003e-10,
+    "d_beta_inf": 3.9992144109670356e-10,
     "indep_gap": 3.3306690738754696e-15,
     "iterations": 83,
-    "sec_indep": 17.6,
-    "sec_prod": 0.7,
+    "sec_indep": 19.2,
+    "sec_prod": 0.9,
     "termination": "EPIGRAPH_STALLED_EXACT_CERT+MINNORM_OK"
    },
    "kel_30074": {
     "G": 9147,
     "d_UB": 5.484501741648273e-14,
-    "d_beta_inf": 5.090516990929688e-07,
+    "d_beta_inf": 5.090516990144183e-07,
     "indep_gap": 8.881784197001252e-15,
     "iterations": 46,
-    "sec_indep": 38.5,
-    "sec_prod": 5.3,
+    "sec_indep": 43.7,
+    "sec_prod": 5.8,
     "termination": "KELLEY_CERTIFIED+MINNORM_OK"
    },
    "ok": true
   },
-  "sec": 81.68,
+  "sec": 93.34,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -361,7 +363,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 11.69,
+  "sec": 13.33,
   "status": "PASS"
  },
  "test_s0link": {
@@ -435,7 +437,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.4,
+    "sec": 1.6,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -453,7 +455,7 @@
     "ok": true
    }
   },
-  "sec": 4.99,
+  "sec": 5.94,
   "status": "PASS"
  }
 }
