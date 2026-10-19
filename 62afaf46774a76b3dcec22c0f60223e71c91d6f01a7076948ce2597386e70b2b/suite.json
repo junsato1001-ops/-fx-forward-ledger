@@ -1,0 +1,461 @@
+{
+ "test_canon": {
+  "detail": {
+   "np_path_equal": true,
+   "pool_sha256_example": "20584438fa2bda2d8e72130ff3f7c9605a6c45e31e3ae4e2ae3bc4a85d4ea920"
+  },
+  "sec": 0.06,
+  "status": "PASS"
+ },
+ "test_cftc_feature": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.0,
+  "status": "PASS"
+ },
+ "test_cftc_parse": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.02,
+  "status": "PASS"
+ },
+ "test_cftc_rules": {
+  "detail": {
+   "ok": true,
+   "schedule_2026_mismatch": {}
+  },
+  "sec": 0.01,
+  "status": "PASS"
+ },
+ "test_cftc_schedule": {
+  "detail": {
+   "n_releases": 52,
+   "ok": true
+  },
+  "sec": 0.0,
+  "status": "PASS"
+ },
+ "test_deadline_gate": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.6,
+  "status": "PASS"
+ },
+ "test_estimation": {
+  "detail": {
+   "groups": 634,
+   "n_e": 317,
+   "ok": true,
+   "solver_status": "ESTIMATED",
+   "ub_minus_lb": 1.399128825370822e-16
+  },
+  "sec": 0.44,
+  "status": "PASS"
+ },
+ "test_features": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.0,
+  "status": "PASS"
+ },
+ "test_forecast": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.02,
+  "status": "PASS"
+ },
+ "test_forward_commit": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.09,
+  "status": "PASS"
+ },
+ "test_forward_run": {
+  "detail": {
+   "n_warmup": 3916,
+   "ok": true,
+   "parameter_state": "ESTIMATED"
+  },
+  "sec": 63.0,
+  "status": "PASS"
+ },
+ "test_freeze_audit": {
+  "detail": {
+   "cases": {
+    "audit_edited_later": "FAIL",
+    "audit_restored": "PASS",
+    "auditor_code_not_candidate": "FAIL",
+    "longterm_all_unavailable": "PASS",
+    "longterm_all_verified": "PASS",
+    "longterm_marker_not_unique": "FAIL",
+    "longterm_marker_parent_mismatch": "FAIL",
+    "longterm_marker_time_differs": "FAIL",
+    "longterm_results_push_actor": "FAIL",
+    "longterm_results_push_differs": "FAIL",
+    "longterm_run_conclusion_failure": "FAIL",
+    "longterm_run_mismatch": "FAIL",
+    "rejected_to_final_rewrite": "FAIL",
+    "rejected_version_retry_refused": "REFUSED",
+    "results_branch_restored": "PASS",
+    "results_commit_not_on_branch": "FAIL",
+    "server_time_unknown_is_window": "FAIL",
+    "window_all_verified": "PASS",
+    "window_boundary_14d_marker_missing": "FAIL",
+    "window_marker_api_down": "FAIL",
+    "window_marker_missing": "FAIL",
+    "window_marker_time_differs": "FAIL",
+    "window_results_push_differs": "FAIL",
+    "window_results_push_missing": "FAIL",
+    "window_run_lookup_down": "FAIL"
+   },
+   "ok": true
+  },
+  "sec": 1.58,
+  "status": "PASS"
+ },
+ "test_freeze_gate": {
+  "detail": {
+   "current_config_pre_freeze": [
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:1D",
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:1W",
+    "CHECK_TIME_NOT_BEFORE_A_FIRST:4W"
+   ],
+   "ok": true
+  },
+  "sec": 0.0,
+  "status": "PASS"
+ },
+ "test_freeze_record": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 3.02,
+  "status": "PASS"
+ },
+ "test_fullscale": {
+  "detail": {
+   "margin_ok_neg_side_le_1e-14": true,
+   "most_negative": 0.0,
+   "rep0": {
+    "build_sec": 13.8,
+    "it": [
+     44,
+     1
+    ],
+    "n_cuts": 87,
+    "phi2_lb": 8.261225548756615e-14,
+    "solve_sec": 4.0,
+    "ub_lb": 5.1081921588211714e-14
+   },
+   "rep1": {
+    "build_sec": 13.9,
+    "it": [
+     48,
+     1
+    ],
+    "n_cuts": 95,
+    "phi2_lb": 7.389869921380254e-14,
+    "solve_sec": 3.8,
+    "ub_lb": 6.479487041187626e-14
+   },
+   "rep2": {
+    "build_sec": 13.9,
+    "it": [
+     44,
+     1
+    ],
+    "n_cuts": 87,
+    "phi2_lb": 3.0079255774871446e-14,
+    "solve_sec": 3.8,
+    "ub_lb": 3.762877234232251e-14
+   }
+  },
+  "sec": 53.25,
+  "status": "PASS"
+ },
+ "test_gate_unique": {
+  "detail": {
+   "cases": {
+    "g5_snapshot_missing": "G5.snapshot_identified=FAIL",
+    "g6_duplicate_and_missing": "G6.th_rows_unique=FAIL",
+    "g6_foreign_key": "G6.th_keyset_equals_universe=FAIL",
+    "g6_keyset_missing": "G6.th_rows_unique=FAIL",
+    "g7_other_snapshot": "G7.same_snapshot_as_g5=FAIL",
+    "g7_row_duplicate": "G7.no_duplicate_rows=FAIL",
+    "g7_rows_missing": "G7.no_duplicate_rows=FAIL",
+    "g7_two_snapshots": "G7.same_snapshot_as_g5=FAIL",
+    "universe_duplicate": "G5.th_universe_unique=FAIL",
+    "universe_missing": "G5.th_universe_unique=FAIL"
+   },
+   "ok": true
+  },
+  "sec": 0.02,
+  "status": "PASS"
+ },
+ "test_gitrepo_tx": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 1.25,
+  "status": "PASS"
+ },
+ "test_indep": {
+  "detail": {
+   "ALL_PASS": true,
+   "C_2.5e-9": {
+    "d_UB": 2.220446049250313e-16,
+    "d_beta_inf": 8.881784197001252e-16,
+    "d_mu_over_sigma": 8.881784197001252e-16,
+    "indep_gap": 0.0,
+    "iterations": 10,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
+   },
+   "D_12000x6000_a": {
+    "d_UB": 1.7763568394002505e-14,
+    "d_beta_inf": 3.1737968555350937e-09,
+    "d_mu_over_sigma": 5.67425684061423e-07,
+    "indep_gap": 9.769962616701378e-15,
+    "iterations": 48,
+    "method": "kelley_fast_longdouble",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "KELLEY_CERTIFIED+MINNORM_OK"
+   },
+   "D_12000x6000_b": {
+    "d_UB": 4.0190073491430667e-14,
+    "d_beta_inf": 1.422612950444796e-08,
+    "d_mu_over_sigma": 2.069011508566065e-06,
+    "indep_gap": 5.995204332975845e-15,
+    "iterations": 46,
+    "method": "kelley_fast_longdouble",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "KELLEY_CERTIFIED+MINNORM_OK"
+   },
+   "D_3000x2000": {
+    "d_UB": 2.7977620220553945e-14,
+    "d_beta_inf": 8.956679334835849e-10,
+    "d_mu_over_sigma": 1.1050978325103409e-07,
+    "indep_gap": 0.0,
+    "iterations": 56,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
+   },
+   "D_600x800": {
+    "d_UB": 0.0,
+    "d_beta_inf": 3.2034444541473306e-13,
+    "d_mu_over_sigma": 5.7526579323752666e-11,
+    "indep_gap": 2.220446049250313e-16,
+    "iterations": 49,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
+   },
+   "E_zero_col": {
+    "d_UB": 0.0,
+    "d_beta_inf": 1.6132928326584306e-16,
+    "d_mu_over_sigma": 2.3545729645104962e-14,
+    "indep_gap": 0.0,
+    "iterations": 36,
+    "method": "epigraph",
+    "pass_UB": true,
+    "pass_beta": true,
+    "pass_gap": true,
+    "pass_mu": true,
+    "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
+   }
+  },
+  "sec": 130.1,
+  "status": "PASS"
+ },
+ "test_indep_stall": {
+  "detail": {
+   "d_UB_vs_production": 0.0,
+   "iterations": 37,
+   "ok": true,
+   "stalled_gap": 0.0
+  },
+  "sec": 2.06,
+  "status": "PASS"
+ },
+ "test_indep_structured": {
+  "detail": {
+   "epi_10140": {
+    "G": 1308,
+    "d_UB": 4.440892098500626e-16,
+    "d_beta_inf": 3.9992144182854003e-10,
+    "indep_gap": 3.3306690738754696e-15,
+    "iterations": 83,
+    "sec_indep": 11.2,
+    "sec_prod": 0.6,
+    "termination": "EPIGRAPH_STALLED_EXACT_CERT+MINNORM_OK"
+   },
+   "kel_30074": {
+    "G": 9147,
+    "d_UB": 5.484501741648273e-14,
+    "d_beta_inf": 5.090516990929688e-07,
+    "indep_gap": 8.881784197001252e-15,
+    "iterations": 46,
+    "sec_indep": 27.2,
+    "sec_prod": 4.4,
+    "termination": "KELLEY_CERTIFIED+MINNORM_OK"
+   },
+   "ok": true
+  },
+  "sec": 56.47,
+  "status": "PASS"
+ },
+ "test_ledger_tx": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.0,
+  "status": "PASS"
+ },
+ "test_manifest_gate": {
+  "detail": {
+   "n_entries": 77,
+   "ok": true,
+   "workflows": [
+    ".github/workflows/m1macro_dev.yml",
+    ".github/workflows/m1macro_forward.yml",
+    ".github/workflows/m1macro_freeze_record.yml",
+    ".github/workflows/m1macro_gates.yml",
+    ".github/workflows/m1macro_snapshot_acquire.yml"
+   ]
+  },
+  "sec": 0.03,
+  "status": "PASS"
+ },
+ "test_rates": {
+  "detail": {
+   "ok": true
+  },
+  "sec": 0.01,
+  "status": "PASS"
+ },
+ "test_reconstruct": {
+  "detail": {
+   "m0_rows": 30021,
+   "ok": true,
+   "s0_forecast_rows": 23538,
+   "sampled": 243
+  },
+  "sec": 7.15,
+  "status": "PASS"
+ },
+ "test_s0link": {
+  "detail": {
+   "forecast_rows": 598,
+   "issued_checked": 800,
+   "ok": true
+  },
+  "sec": 0.03,
+  "status": "PASS"
+ },
+ "test_solver": {
+  "detail": {
+   "A": {
+    "it": [
+     31,
+     13
+    ],
+    "norm_diff": -3.4785362385400184e-06,
+    "ok": true,
+    "phi2_lb": 0.0,
+    "phi_diff": 0.0,
+    "ub_lb": 0.0
+   },
+   "ALL_OK": true,
+   "B": {
+    "beta": [
+     1.0000000000000004,
+     0.0,
+     -1.9999999999999996
+    ],
+    "err": 4.440892098500626e-16,
+    "ok": true,
+    "phi2_lb": 0.0,
+    "ub_lb": 0.0
+   },
+   "C_1e-10": {
+    "err": 8.881784197001252e-16,
+    "ok": true,
+    "phi2_lb": 1.5171528948207494e-16,
+    "ub_lb": 1.5171528948207494e-16
+   },
+   "C_1e-11": {
+    "err": 2.220446049250313e-16,
+    "ok": true,
+    "phi2_lb": -7.03293153735645e-18,
+    "ub_lb": -7.03293153735645e-18
+   },
+   "C_1e-12": {
+    "err": 4.440892098500626e-16,
+    "ok": true,
+    "phi2_lb": 2.435457722643896e-16,
+    "ub_lb": 2.435457722643896e-16
+   },
+   "C_1e-14": {
+    "err": 4.440892098500626e-16,
+    "ok": true,
+    "phi2_lb": 6.793861617552835e-17,
+    "ub_lb": 2.3937733645616394e-14
+   },
+   "C_3e-09": {
+    "err": 8.881784197001252e-16,
+    "ok": true,
+    "phi2_lb": 2.401685621697866e-16,
+    "ub_lb": 1.8123957244755276e-17
+   },
+   "D_3000x2000": {
+    "it": [
+     44,
+     1
+    ],
+    "ok": true,
+    "phi2_lb": 9.703091115807909e-14,
+    "sec": 0.9,
+    "ub_lb": 5.2399945568147803e-14
+   },
+   "D_600x800": {
+    "it": [
+     37,
+     1
+    ],
+    "ok": true,
+    "phi2_lb": 1.0343952490597432e-16,
+    "sec": 0.2,
+    "ub_lb": 1.0343952490597432e-16
+   },
+   "E": {
+    "beta_us_hex": "0x0.0p+0",
+    "ok": true
+   }
+  },
+  "sec": 3.22,
+  "status": "PASS"
+ }
+}
