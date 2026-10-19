@@ -4,7 +4,7 @@
    "np_path_equal": true,
    "pool_sha256_example": "20584438fa2bda2d8e72130ff3f7c9605a6c45e31e3ae4e2ae3bc4a85d4ea920"
   },
-  "sec": 0.1,
+  "sec": 0.09,
   "status": "PASS"
  },
  "test_cftc_feature": {
@@ -18,7 +18,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.03,
+  "sec": 0.04,
   "status": "PASS"
  },
  "test_cftc_rules": {
@@ -41,7 +41,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.75,
+  "sec": 0.68,
   "status": "PASS"
  },
  "test_estimation": {
@@ -52,7 +52,7 @@
    "solver_status": "ESTIMATED",
    "ub_minus_lb": 1.399128825370822e-16
   },
-  "sec": 0.8,
+  "sec": 0.69,
   "status": "PASS"
  },
  "test_features": {
@@ -66,14 +66,14 @@
   "detail": {
    "ok": true
   },
-  "sec": 0.05,
+  "sec": 0.04,
   "status": "PASS"
  },
  "test_forward_commit": {
   "detail": {
    "ok": true
   },
-  "sec": 0.11,
+  "sec": 0.12,
   "status": "PASS"
  },
  "test_forward_run": {
@@ -82,7 +82,41 @@
    "ok": true,
    "parameter_state": "ESTIMATED"
   },
-  "sec": 117.09,
+  "sec": 98.73,
+  "status": "PASS"
+ },
+ "test_freeze_audit": {
+  "detail": {
+   "cases": {
+    "audit_edited_later": "FAIL",
+    "audit_restored": "PASS",
+    "auditor_code_not_candidate": "FAIL",
+    "longterm_all_unavailable": "PASS",
+    "longterm_all_verified": "PASS",
+    "longterm_marker_not_unique": "FAIL",
+    "longterm_marker_parent_mismatch": "FAIL",
+    "longterm_marker_time_differs": "FAIL",
+    "longterm_results_push_actor": "FAIL",
+    "longterm_results_push_differs": "FAIL",
+    "longterm_run_conclusion_failure": "FAIL",
+    "longterm_run_mismatch": "FAIL",
+    "rejected_to_final_rewrite": "FAIL",
+    "rejected_version_retry_refused": "REFUSED",
+    "results_branch_restored": "PASS",
+    "results_commit_not_on_branch": "FAIL",
+    "server_time_unknown_is_window": "FAIL",
+    "window_all_verified": "PASS",
+    "window_boundary_14d_marker_missing": "FAIL",
+    "window_marker_api_down": "FAIL",
+    "window_marker_missing": "FAIL",
+    "window_marker_time_differs": "FAIL",
+    "window_results_push_differs": "FAIL",
+    "window_results_push_missing": "FAIL",
+    "window_run_lookup_down": "FAIL"
+   },
+   "ok": true
+  },
+  "sec": 1.65,
   "status": "PASS"
  },
  "test_freeze_gate": {
@@ -99,7 +133,7 @@
   "detail": {
    "ok": true
   },
-  "sec": 3.84,
+  "sec": 3.34,
   "status": "PASS"
  },
  "test_fullscale": {
@@ -107,40 +141,40 @@
    "margin_ok_neg_side_le_1e-14": true,
    "most_negative": 0.0,
    "rep0": {
-    "build_sec": 25.6,
+    "build_sec": 20.9,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 8.261225548756615e-14,
-    "solve_sec": 6.6,
+    "solve_sec": 6.4,
     "ub_lb": 5.1081921588211714e-14
    },
    "rep1": {
-    "build_sec": 25.8,
+    "build_sec": 20.9,
     "it": [
      48,
      1
     ],
     "n_cuts": 95,
     "phi2_lb": 7.389869921380254e-14,
-    "solve_sec": 7.4,
+    "solve_sec": 6.9,
     "ub_lb": 6.479487041187626e-14
    },
    "rep2": {
-    "build_sec": 25.9,
+    "build_sec": 20.9,
     "it": [
      44,
      1
     ],
     "n_cuts": 87,
     "phi2_lb": 3.0079255774871446e-14,
-    "solve_sec": 6.8,
+    "solve_sec": 6.2,
     "ub_lb": 3.762877234232251e-14
    }
   },
-  "sec": 98.27,
+  "sec": 82.36,
   "status": "PASS"
  },
  "test_gate_unique": {
@@ -159,14 +193,14 @@
    },
    "ok": true
   },
-  "sec": 0.01,
+  "sec": 0.02,
   "status": "PASS"
  },
  "test_gitrepo_tx": {
   "detail": {
    "ok": true
   },
-  "sec": 1.57,
+  "sec": 1.43,
   "status": "PASS"
  },
  "test_indep": {
@@ -251,7 +285,7 @@
     "termination": "EPIGRAPH_CONVERGED+MINNORM_OK"
    }
   },
-  "sec": 224.96,
+  "sec": 195.73,
   "status": "PASS"
  },
  "test_indep_stall": {
@@ -261,7 +295,7 @@
    "ok": true,
    "stalled_gap": 0.0
   },
-  "sec": 3.56,
+  "sec": 3.14,
   "status": "PASS"
  },
  "test_indep_structured": {
@@ -269,26 +303,26 @@
    "epi_10140": {
     "G": 1308,
     "d_UB": 4.440892098500626e-16,
-    "d_beta_inf": 3.9992144109670356e-10,
+    "d_beta_inf": 3.9992144182854003e-10,
     "indep_gap": 3.3306690738754696e-15,
     "iterations": 83,
-    "sec_indep": 19.4,
-    "sec_prod": 1.0,
+    "sec_indep": 17.6,
+    "sec_prod": 0.7,
     "termination": "EPIGRAPH_STALLED_EXACT_CERT+MINNORM_OK"
    },
    "kel_30074": {
     "G": 9147,
     "d_UB": 5.484501741648273e-14,
-    "d_beta_inf": 5.090516990144183e-07,
+    "d_beta_inf": 5.090516990929688e-07,
     "indep_gap": 8.881784197001252e-15,
     "iterations": 46,
-    "sec_indep": 43.5,
-    "sec_prod": 5.9,
+    "sec_indep": 38.5,
+    "sec_prod": 5.3,
     "termination": "KELLEY_CERTIFIED+MINNORM_OK"
    },
    "ok": true
   },
-  "sec": 93.69,
+  "sec": 81.68,
   "status": "PASS"
  },
  "test_ledger_tx": {
@@ -300,7 +334,7 @@
  },
  "test_manifest_gate": {
   "detail": {
-   "n_entries": 76,
+   "n_entries": 77,
    "ok": true,
    "workflows": [
     ".github/workflows/m1macro_dev.yml",
@@ -327,7 +361,7 @@
    "s0_forecast_rows": 23538,
    "sampled": 243
   },
-  "sec": 13.27,
+  "sec": 11.69,
   "status": "PASS"
  },
  "test_s0link": {
@@ -401,7 +435,7 @@
     ],
     "ok": true,
     "phi2_lb": 9.703091115807909e-14,
-    "sec": 1.6,
+    "sec": 1.4,
     "ub_lb": 5.2399945568147803e-14
    },
    "D_600x800": {
@@ -419,7 +453,7 @@
     "ok": true
    }
   },
-  "sec": 5.88,
+  "sec": 4.99,
   "status": "PASS"
  }
 }
