@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 from m1macro import freeze_record as F, gitrepo
-from m1macro.test_freeze_record import FIRST, SNAP, _clock, _passing_results, _t
+from m1macro.test_freeze_record import FIRST, SNAP, _clock, _passing_results, _pre, _t
 from m1macro.test_gitrepo_tx import _hook, _repo
 
 CS, CAND = "c" * 64, "a" * 40
@@ -74,7 +74,7 @@ def _setup(td, name, marker_push="ok"):
     assert gr["Server_Evidence"] == {"run": "VERIFIED", "push": "VERIFIED"} and gr["Results_Commit"] == res_commit
     rec = F.record_bytes({"Spec": "M1-MACRO-IMPL-CODE-V1", "Code_SHA256": CS, "Candidate_Commit": CAND,
                           "First_Forward_Origin": FIRST, "CFTC_Snapshot_Window_Hours": 6,
-                          "Dev_Snapshot": {"Manifest_SHA256": SNAP}, "Gate_Results": gr})
+                          "Dev_Snapshot": {"Manifest_SHA256": SNAP}, "Gate_Results": gr, "Pre_Freeze_Gate": _pre()})
     g = gitrepo.RealGit(work, message="freeze")
     head = lambda: git("rev-parse", "HEAD")
     parent_of = lambda c: git("rev-parse", c + "^")

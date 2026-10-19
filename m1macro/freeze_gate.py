@@ -9,6 +9,9 @@ which is no later than the scheduled 00:40 JST pre-T_info acquisition.
 Pre-Freeze Gate (candidate creation / audit): every first_forward_origin(h) is set, is a formal Origin of h, every
 check time (now, and the planned freeze time if given) is strictly before A_first(h), and the formal main branch holds
 no acquisition at or after min_h A_first(h) and no M1 ledger or audit row for an Origin >= min_h first(h).
+Part 3 §2 lower bound (IMPL-FINDINGS-10 F10-a): first(h) must be the FIRST scheduled Origin after the freeze, i.e. the
+formal Origin of h just before first(h), prev(h), must already be out of reach: A_first(prev(h)) <= check time.
+Too early -> CHECK_TIME_BEFORE_PREVIOUS_ORIGIN (refused before anything is written; the Version is not consumed).
 
 Freeze-finalization Gate: T_freeze_recorded < A_first(h) for all h (strict, UTC).
 NOT WIRED: the canonical source of T_freeze_recorded (an auditable Recorded_At_UTC of the freeze-record transaction,
@@ -62,6 +65,16 @@ def _rows(b):
     return list(csv.DictReader(io.StringIO(b.decode("utf-8")))) if b else []
 
 
+def prev_origin(first_h, h, is_formal_origin, max_days=60):
+    """The formal Origin of h immediately before first_h (None if none within max_days)."""
+    d = first_h - dt.timedelta(days=1)
+    for _ in range(max_days):
+        if is_formal_origin(d, h):
+            return d
+        d -= dt.timedelta(days=1)
+    return None
+
+
 def pre_freeze(cfg, check_times, main_files, is_formal_origin):
     """check_times: datetimes (UTC); main_files: {rel: bytes} from the formal main branch (absent = b'');
     is_formal_origin(date, h) -> bool (frozen ORIGIN_TARGET_MAP). Returns a result dict."""
@@ -73,12 +86,20 @@ def pre_freeze(cfg, check_times, main_files, is_formal_origin):
     res["first_forward_origin"] = {h: first[h].isoformat() for h in HORIZONS}
     res["a_first_utc"] = {h: _s(af[h]) for h in HORIZONS}
     res["check_times_utc"] = [_s(t) for t in check_times]
+    res["previous_origin"] = {}; res["a_previous_utc"] = {}
     for h in HORIZONS:
         if not is_formal_origin(first[h], h):
             res["violations"].append(f"NOT_A_FORMAL_ORIGIN:{h}")
+        pv = prev_origin(first[h], h, is_formal_origin)
+        if pv is None:
+            res["violations"].append(f"PREVIOUS_ORIGIN_UNKNOWN:{h}"); continue
+        ap = features.tinfo_utc(pv) - cftc_feature.WINDOW
+        res["previous_origin"][h] = pv.isoformat(); res["a_previous_utc"][h] = _s(ap)
         for t in check_times:
             if not t < af[h]:
                 res["violations"].append(f"CHECK_TIME_NOT_BEFORE_A_FIRST:{h}")
+            if not ap <= t:
+                res["violations"].append(f"CHECK_TIME_BEFORE_PREVIOUS_ORIGIN:{h}")
     lo = min(af.values()); first_min = min(first.values()).isoformat()
     for r in _rows(main_files.get(FETCHES, b"")):
         if r.get("Retrieved_At_UTC") and _utc(r["Retrieved_At_UTC"]) >= lo:

@@ -312,9 +312,15 @@ def is_final(rec_b: bytes, marker_b: bytes, audit_b: bytes, code_sha: str, first
                                            "Marker_Reread_At_UTC", "Marker_Push_At_Server_UTC")]
         af = {h: parse_utc(a[f"A_First_{h}_UTC"]) for h in HORIZONS}
         exp = a_first(rec["First_Forward_Origin"], rec["CFTC_Snapshot_Window_Hours"])
+        pre = rec["Pre_Freeze_Gate"]
+        ap = {h: parse_utc(pre["a_previous_utc"][h]) for h in HORIZONS}
     except (KeyError, ValueError, TypeError):
         return False
     if any(af[h] != exp[h] for h in HORIZONS):
+        return False
+    # F10-a (Part 3 §2): first(h) is the first Origin after the freeze -> marker push >= A_first(prev(h)) for every h
+    if pre.get("pass") is not True or pre.get("a_first_utc") != {h: utc_s(af[h]) for h in HORIZONS} \
+            or pre.get("first_forward_origin") != rec["First_Forward_Origin"] or not all(ap[h] <= times[4] for h in HORIZONS):
         return False
     return (a["Anchor_Status"] == "PASS" and a["D2_Status"] == "PASS" and a["Freeze_Status"] == "FINAL"
             and anchor_ok(*times) and d2_ok(times[4], af))
@@ -481,6 +487,8 @@ def run(cout, main_wt, cand_sha):
                             "Manifest_SHA256": hashlib.sha256(snap_b).hexdigest(),
                             "Files": {f["source"] + ":" + f["path"]: f["sha256"] for f in snap["files"]}},
            "First_Forward_Origin": first, "CFTC_Snapshot_Window_Hours": win,
+           "Pre_Freeze_Gate": {k: pre[k] for k in ("pass", "first_forward_origin", "a_first_utc", "previous_origin",
+                                                   "a_previous_utc", "check_times_utc")},
            "Gate_Results": gate_results(str(ROOT), code_sha, cand_sha, hashlib.sha256(snap_b).hexdigest()),
            "Run": {"Run_ID": rid, "Run_Attempt": att, "Workflow": os.environ.get("GITHUB_WORKFLOW", "")}}
     git = gitrepo.RealGit(main_wt, message=f"preregistration: M1-MACRO implementation freeze (run {rid})")

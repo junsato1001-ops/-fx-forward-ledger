@@ -104,9 +104,6 @@ def g678(out, manifest, pub, priv, shard, n_shards, label):
     with tempfile.TemporaryDirectory() as td:
         ctx, _ = _ctx(manifest, pub, priv, td)
     mine = [x for i, x in enumerate(ctx.th) if i % n_shards == shard]
-    lim = int(__import__("os").environ.get("M1_GATE_LIMIT", "0"))      # smoke tests only
-    if lim:
-        mine = mine[-lim:]
     cache = {h: {} for h in ("1D", "1W", "4W")}
     f6 = open(out / f"g6_{label}_{shard}.jsonl", "w"); fh = open(out / f"hash_{label}_{shard}.jsonl", "w")
     f8 = open(out / f"g8_{label}_{shard}.jsonl", "w")

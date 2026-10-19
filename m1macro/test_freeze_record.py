@@ -17,9 +17,17 @@ UTC = dt.timezone.utc
 SNAP = "5" * 64
 
 
-def _rec(code="c" * 64, first=FIRST):
+def _pre(first=FIRST, a_prev="2026-10-01T00:00:00Z"):
+    """The Pre-Freeze Gate result the record carries (F10-a): previous Origins' A_first well before the test freezes."""
+    af = F.a_first(first, 6)
+    return {"pass": True, "first_forward_origin": first, "a_first_utc": {h: F.utc_s(af[h]) for h in F.HORIZONS},
+            "previous_origin": {h: "2026-09-30" for h in F.HORIZONS}, "a_previous_utc": {h: a_prev for h in F.HORIZONS},
+            "check_times_utc": []}
+
+
+def _rec(code="c" * 64, first=FIRST, pre=None):
     return F.record_bytes({"Spec": "M1-MACRO-IMPL-CODE-V1", "Code_SHA256": code, "First_Forward_Origin": first,
-                           "CFTC_Snapshot_Window_Hours": 6})
+                           "CFTC_Snapshot_Window_Hours": 6, "Pre_Freeze_Gate": pre or _pre(first)})
 
 
 def _t(s):
@@ -223,6 +231,25 @@ def run():
         write_final(td, "c" * 64)
         assert F.is_final_tree(td, "c" * 64, FIRST) and F.is_final_tree(td, "c" * 64)
         assert not F.is_final_tree(td, "d" * 64) and not F.is_final_tree(td, "c" * 64, {**FIRST, "1D": "2026-11-11"})
+    # F10-a: the record's Pre-Freeze Gate must show first(h) as the first Origin after the marker push
+    for bad_pre, want in ((_pre(a_prev="2026-11-05T12:00:00Z"), True),        # control: A_prev <= marker push
+                          (_pre(a_prev="2026-11-08T00:00:00Z"), False),       # A_prev after the marker push
+                          ({**_pre(), "pass": False}, False), (None, False),
+                          ({**_pre(), "a_first_utc": {**_pre()["a_first_utc"], "1D": "2026-11-09T13:00:00Z"}}, False)):
+        with tempfile.TemporaryDirectory() as td2:
+            write_final(td2, "c" * 64)
+            rec = json.loads(Path(td2, F.RECORD).read_bytes())
+            if bad_pre is None:
+                del rec["Pre_Freeze_Gate"]
+            else:
+                rec["Pre_Freeze_Gate"] = bad_pre
+            nb = F.record_bytes(rec); Path(td2, F.RECORD).write_bytes(nb)
+            mk = Path(td2, F.MARKER).read_bytes().replace(
+                hashlib.sha256(_rec()).hexdigest().encode(), hashlib.sha256(nb).hexdigest().encode())
+            Path(td2, F.MARKER).write_bytes(mk)
+            assert F.is_final_tree(td2, "c" * 64) == want, bad_pre
+    with tempfile.TemporaryDirectory() as td:
+        write_final(td, "c" * 64)
         p = Path(td)
         orig = {x: (p / x).read_bytes() for x in (F.RECORD, F.MARKER, F.AUDIT)}
         for path, new in ((F.RECORD, orig[F.RECORD].replace(b"\n}", b',"x":1\n}')),

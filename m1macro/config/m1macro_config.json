@@ -1,5 +1,5 @@
 {
- "config_version": "candidate-dev",
+ "config_version": "M1-MACRO-IMPL-CODE-V1-candidate-1",
  "model": "M1-MACRO-V1",
  "private_raw_storage": {
   "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
@@ -20,10 +20,7 @@
   "STAGE2_MAX": 100,
   "LP_TOL": 1e-10
  },
- "pending": [
-  "series URLs and column names",
-  "first forward origin (set at implementation freeze)"
- ],
+ "pending": [],
  "frozen_specs": {
   "M1-MACRO-IMPL-PART1-V1.2": "705f1d49a0c2a2ba4088208014fd775a074cab90c588f2fc244d181ab7ac3bdf",
   "M1-MACRO-IMPL-PART2-V1": "1789ff486b01ad27840bc596b053c5c58a52c7f679afd8d18f74525e30ba8756",
@@ -51,5 +48,10 @@
   "lev_short": "Lev_Money_Positions_Short_All",
   "open_interest": "Open_Interest_All",
   "status": "checked against the headers of fin_fut_txt_2006_2016.zip and fut_fin_txt_2017..2026.zip (dev runs 39038301649, 39038642316); 2006-2016 uses M/D/YYYY 12:00:00 AM dates and counts written as N.000000"
+ },
+ "first_forward_origin": {
+  "1D": "2026-10-22",
+  "1W": "2026-10-25",
+  "4W": "2026-10-25"
  }
 }
