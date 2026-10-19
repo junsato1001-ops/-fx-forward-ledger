@@ -85,7 +85,7 @@
  },
  "SUITE_ALL": {
   "checks": {
-   "n_tests": 26
+   "n_tests": 27
   },
   "pass": true
  },
