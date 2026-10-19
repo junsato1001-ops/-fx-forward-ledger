@@ -27,6 +27,8 @@ REQUIRED_COMMITS = {        # fixes that must be in the candidate (ancestors of 
     "e72e2d8": "F7-a (t, h) uniqueness",
     "15bb31d": "F8-a..F8-d",
     "4f21436": "F8-f, 14-day window, F8-e",
+    "6f9e09d": "candidate-1: F10-a Part 3 §2 lower bound, F10-b debug path removed",
+    "fb5e415": "F11-a activity type from git topology (root -> branch_creation, else push)",
 }
 ALLOWED_ENV = {"GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_REPOSITORY", "GITHUB_TOKEN", "GITHUB_WORKFLOW"}
 SNAPSHOT_MAIN_COMMIT = "8ed83c23c42566fe5d91364ba035f750c5754041"     # one-shot acquisition (run 39045282957)
@@ -73,6 +75,9 @@ def main(argv):
     matrix = re.search(r"shard: \[([0-9, ]+)\]", wf.split("g678:")[1]).group(1)
     check("forty_shards_everywhere", gate_verdict.N_SHARDS == 40 == int(nsh)
           and [int(x) for x in matrix.split(",")] == list(range(40)))
+    frs0 = (ROOT / "m1macro/freeze_record.py").read_text("utf-8")
+    check("f11a_kind_from_topology", 'api["push"](commit, parent or ZERO_SHA, "push" if parent else "branch_creation")' in frs0
+          and (ROOT / "m1macro/test_activity_kind.py").exists())
     check("server_reverify_window_14d", FR.SERVER_REVERIFY_WINDOW == dt.timedelta(days=14))
     check("activity_retry_fixed_12x15s", (FR.ACTIVITY_POLLS, FR.ACTIVITY_POLL_SEC) == (12, 15))
     st = {k: FR.freeze_state(*v) for k, v in {"none": (b"", b"", b""), "incomplete": (b"r", b"", b""),

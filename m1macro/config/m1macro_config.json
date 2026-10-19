@@ -1,5 +1,5 @@
 {
- "config_version": "M1-MACRO-IMPL-CODE-V1-candidate-1",
+ "config_version": "M1-MACRO-IMPL-CODE-V1-candidate-2",
  "model": "M1-MACRO-V1",
  "private_raw_storage": {
   "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
