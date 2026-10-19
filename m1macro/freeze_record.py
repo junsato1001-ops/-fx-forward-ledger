@@ -115,11 +115,17 @@ def d2_ok(marker_push, af: dict) -> bool:
     return all(marker_push < af[h] for h in HORIZONS)
 
 
-def find_push(events, commit, ref="refs/heads/main", parent=None, actor=None):
-    """events: activity API records. Exactly one push to ref whose `after` is commit -> (id, time).
-    F8-a: if parent is given, that push must have moved ref from parent (`before`); if actor is given, it must be the
-    pusher. Any other outcome raises PushNotFound (fail closed)."""
-    hits = [e for e in events if e.get("activity_type") == "push" and e.get("ref") == ref and e.get("after") == commit]
+ZERO_SHA = "0" * 40
+
+
+def find_push(events, commit, ref="refs/heads/main", parent=None, actor=None, kind="push"):
+    """events: activity API records. Exactly one event of `kind` on ref whose `after` is commit -> (id, time).
+    kind: "push" (an existing branch moved) or "branch_creation" (F11-a: the FIRST push of a branch is recorded by
+    GitHub as branch_creation, before = 40 zeros, never as push). F8-a: if parent is given, the event must have moved
+    ref from parent (`before`); if actor is given, it must be the pusher. Any other outcome raises PushNotFound."""
+    if kind not in ("push", "branch_creation"):
+        raise PushNotFound("PUSH_EVENT_KIND_INVALID")
+    hits = [e for e in events if e.get("activity_type") == kind and e.get("ref") == ref and e.get("after") == commit]
     if len(hits) != 1:
         raise PushNotFound("PUSH_EVENT_NOT_UNIQUE" if hits else "PUSH_EVENT_NOT_FOUND")
     e = hits[0]
@@ -139,11 +145,12 @@ def _next_link(resp):
     return None
 
 
-def _activity_all(repo, token, ref):
+def _activity_all(repo, token, ref, kind="push"):
     """F8-a: every page of the push activity of ref (oldest pushes included); a missing page or more than
     ACTIVITY_MAX_PAGES pages raises (fail closed)."""
     from urllib.parse import quote
-    url = f"https://api.github.com/repos/{repo}/activity?ref={quote(ref, safe='')}&activity_type=push&per_page=100"
+    url = (f"https://api.github.com/repos/{repo}/activity?ref={quote(ref, safe='')}&activity_type={quote(kind)}"
+           f"&per_page=100")
     out = []
     for _ in range(ACTIVITY_MAX_PAGES):
         req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
@@ -163,11 +170,11 @@ def activity_lookup(repo, token, sleep=None, ref="refs/heads/main", actor=ACTION
     import time
     sleep = sleep or time.sleep
 
-    def push_time(commit, parent=None):
+    def push_time(commit, parent=None, kind="push"):
         last = None
         for i in range(ACTIVITY_POLLS):
             try:
-                return find_push(_activity_all(repo, token, ref), commit, ref, parent, actor)
+                return find_push(_activity_all(repo, token, ref, kind), commit, ref, parent, actor, kind)
             except PushNotFound as e:
                 last = e
                 if str(e) != "PUSH_EVENT_NOT_FOUND":
@@ -441,7 +448,8 @@ def gate_results(cand_root, code_sha, cand_sha, snapshot_sha=None, api=None, res
         raise FreezeRefused("GATE_RESULTS_PARENT_UNKNOWN")
     push = None
     try:
-        aid, t = api["push"](commit, parent)
+        # F11-a: the first results commit of the branch is a branch_creation event (before = zeros), later ones pushes
+        aid, t = api["push"](commit, parent or ZERO_SHA, "push" if parent else "branch_creation")
         push = {"Activity_ID": aid, "At_Server_UTC": utc_s(t)}; server["push"] = "VERIFIED"
     except PushNotFound as e:
         if server_required or str(e) not in ("PUSH_EVENT_NOT_FOUND", "ACTIVITY_API_FAILED"):

@@ -103,6 +103,23 @@ def unit_find_push():
             F.find_push(evs, c); raise AssertionError(code)
         except F.PushNotFound as e:
             assert str(e) == code
+    # F11-a: the first push of a branch is recorded as branch_creation (real activity record of the Formal results
+    # branch, run 39196332834); it is never found as kind=push, and a push is never found as branch_creation
+    real = {"id": 46968308924, "activity_type": "branch_creation", "ref": "refs/heads/m1macro-gates-results",
+            "before": F.ZERO_SHA, "after": "234accb87ba890caa454ef9abf64e38e0a4fcf9f", "timestamp": "2026-10-19T05:35:06Z",
+            "actor": {"login": "github-actions[bot]"}}
+    rc = real["after"]; rr = real["ref"]
+    assert F.find_push([real], rc, rr, F.ZERO_SHA, F.ACTIONS_ACTOR, "branch_creation") == ("46968308924", _t("2026-10-19T05:35:06"))
+    for kw, code in (({"kind": "push"}, "PUSH_EVENT_NOT_FOUND"), ({"kind": "force_push"}, "PUSH_EVENT_KIND_INVALID"),
+                     ({"kind": "branch_creation", "parent": "p" * 40}, "PUSH_EVENT_PARENT_MISMATCH")):
+        try:
+            F.find_push([real], rc, rr, **kw); raise AssertionError(code)
+        except F.PushNotFound as e:
+            assert str(e) == code, (kw, str(e))
+    try:
+        F.find_push([ev()], c, kind="branch_creation"); raise AssertionError("push found as creation")
+    except F.PushNotFound as e:
+        assert str(e) == "PUSH_EVENT_NOT_FOUND"
     # F8-a: parent (`before`) and pusher must match when required
     assert F.find_push([ev()], c, parent="p" * 40, actor=F.ACTIONS_ACTOR) == ("1", _t("2026-10-20T00:00:14"))
     for kw, code in (({"parent": "q" * 40}, "PUSH_EVENT_PARENT_MISMATCH"), ({"actor": "someone"}, "PUSH_EVENT_ACTOR_MISMATCH")):
@@ -150,6 +167,14 @@ def unit_find_push():
             raise AssertionError("actor")
         except F.PushNotFound as e:
             assert str(e) == "PUSH_EVENT_ACTOR_MISMATCH"
+        # F11-a: the lookup asks the API for the requested kind on the requested ref
+        urls = []
+        def cap(req, timeout=30):
+            urls.append(req.full_url); return Resp(json.dumps([real]).encode())
+        urllib.request.urlopen = cap
+        assert F.activity_lookup("o/r", "t", sleep=lambda s: None, ref=rr)(rc, F.ZERO_SHA, "branch_creation") == \
+            ("46968308924", _t("2026-10-19T05:35:06"))
+        assert "activity_type=branch_creation" in urls[0] and "ref=refs%2Fheads%2Fm1macro-gates-results" in urls[0], urls
         # endless pagination -> fail closed (never a partial list)
         def endless(req, timeout=30):
             r = Resp(b"[]"); r.headers = {"Link": '<https://api.github.com/x?cur=z>; rel="next"'}; return r
@@ -362,7 +387,8 @@ def gate_results_negative():
                 raise OSError("down")
             assert (i, a) == ("555", "1")
             return {**RUN, **({field: value} if field else {})}
-        def push(commit, parent=None):
+        def push(commit, parent=None, kind="push"):
+            assert (parent, kind) == (F.ZERO_SHA, "branch_creation")   # F11-a: one-commit results branch
             if err and err != "RUN_DOWN":
                 raise F.PushNotFound(err)
             return "9", F.parse_utc("2026-10-20T00:00:00Z")

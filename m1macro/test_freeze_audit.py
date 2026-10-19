@@ -43,8 +43,8 @@ class Api:
             raise OSError("down")
         return {**RUN, **(self.run_mode if isinstance(self.run_mode, dict) else {})}
 
-    def push(self, commit, parent=None):
-        assert commit == self.res_commit
+    def push(self, commit, parent=None, kind="push"):
+        assert commit == self.res_commit and kind == "push"      # results commit with a parent: a push event
         assert parent == subprocess.run(["git", "rev-parse", commit + "^"], cwd=self.work, capture_output=True,
                                         check=True).stdout.decode().strip()
         if isinstance(self.push_mode, tuple):
