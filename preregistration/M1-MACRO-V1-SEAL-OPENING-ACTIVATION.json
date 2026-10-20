@@ -1,0 +1,26 @@
+{
+ "Record": "M1-MACRO-V1-SEAL-OPENING-ACTIVATION",
+ "Model": "M1-MACRO-V1",
+ "Kind": "append-only audit trail of an already-given PASS; adds no new opening condition and no new scope",
+ "Opening_Record": {
+  "Path": "preregistration/M1-MACRO-V1-SEAL-OPENING.json",
+  "Commit": "0029187e7ca8d3fc4b56252e43a3881535c958c0",
+  "SHA256": "1095b255ff954fc4d674926469680fe7c04e85603ea5eef82593d941a0bbe6a2",
+  "Git_Blob": "0c7eba5a81dc2a8ee15c3decc2b6ba3d567ba091",
+  "Server_Push": {
+   "Activity_ID": "47156701192",
+   "At_UTC": "2026-10-20T16:48:24Z"
+  }
+ },
+ "Audit": {
+  "By": "むすび",
+  "Report": "drafts/IMPL-FINDINGS-15.md",
+  "Report_Git_Blob": "f1f7df7dc24c335ac460fcc330af65569639f168",
+  "Result": "PASS",
+  "Judgement": "IMPL-FINDINGS-15 = PASS; M1-MACRO-V1 Performance Seal Opening record = PASS / EFFECTIVE"
+ },
+ "Effective_Status": "OPEN",
+ "Effective_At_Server_UTC": "the GitHub server push time of the commit that adds this file to main (activity API, refs/heads/main)",
+ "Scope": "exactly the Opening section of the Opening_Record: Part 4 §6.2 Development Replay only (frozen Code_SHA256, one-shot development snapshot, replay/ only, Evidence_Class = DEVELOPMENT_REPLAY, descriptive/diagnostic use). Historical Reserve Holdout (5 pairs) stays SEALED and is not computed; nothing is written to ledger/; replay results never change M1-MACRO-V1's spec, code, config or first Forward Origin.",
+ "Replay_Execution": "not started; its run scope is decided separately after this record is reviewed"
+}
