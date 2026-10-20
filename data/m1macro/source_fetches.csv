@@ -1,0 +1,2 @@
+Run_ID,Source,Source_URL,Retrieved_At_UTC,Byte_Count,SHA256,Path,Normal,Subreason,Dates_Path
+39484473314-1,cftc,https://www.cftc.gov/files/dea/history/fut_fin_txt_2026.zip,2026-10-20T19:33:50Z,578812,6722fc377087c9380d7504345ac7145a891185ea7d57c9ad3f184b29da43aa57,data/m1macro/cftc/2026/20261020T193350Z_6722fc377087.zip,true,,data/m1macro/accepted_dates/cftc_6722fc377087c938.txt
