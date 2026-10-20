@@ -1,0 +1,134 @@
+{
+ "CFTC_Snapshot_Window_Hours": 6,
+ "CODE_MANIFEST_V1": "CODE_MANIFEST_V1\n.github/workflows/m1macro_dev.yml,63f403bea0486f556271fa8a44dec327629357bb2aae996e2700ad12afb70a27\n.github/workflows/m1macro_forward.yml,07a15fdb4029638d7b6dffe25a887304dd0f1bb73d3cdcfe206d2c4e427bc7e1\n.github/workflows/m1macro_freeze_record.yml,b5ab751a738992df35480e08765e9d4b40da9c9ced0a456c316d9748e0b9d679\n.github/workflows/m1macro_gates.yml,9aa43eb51ba4679854d9bfb6b73f72350e454559aa88d6387f6ddf9b365e8580\n.github/workflows/m1macro_snapshot_acquire.yml,8d7ae65b279602808681b10b081824597ba2c0d09b1c25aceb35540fc23f1061\nenv/IMAGE,8793cb00385087819a5cc95bc553e5388ce08fb3ccbeaa5d5be28386db8ee85e\nenv/IMAGE_DIGEST,9bad9d7fca7166b88c928c7b3b29e7db3fd50221ae65e9d2f56b66df091999ca\nenv/requirements.in,1ba8c1c35a0536bb443c01e946ff1fbaa5b8d3fdaae331195cc7eb5b97805521\nenv/requirements.lock,4a0a74d2c7f263a62c1f293d6d2b8b53a2f2c5a24912e8263f8dcbbadc06a51a\nforward/ledger_builder.py,5d3b91c7a666b9f7d5c12db88dbbf969ebceef5386bbabb22f13e3e907de25a0\nfrozen/m0_walkforward_v1_2.py,4ca2f37ab729d08f24f008d75c5ceb95f11d79d5bf9575941f44ffd32a77e3d5\nfrozen/origin_target_map_v1.py,902f0b43a84a0ec309a6e99b6617ca2816e240054bd77e9dbf7d3b2812f3c988\nfrozen/s0_empclim_std_exp_v1_1.py,84c317661e6798b906063a50fc416c9d594708ffcfbb6010a5bd83f636487676\nm1macro/__init__.py,8ef880329a1529177f54d542982fdaa4395a01105ec369d7315acb52cd5a50b5\nm1macro/canon.py,37604a23b588901d6ba38229eed52e58211e65189ffa46c77fe385caf749c3cb\nm1macro/certs/SectigoPublicServerAuthenticationRootR46.pem,7eaaf8c5047d5dbb4f3d7f173318ee936b09da4f0ceb5f3beb45c277480836eb\nm1macro/cftc_feature.py,e55cd974a247b7a1fba0295544d0a71d49f592f3aad71c63c1b7a34ad5adf31b\nm1macro/cftc_parse.py,42d875ba2cda29fe85972aa1712d6d136046981a66f225b728488dff7dedf40b\nm1macro/cftc_rules.py,da891d070a54352ae7c284b4cf19f2197a98d53ce07bc4c0fbcca751a5e75571\nm1macro/cftc_schedule.py,3c7ed57f96aa2447f5bcfbe4057c412f993a07ce2057acf5e4ce34ad4386c6dc\nm1macro/config/m1macro_config.json,473db7dbd62a8446f56bf58890689dab66f9322b7e4e73a29e0729428ac8c7d3\nm1macro/deadline_gate.py,f101dbdcaec1ae77477711e55408087bb51242186d72cd53012693e8adeb9404\nm1macro/dev_suite.py,5a3ae6c1d5da979518b35673033e2307efa91c6cc5e4d584008c4b508b878f1c\nm1macro/estimation.py,a811c8b471817a1cec0b4dd32627a7f5079ea0b3ea193c246511cbb33351ee28\nm1macro/features.py,041c8e516d75d88a8abce176325e154237c0344370914d851252211f57c942db\nm1macro/fixtures/cftc_release_schedule_2026.html,a3781f9e82a848fc174ecd6119f493c54a2e7ae4ae8d44e72c2bd4bbd4e2ef07\nm1macro/forecast.py,580965fac9f63bba27b1878f66160c8545a0ba3042226716c661b63cbcb58d6b\nm1macro/forward_commit.py,32a813d4a82c742fe7385e15988fa9823b47b248bac682e645a6e41cc45a162a\nm1macro/forward_run.py,4820c2d971fb4ba67bbe695551b5871373aa9715f49c03552dec04dcf11fa956\nm1macro/freeze_gate.py,129b427f8733c7a2c2659cfc9f290bbcc5a8bd52c76eec7921fa50da5c2af1c3\nm1macro/freeze_record.py,7407ca997a68d5a32b7edde5d6a098f3499976ee71aaf9d2aef7c348a925dd27\nm1macro/gate_verdict.py,0b9ce0fe3924eb3eb29d14032ca8d5588877355657bd5ce59723d14f84e420d4\nm1macro/gates.py,62cc89b70be4c54455877104a79b175b17ece5774d4b1e0d40873c741ab2c974\nm1macro/gitrepo.py,8b38b3b2c20a19228f48268e61cbd7198d83cb97cbf781b66bd8cd745e373361\nm1macro/indep.py,55983fed20894638470fd2f1b8400206d4048d876863ef85339da0e0dd3f0eec\nm1macro/jpcal.py,d08f661a3ef61ad889379f8254ce9426f10263481c08afef8df1e20f2eabafe6\nm1macro/ledger_tx.py,eba644f597d9e97b195553c184f3d22f8911626cf900f93a22f30c28632fb680\nm1macro/manifest.py,df5a30029d7ae9f73277936fbf285954f9652fb8d9cac6d488fc580709b78129\nm1macro/manifest_gate.py,b7a87aba1860208ba7c7d6fe7d214275051f07b7e3cfcb20dcd5a916798e9e96\nm1macro/pipeline.py,efc7edbfe272e7525151bf63c9266ba3f1dbee37ddc5c6adfd8f69b2f3f2b9fa\nm1macro/rates.py,1b2098765b26fd046ac2eb0fd3b34ce810f3ecea026c9967ae5e202f5fe84116\nm1macro/s0link.py,cac6a6dc7bb4ab993e4eb8610b668d2c2b11de28ad65869953076366f66b21bb\nm1macro/schema.py,b1949953400f02874eb617f4859905a5f5af8eaa781283c40ada029d02ebc96c\nm1macro/snapshot_acq.py,451be601a986e2ed2429868c955647a0ff4560ee0acd2933899c0b605ac6d403\nm1macro/solver.py,ed5e4e6f47164f9ab216a138e3acc09883db240c4ba80be8d9fa554efaa9e2d3\nm1macro/sources.py,c35f37b37212d44e2d6781908e45e01bc8cb16b3bd4f7a08165904adcb9fc2a0\nm1macro/synth.py,a636505bc74b7de7293171e42880367a443fb6b88c882d94d13add3869f51d23\nm1macro/test_activity_kind.py,ef6f73b5a6ef411529be568268f1e8df821f235a5db4bb0ebaddc61ca2242076\nm1macro/test_canon.py,5b337177c2f36aca1e8762431a2a331c9a89023eb7f4f4d6159eacd5701387bc\nm1macro/test_cftc_feature.py,946c656df35eb5a6744c4df90e7baaec09c42810c17b27596cc2f8bb6a36d6c8\nm1macro/test_cftc_parse.py,8e15ccf90d899db47cca70d5137d1f7916e2b652b88a14e964ad06b58a2be2ac\nm1macro/test_cftc_rules.py,4a0290337a3daa5621658194a4286e0b753635e6713552dcaa86e66f52f37041\nm1macro/test_cftc_schedule.py,16c469082cae7cb0a3113f6a9b63da3c758770b02d7054ceb5c90514d5984170\nm1macro/test_deadline_gate.py,71bf60dca4938718743f7a53403832e1549609a1de158890f6a5269030a96bda\nm1macro/test_estimation.py,91c8a95da9579512bfb3d83a62cf2fe25a435ba92f964fbae70f905753ad2bb2\nm1macro/test_features.py,7fa898083f0f102a1179c834bf5312e322239f0b4c29eb0e9cfc026c945786da\nm1macro/test_forecast.py,214020165717265ec440455a8c579e4f62cca7dc6de58a3885d9645600db9476\nm1macro/test_forward_commit.py,7295a30fc1040548e608e22ac09caebb8d71daed3c3470621ce7424efc9c1ff7\nm1macro/test_forward_run.py,811f87057462bd83cdd93bcddf9b83b332c8696f64588db1fe9f199ed220d228\nm1macro/test_freeze_audit.py,1d7fe850317850fdca95a223e33ba41918451f0800790003106d82da75ae2215\nm1macro/test_freeze_gate.py,57bf5eec74d91fc13de84bdeb502d566b5db1b0a250d01e733f9ef5dae6c1ff1\nm1macro/test_freeze_record.py,639e863213172f21cabf2fa4a8067c29419716acb7f398539b982a99c592c8aa\nm1macro/test_fullscale.py,eeb269167aa984bb37c608ca30420fecc422eabeae777158b81abf1b3f32135d\nm1macro/test_gate_unique.py,eb4c1a4ec7a3d5d339910602cf144cd030f0ae7e9112d8465d7c4005b2ef47e3\nm1macro/test_gitrepo_tx.py,0c2c6cce4f93284abd3c1a2716fcd748a903d15e0adbb64cc78886b609d5446a\nm1macro/test_indep.py,6a4560bf8ef28c41f8c18d0eab8a6a3b8c459a69f49fc1297fcb1759980929d0\nm1macro/test_indep_stall.py,057bb5780c43ff862c235766b7cd60f2969a1878d6a3e72f6176ede9bad9db38\nm1macro/test_indep_structured.py,9209a8051847c9d007f611ee17822b421aa531aab753e2278714199d997b2b13\nm1macro/test_ledger_tx.py,4129021d48ca0462f32fa7c92a0a2d93de5af1b825a78ff9a7fa9274946c001b\nm1macro/test_manifest_gate.py,ab5b8931abf937f903eb226ad8c385ca8a8a9d346346e97b409a57c96f537b5e\nm1macro/test_rates.py,c3bed386f15d1c68cf632b301a85514b7e3498dfeeac439d060cce0f0cd0e42f\nm1macro/test_reconstruct.py,fa11d65bfbbe20d1e0fd58bb80c4d1e014b46acf9e4ad5ccbcadcf174109f965\nm1macro/test_s0link.py,9b5f2265ffb98540dab89002ad7b440d5c0e651dfc0417aa56fd83af5f4e4126\nm1macro/test_solver.py,d6b46b37bbbac9b7d59a6ab6d6f27c2bbb97e7a5f5da923d79c9b7d6f389ac1a\nm1macro/tls.py,472f27f99e1fdc950ca26d97f31dfcbe6da69e5da2baf4713658dbb93adedb58\nm1macro/tz.py,94c2dc53588b5209cb008c6ae708a3273b9c029cc03de3072a82cc7caab1d81c\nm1macro/uscal.py,055d0a40f0d32f61148f9fd1bf67c598ffdedfe30173e4de426cd1b0885a264d\ntests/fixtures/eurofxref-hist_20261009.zip,f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649\n",
+ "Candidate_Commit": "bdf1bfe9a089240083670eb5315dab892794275a",
+ "Code_SHA256": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+ "Dev_Snapshot": {
+  "Files": {
+   "cftc:cftc/fin_fut_txt_2006_2016.zip": "c3a8d01765133a24ce9c082de88933816497d06f1b03eec8c53750bdd818f14b",
+   "cftc:cftc/fut_fin_txt_2017.zip": "e6e2dd537efcc57cdd6cdcc4e45e567fd47e65d8afc8369d8383bf09195ae7f5",
+   "cftc:cftc/fut_fin_txt_2018.zip": "6843d130a25a17c6248df67463810f02077ef4eeafdd629299d21c18f5125e40",
+   "cftc:cftc/fut_fin_txt_2019.zip": "631b31880d513072aa50d63117c896184dd35db3cc8fcdd6debd80197ee7a661",
+   "cftc:cftc/fut_fin_txt_2020.zip": "c90d98d94db708772d669f263fb8061c75f8a7f681ba231fb21247e5c9798e6b",
+   "cftc:cftc/fut_fin_txt_2021.zip": "5c929991038c70ae2501661b6d442b9e784d3c29d3166ceac2e21b45ac93d56a",
+   "cftc:cftc/fut_fin_txt_2022.zip": "94c9c1fdee9dfbe377a09923ddfe26b88d3460605dd076081f221ad367d88601",
+   "cftc:cftc/fut_fin_txt_2023.zip": "43c3dbdd4d01fceefad5e457003751cdc0974c7cf46097b322e26e9e2fe44d7a",
+   "cftc:cftc/fut_fin_txt_2024.zip": "3f00585741a7cf76c207df640951d644dd91ff22a1106b38ca37a2469c765637",
+   "cftc:cftc/fut_fin_txt_2025.zip": "2ea0cda6395f7dd6501c27422be3763e1f2f5b41b768cfd36b871f092a07d438",
+   "cftc:cftc/fut_fin_txt_2026.zip": "6722fc377087c9380d7504345ac7145a891185ea7d57c9ad3f184b29da43aa57",
+   "mof:mof/jgbcm.csv": "4d2d060bbd937f602fdcf8f5d7d0e2c958c2d955df20879ab9744715b8b32248",
+   "mof:mof/jgbcm_all.csv": "3ed93b158ca7abec8c8c17e9b6b7c04df50cd4da276d731c5625bbca6afce951",
+   "treasury:treasury/daily_treasury_yield_curve_1990.csv": "d8d5e4bb7ae2f13ccf03a7f50537723a4a5a37e2ebe85da3e32f53328c411d18",
+   "treasury:treasury/daily_treasury_yield_curve_1991.csv": "d52d81bd96f5e02d8b7a74384d568eaafe36c2a067272e0840c5ea4022c1d4d4",
+   "treasury:treasury/daily_treasury_yield_curve_1992.csv": "13fb485ff7085d1c8afb70b3bb6fd7fe7c728f7b672a9c1844d7e9e6d26827f9",
+   "treasury:treasury/daily_treasury_yield_curve_1993.csv": "c5482e2e88fa8256eb513600c44fbcb8bd317e061a840a429676f4d1330cea3d",
+   "treasury:treasury/daily_treasury_yield_curve_1994.csv": "cea2fce245f7a1be83395a82c4f56e146d2074909255930226551170bf25de18",
+   "treasury:treasury/daily_treasury_yield_curve_1995.csv": "5815b05e0575a6220d84666346c56bc1fa39d0a4212b89bf0f50a3c09579de15",
+   "treasury:treasury/daily_treasury_yield_curve_1996.csv": "656992cb54c922745bb7ccf11a57a3dd5fe2f1653f7d8127d04d25f3e3aaa674",
+   "treasury:treasury/daily_treasury_yield_curve_1997.csv": "3653e22f12846593dc6e0d95a7518acfc2d2f6dd89ec83cc82e2ebeb4586b833",
+   "treasury:treasury/daily_treasury_yield_curve_1998.csv": "3861b3be824744c1c6c616224fd1b87054dfcf2e8106c7551a589b5fedeb7f4a",
+   "treasury:treasury/daily_treasury_yield_curve_1999.csv": "36bff57ac81eb582c68e57479c0ad4fbc4ee090e9028886d49b7f1ce434a5aea",
+   "treasury:treasury/daily_treasury_yield_curve_2000.csv": "a8cde4c7a757ac74f7b6257d3778db73a215483002317e19ee9e3f3c524a8a24",
+   "treasury:treasury/daily_treasury_yield_curve_2001.csv": "bc48181de2b452d19b159bc12354653f64ce3b119d7072dbf4aa92fa6998799c",
+   "treasury:treasury/daily_treasury_yield_curve_2002.csv": "33f84b7c6f50bf3ea0ca4703cb51c8d469bbb93dad92f181d42132b7e2359bf7",
+   "treasury:treasury/daily_treasury_yield_curve_2003.csv": "0c255188cf596e5bc42a4e00b9a60649df01fb95a58a3382d7586da83e5cc0e0",
+   "treasury:treasury/daily_treasury_yield_curve_2004.csv": "0f0561773c7a3220fe1eded9a7ba0645790e9239fd3cf569158171fedf2dc969",
+   "treasury:treasury/daily_treasury_yield_curve_2005.csv": "ecf2ab3d1ca1b6ee8e916fee90474028c2d1221b8d236131621ad58020db0552",
+   "treasury:treasury/daily_treasury_yield_curve_2006.csv": "cdbdcd8b32735caa453e00280232ff70c7012c055b7daf7b8cf1d9aaa8c66bfe",
+   "treasury:treasury/daily_treasury_yield_curve_2007.csv": "297f6be4059a605b1ec0f266eb7b8467c3d40504a0dd53341746223276e6e6d8",
+   "treasury:treasury/daily_treasury_yield_curve_2008.csv": "686db01584dd45f67addc243ee0c42339d491171a0e947c8f88ecac78ee0e9ea",
+   "treasury:treasury/daily_treasury_yield_curve_2009.csv": "3c9294cfa71136e1d5330b09a00bf996ecf86c865d593d7ee954d11984a5bdb1",
+   "treasury:treasury/daily_treasury_yield_curve_2010.csv": "f973bd3988989d3e408655cbc7fed89faefbaa8a1c111ec313241fb47fc75e2d",
+   "treasury:treasury/daily_treasury_yield_curve_2011.csv": "224eaf29d6fe7cbccc746c7a8c845f189cf91424bab43f46ca386a74e98d81f7",
+   "treasury:treasury/daily_treasury_yield_curve_2012.csv": "9c889b6e3cb87f40f3760bddb69f05f7525800ac480ef5712b2cf318765fa184",
+   "treasury:treasury/daily_treasury_yield_curve_2013.csv": "1e1a98426d9274afcc68467962f9238104db775b8765e48f45ac7488b33ff338",
+   "treasury:treasury/daily_treasury_yield_curve_2014.csv": "8d560698e03e4c0d8d22ff8be7f5f7c5c0d472b1e33a22b6a75373a57e84aa0f",
+   "treasury:treasury/daily_treasury_yield_curve_2015.csv": "b7665d1ce46d6ed6d08fbda34aae1831de38e274e3c7caed81904042aac9b5bc",
+   "treasury:treasury/daily_treasury_yield_curve_2016.csv": "b4d0a8d86e2734bc64d84d9a9824434d841737621582daeac58f13c7129f325c",
+   "treasury:treasury/daily_treasury_yield_curve_2017.csv": "56074da7c32103a28cf4ba2bdf5eaa12f98fd49852047aef1a6eb16e64bd6e83",
+   "treasury:treasury/daily_treasury_yield_curve_2018.csv": "e8375524a7a8d3e8091bbe7690d0378b9365be09efff5b18b8eefddc25f718d3",
+   "treasury:treasury/daily_treasury_yield_curve_2019.csv": "83fc47c17325e222c45fd3a1eb26c69ae01f62d33b793030b4b8b350ca0a290b",
+   "treasury:treasury/daily_treasury_yield_curve_2020.csv": "edcf1c8be9622f3cd92eb7de1847aefc3977e2118e2ff9af67f46614a5c306a7",
+   "treasury:treasury/daily_treasury_yield_curve_2021.csv": "1be57e49c63a99f6002431a1030c8fbe539b71066c3eaf14f9f58ddc34492cea",
+   "treasury:treasury/daily_treasury_yield_curve_2022.csv": "c33cb2758e5e34c2c23b7ab759d18681091860f3f9e5960112859f64f31cd814",
+   "treasury:treasury/daily_treasury_yield_curve_2023.csv": "edb7f3904e11dcaa502cdcc03ad9b1b16c893802d166ce9bc5fa1118251249d4",
+   "treasury:treasury/daily_treasury_yield_curve_2024.csv": "6775840b76cd7fd41121f61d6f6c60184eca6b2ba49954ec7372c463cbeef34d",
+   "treasury:treasury/daily_treasury_yield_curve_2025.csv": "cf2fa3da7f160384b63d2ead698532b1d76cd9f789ce4911e2304db85b14e6d5",
+   "treasury:treasury/daily_treasury_yield_curve_2026.csv": "b06702248327bb7aa652e3be1d104649bb7cce199bf04c176e4d62a9ff6803d8"
+  },
+  "Main_Commit": "8ed83c23c42566fe5d91364ba035f750c5754041",
+  "Manifest_SHA256": "310e84757cbb3d8f81450d7c6210f076635af4ea3f2676e75c02fa83e4df2769"
+ },
+ "First_Forward_Origin": {
+  "1D": "2026-10-22",
+  "1W": "2026-10-25",
+  "4W": "2026-10-25"
+ },
+ "Gate_Results": {
+  "Files_SHA256": {
+   "code_manifest.txt": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+   "code_sha256.txt": "2b36b525275df5f540b41e32e7b981c9ce9ed6e3bdcfda66fbfb8cdd90881f93",
+   "exits.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "freeze_gate_pre.json": "819fd891f25704cf924f7548f8e0e606dcfd84603bf2d7ee8b282905287c9268",
+   "g5_features_reconstruction.csv": "7a9d5cd099d1fd00eda540200ff3a843421bc1a939df552b980d6af22442c0ff",
+   "g5_summary.json": "e8a1c7b5116708775df49ae5e91f6e3070e4a7e12b7538c7212de40e73315bd9",
+   "g678_summary.json": "08f3254aa7ca3f8359a671f8b68487e1b4aa2924d64f230b57ef67485133c4d0",
+   "g6_records.jsonl": "f1ef603b4fcd3731fdd7456accb93d375b4735e7dd362de6495f25ebebfede20",
+   "gates_verdict.json": "68db717b9a0e4ef86214e9aa02e3b1d0062cb3b9c34064e6be0fc13b2556fc7d",
+   "manifest_gate.json": "3fd1ae4d0a8968b5f2e87e0b89951a82a92442f7c067aa71e40ebfee2cde7e14",
+   "run_class.txt": "2caaa3edd685a16e770cb17371f45b50fb1cb6d71d613a36d0f89f93fe854313",
+   "run_provenance.json": "c21674a10bd65a7c6ac83b44f4e9e2f084cf1d981fc0175f8ca641477c87f39f",
+   "source_commit.txt": "82493dc5eedd388f58181ddc44b2cdf6de74325c8f7555f6af2098d917eba4d7",
+   "suite.json": "a09324d852bcc8d20e57fc2752ca9b1732923ef63d5a2a82e81dd5a8f4fbd9c3"
+  },
+  "Gates_Run": {
+   "Run_Attempt": "1",
+   "Run_ID": "39291810501"
+  },
+  "Results_Branch": "m1macro-gates-results",
+  "Results_Commit": "f3c2b0abdc14dc912e2f33e40a729ca5f745ba32",
+  "Results_Dir": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+  "Results_Push": {
+   "Activity_ID": "47044332729",
+   "At_Server_UTC": "2026-10-19T18:57:00Z"
+  },
+  "Server_Evidence": {
+   "push": "VERIFIED",
+   "run": "VERIFIED"
+  }
+ },
+ "Image_Digest": "python@sha256:60d9996b6a8a3689d36db740b49f4327be3be09a21122bd02fb8895abb38b50d",
+ "Pre_Freeze_Gate": {
+  "a_first_utc": {
+   "1D": "2026-10-21T12:00:00Z",
+   "1W": "2026-10-24T12:00:00Z",
+   "4W": "2026-10-24T12:00:00Z"
+  },
+  "a_previous_utc": {
+   "1D": "2026-10-20T12:00:00Z",
+   "1W": "2026-10-17T12:00:00Z",
+   "4W": "2026-10-17T12:00:00Z"
+  },
+  "check_times_utc": [
+   "2026-10-20T12:07:19Z"
+  ],
+  "first_forward_origin": {
+   "1D": "2026-10-22",
+   "1W": "2026-10-25",
+   "4W": "2026-10-25"
+  },
+  "pass": true,
+  "previous_origin": {
+   "1D": "2026-10-21",
+   "1W": "2026-10-18",
+   "4W": "2026-10-18"
+  }
+ },
+ "Requirements_Lock_SHA256": "4a0a74d2c7f263a62c1f293d6d2b8b53a2f2c5a24912e8263f8dcbbadc06a51a",
+ "Run": {
+  "Run_Attempt": "1",
+  "Run_ID": "39419835148",
+  "Workflow": "m1macro-freeze-record"
+ },
+ "Spec": "M1-MACRO-IMPL-CODE-V1"
+}
