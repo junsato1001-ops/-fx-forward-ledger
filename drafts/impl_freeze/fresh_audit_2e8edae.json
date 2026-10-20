@@ -1,0 +1,18 @@
+{
+ "auditor_code": true,
+ "checkout_head": "2e8edaee13d578aecc67df003ded3d720b4fe5e9",
+ "code_sha256_auditor": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+ "code_sha256_record": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+ "gate_evidence": true,
+ "gate_server_evidence": {
+  "push": "VERIFIED",
+  "run": "VERIFIED"
+ },
+ "git_binding": true,
+ "mode": "WINDOW",
+ "pass": true,
+ "server_anchor": "VERIFIED",
+ "server_now_utc": "2026-10-20T12:09:11Z",
+ "three_files_final": true,
+ "write_once": true
+}
