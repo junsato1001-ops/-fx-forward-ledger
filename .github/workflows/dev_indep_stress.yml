@@ -1,0 +1,64 @@
+name: dev-indep-stress
+# Synthetic-only stress test of the independent implementation (IMPL-FINDINGS-05 F5-a). No real data, no secrets.
+# Not part of CODE_MANIFEST_V1 (file name outside m1macro_*.yml). Results -> branch m1macro-stress-results.
+on:
+  push:
+    branches: [m1macro-stress]
+permissions:
+  contents: write
+concurrency:
+  group: dev-indep-stress
+  cancel-in-progress: false
+env:
+  N_SHARDS: "20"
+  N_EPI: "30"
+  N_KEL: "4"                            # 80 Kelley cases (seeds 30000-30079, G 9000-15000)
+  STRESS_SEED_SET: "validation"         # 167 previously failing + 80 previously passing epigraph cases
+  STRESS_BETA_DIAG: "0"                 # every case: production solve + indep.compare (full §10 comparison)
+  STRESS_KEL_ORIGINS: "3000,5000"      # G 9000-15000 (real 1D sizes with the Kelley path)
+  STRESS_KEL_SEED0: "30000"
+jobs:
+  shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stress inside pinned image
+        run: |
+          set -eu; mkdir -p out
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          SEEDS=tools/m1macro_stress/${STRESS_SEED_SET:-rerun}_epi_seeds.txt
+          if [ -f "$SEEDS" ]; then export STRESS_EPI_SEEDS=$(cat "$SEEDS"); fi
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 -e OMP_NUM_THREADS=1 \
+            -e OPENBLAS_NUM_THREADS=1 -e MKL_NUM_THREADS=1 -e STRESS_EPI_SEEDS -e STRESS_KEL_ORIGINS -e STRESS_KEL_SEED0 -e STRESS_BETA_DIAG "$DIG" sh -c "
+              pip install -q --require-hashes -r env/requirements.lock &&
+              timeout 280m python -I tools/m1macro_stress/stress_indep.py out ${{ matrix.shard }} $N_SHARDS $N_EPI $N_KEL" \
+            > out/stdout_${{ matrix.shard }}.txt 2>&1 || echo "EXIT=$?" >> out/stdout_${{ matrix.shard }}.txt
+      - uses: actions/upload-artifact@v4
+        with: { name: "stress-${{ matrix.shard }}", path: out/, retention-days: 7 }
+  collect:
+    needs: [shard]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: arts }
+      - name: Publish
+        run: |
+          set -eu
+          SRC=$(git rev-parse HEAD)
+          mkdir -p res && cat arts/stress-*/stress_*.jsonl > res/stress.jsonl 2>/dev/null || true
+          tail -n 3 arts/stress-*/stdout_*.txt > res/stdout_tails.txt 2>/dev/null || true
+          echo "$SRC" > res/source_commit.txt
+          git fetch -q origin m1macro-stress-results || true
+          git checkout -q -B m1macro-stress-results origin/m1macro-stress-results 2>/dev/null || git checkout -q --orphan m1macro-stress-results
+          git rm -rq --cached . 2>/dev/null || true
+          mkdir -p "$SRC" && cp res/* "$SRC"/
+          git add "$SRC"
+          git -c user.name=junsato1001-ops -c user.email=junsato1001-ops@users.noreply.github.com commit -q -m "stress for $SRC"
+          git push -q origin m1macro-stress-results

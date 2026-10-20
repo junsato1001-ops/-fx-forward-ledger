@@ -1,0 +1,57 @@
+{
+ "config_version": "M1-MACRO-IMPL-CODE-V1-candidate-2",
+ "model": "M1-MACRO-V1",
+ "private_raw_storage": {
+  "Private_Repository": "junsato1001-ops/fx-ledger-private-raw",
+  "auth_secret_name": "PRIVATE_RAW_TOKEN",
+  "approved": "むすび 2026-10-17 17:14 JST (connectivity probe run 39016504914 PASS)"
+ },
+ "solver_constants": {
+  "EPS_TIE": 1e-13,
+  "LAMBDA_LEV": 0.3,
+  "BOX_B": 10.0,
+  "CAND_SIZES": [
+   8,
+   12,
+   16,
+   24
+  ],
+  "STAGE1_MAX": 3000,
+  "STAGE2_MAX": 100,
+  "LP_TOL": 1e-10
+ },
+ "pending": [],
+ "frozen_specs": {
+  "M1-MACRO-IMPL-PART1-V1.2": "705f1d49a0c2a2ba4088208014fd775a074cab90c588f2fc244d181ab7ac3bdf",
+  "M1-MACRO-IMPL-PART2-V1": "1789ff486b01ad27840bc596b053c5c58a52c7f679afd8d18f74525e30ba8756",
+  "M1-MACRO-IMPL-PART3-V1": "a6ea20968ec76cfdd485e1c55bda25d5d402f34212ed4cf5a8e68870e4d2a592",
+  "M1-MACRO-IMPL-PART4-V1": "f5b1571a006debe39a9000a29b3ac9dc1e6602e43c9025d811e76480a101f2ca"
+ },
+ "cftc_pre_tinfo_fetch_jst": [
+  "00:40",
+  "02:40"
+ ],
+ "cftc_snapshot_window_hours": 6,
+ "cftc_tls": {
+  "root_file": "certs/SectigoPublicServerAuthenticationRootR46.pem",
+  "root_sha256": "7bb647a62aeeac88bf257aa522d01ffea395e0ab45c73f93f65654ec38f25a06",
+  "root_subject": "C=GB, O=Sectigo Limited, CN=Sectigo Public Server Authentication Root R46",
+  "fingerprint_source": "Mozilla Bugzilla 1840432 (CA inclusion record) and runner trust store /etc/ssl/certs (dev run 39038301649)"
+ },
+ "cftc_columns": {
+  "contract_code": "CFTC_Contract_Market_Code",
+  "contract_code_value": "097741",
+  "report_date_candidates": [
+   "Report_Date_as_YYYY-MM-DD"
+  ],
+  "lev_long": "Lev_Money_Positions_Long_All",
+  "lev_short": "Lev_Money_Positions_Short_All",
+  "open_interest": "Open_Interest_All",
+  "status": "checked against the headers of fin_fut_txt_2006_2016.zip and fut_fin_txt_2017..2026.zip (dev runs 39038301649, 39038642316); 2006-2016 uses M/D/YYYY 12:00:00 AM dates and counts written as N.000000"
+ },
+ "first_forward_origin": {
+  "1D": "2026-10-22",
+  "1W": "2026-10-25",
+  "4W": "2026-10-25"
+ }
+}

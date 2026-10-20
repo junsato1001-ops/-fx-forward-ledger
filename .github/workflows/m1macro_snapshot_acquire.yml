@@ -1,0 +1,92 @@
+name: m1macro-dev-snapshot-acquire
+# One-time acquisition of the M1-MACRO development snapshot (Impl Part 1 V1.2 §6, Part 4 §4, §8).
+# Runs only on a push to branch m1macro-acquire. ONE-SHOT: the canonical snapshot was acquired by run 39045282957
+# (main 8ed83c2, private f424840); every later run fails closed at the guard below and never overwrites it. Treasury raw bytes go to the private repository only;
+# the public side gets MOF/CFTC raw files, the snapshot manifest and treasury_raw_manifest.csv rows.
+on:
+  push:
+    branches: [m1macro-acquire]
+permissions:
+  contents: write
+concurrency:
+  group: m1macro-snapshot-acquire
+  cancel-in-progress: false
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PRIVATE_REPO: junsato1001-ops/fx-ledger-private-raw
+      TOKEN: ${{ secrets.PRIVATE_RAW_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: One-shot guard (fail closed if the canonical snapshot already exists on main or in private storage)
+        run: |
+          set -eu
+          git fetch -q origin main
+          if git cat-file -e origin/main:data/m1macro/dev_snapshot/manifest.json 2>/dev/null; then
+            echo "CANONICAL_SNAPSHOT_EXISTS (main)"; exit 1
+          fi
+          [ -n "${TOKEN}" ] || { echo "SECRET_MISSING"; exit 1; }
+          git clone -q --depth 1 "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" guardpriv 2>/dev/null
+          if [ -e guardpriv/m1macro_dev_snapshot ]; then rm -rf guardpriv; echo "CANONICAL_SNAPSHOT_EXISTS (private)"; exit 1; fi
+          rm -rf guardpriv
+      - name: Fetch inside pinned image
+        run: |
+          set -eu
+          DIG=$(cat env/IMAGE_DIGEST); docker pull -q "$DIG" > /dev/null
+          mkdir -p acq
+          docker run --rm -v "$PWD":/w -w /w -e PYTHONHASHSEED=0 -e TZ=UTC -e LC_ALL=C.UTF-8 "$DIG" sh -c '
+            pip install -q --require-hashes -r env/requirements.lock && python -I m1macro/snapshot_acq.py acq acquire' > acq_stdout.txt 2>&1
+          tail -3 acq_stdout.txt
+      - name: Store Treasury raw in private repository (token never printed)
+        run: |
+          set -eu
+          [ -n "${TOKEN}" ] || { echo "SECRET_MISSING"; exit 1; }
+          git clone -q "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" priv 2>/dev/null
+          [ ! -e priv/m1macro_dev_snapshot ] || { echo "CANONICAL_SNAPSHOT_EXISTS (private)"; exit 1; }
+          mkdir -p priv/m1macro_dev_snapshot
+          cp -r acq/private/treasury priv/m1macro_dev_snapshot/
+          cd priv
+          git config user.name "junsato1001-ops"; git config user.email "junsato1001-ops@users.noreply.github.com"
+          git add m1macro_dev_snapshot && git commit -q -m "M1-MACRO development snapshot: Treasury raw (run ${GITHUB_RUN_ID})"
+          git push -q origin HEAD:main 2>/dev/null
+          git rev-parse HEAD > ../acq/private_commit.txt
+          cd .. && rm -rf priv
+          git clone -q "https://x-access-token:${TOKEN}@github.com/${PRIVATE_REPO}.git" priv2 2>/dev/null
+          python3 - <<'P'
+          import hashlib, json, pathlib
+          m = json.loads(pathlib.Path("acq/dev_snapshot_manifest.json").read_text())
+          for f in m["files"]:
+              if f["source"] == "treasury":
+                  b = pathlib.Path("priv2/m1macro_dev_snapshot", f["path"]).read_bytes()
+                  assert hashlib.sha256(b).hexdigest() == f["sha256"], "PRIVATE_READBACK_MISMATCH"
+          print("private readback OK")
+          P
+          rm -rf priv2
+      - name: Record public side (MOF/CFTC raw, manifests) on main
+        run: |
+          set -eu
+          PC=$(cat acq/private_commit.txt)
+          D=data/m1macro/dev_snapshot
+          git fetch -q origin main && git checkout -q -B main origin/main
+          mkdir -p $D && cp -r acq/public/* $D/ && cp acq/dev_snapshot_manifest.json $D/manifest.json
+          python3 - "$PC" <<'P'
+          import csv, json, pathlib, sys
+          pc = sys.argv[1]; m = json.loads(pathlib.Path("acq/dev_snapshot_manifest.json").read_text())
+          p = pathlib.Path("data/m1macro/treasury_raw_manifest.csv"); new = not p.exists()
+          with open(p, "a", newline="", encoding="utf-8") as f:
+              w = csv.writer(f, lineterminator="\n")
+              if new:
+                  w.writerow(["Retrieved_At_UTC", "Source_URL", "Byte_Count", "SHA256", "Private_Repository", "Private_Path", "Private_Commit"])
+              for x in m["files"]:
+                  if x["source"] == "treasury":
+                      w.writerow([x["retrieved_at_utc"], x["url"], x["bytes"], x["sha256"], "junsato1001-ops/fx-ledger-private-raw",
+                                  "m1macro_dev_snapshot/" + x["path"], pc])
+          P
+          git config user.name "junsato1001-ops"; git config user.email "junsato1001-ops@users.noreply.github.com"
+          git add data/m1macro
+          git commit -q -m "data: M1-MACRO development snapshot (MOF/CFTC raw, manifests; Treasury raw in private storage ${PC})"
+          for i in 1 2 3 4 5; do git push -q origin HEAD:main && break; git pull -q --rebase origin main; done
+          git log --oneline -1
