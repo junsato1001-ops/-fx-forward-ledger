@@ -1,0 +1,80 @@
+{
+ "Record": "M1-MACRO-V1-SEAL-OPENING",
+ "Model": "M1-MACRO-V1",
+ "Basis": {
+  "Spec": "M1-MACRO-IMPL-PART4-V1 §6.1 step 3",
+  "Spec_SHA256": "f5b1571a006debe39a9000a29b3ac9dc1e6602e43c9025d811e76480a101f2ca"
+ },
+ "Implementation_Freeze": {
+  "Record_Path": "preregistration/M1-MACRO-IMPL-CODE-V1.freeze.json",
+  "Record_SHA256": "bb18b3f36da000a74f216495cdbe7a6eef5ed8a07c4f25604a3acb48103e2b75",
+  "Record_Commit": "6a90d1d55deed97140edf882cc7f1cc15409284d",
+  "Marker_Commit": "07bdae9bea8da51db80a77b95928ce9f73eb4731",
+  "Audit_Commit": "93e90b7ed83c0f171c3536113b9198064ca4f298",
+  "Freeze_Run": {
+   "Run_ID": "39419835148",
+   "Run_Attempt": "1",
+   "Workflow": ".github/workflows/m1macro_freeze_record.yml"
+  },
+  "Freeze_Status": "FINAL",
+  "Marker_Push_Activity_ID": "47126707625",
+  "Marker_Push_At_Server_UTC": "2026-10-20T12:07:23Z",
+  "Code_SHA256": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+  "Candidate_Commit": "bdf1bfe9a089240083670eb5315dab892794275a",
+  "Main_Integration_Commit": "2e8edaee13d578aecc67df003ded3d720b4fe5e9",
+  "First_Forward_Origin": {
+   "1D": "2026-10-22",
+   "1W": "2026-10-25",
+   "4W": "2026-10-25"
+  },
+  "Fresh_Audit": {
+   "Path": "drafts/impl_freeze/fresh_audit_2e8edae.json",
+   "Git_Blob": "fdd3c3c4a964a392ddb7ebabf9e5007631fbd141",
+   "Mode": "WINDOW",
+   "Pass": true
+  },
+  "Close": {
+   "By": "むすび",
+   "At_JST": "2026-10-21 01:47",
+   "Judgement": "IMPL-FINDINGS-14 = PASS; M1-MACRO-V1 Implementation Freeze = PASS / CLOSE",
+   "Report": "drafts/IMPL-FINDINGS-14.md",
+   "Report_Git_Blob": "5372937c5b1bb523d20083f0cc891497a7ffd2be"
+  }
+ },
+ "Gate_Results_Part4_Section5": {
+  "Formal_Run": {
+   "Run_ID": "39291810501",
+   "Run_Attempt": "1",
+   "Workflow": ".github/workflows/m1macro_gates.yml",
+   "Branch": "m1macro-gates"
+  },
+  "Results_Branch": "m1macro-gates-results",
+  "Results_Commit": "f3c2b0abdc14dc912e2f33e40a729ca5f745ba32",
+  "Results_Dir": "d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4",
+  "Gates_Verdict_SHA256": "68db717b9a0e4ef86214e9aa02e3b1d0062cb3b9c34064e6be0fc13b2556fc7d",
+  "All_Pass": true,
+  "Audit": {
+   "Report": "drafts/IMPL-FINDINGS-13.md",
+   "Report_Git_Blob": "fb70ad2d1c4b5a7999815497b04b07a6bd389ab5",
+   "Judgement": "むすび 2026-10-20 18:14 JST: IMPL-FINDINGS-13 = PASS"
+  },
+  "Superseded_Candidate_1": {
+   "Formal_Run": "39196332834",
+   "Results_Commit": "234accb87ba890caa454ef9abf64e38e0a4fcf9f",
+   "Status": "PASS, but superseded before Freeze by F11-a implementation correction; not evidence for this Freeze"
+  }
+ },
+ "Opening": {
+  "Opening_At": "the GitHub server push time of the commit that adds this file to main (activity API, refs/heads/main)",
+  "Effective_When": "むすび's audit of this record and its commit PASSes; until then the Performance Seal stays INTACT",
+  "Opens": "Part 4 §6.2 development replay only: all historical (t, h) computed with the frozen code (Code_SHA256 above) and the one-shot development snapshot; written under replay/ only, every row Evidence_Class = DEVELOPMENT_REPLAY; descriptive and diagnostic use only",
+  "Does_Not_Open": [
+   "Historical Reserve Holdout (RFX-HOLDOUT-A-V1): the 5 holdout pairs stay SEALED and are not computed",
+   "ledger/ (Forward): replay rows are never written there; confirmatory evaluation reads only COMPLETE and ON_TIME ledger rows from the first Forward Origin (EVAL-SPEC-V1 §5.5)"
+  ],
+  "Binding_Rules": [
+   "Replay results never change M1-MACRO-V1's specification, code, config or first Forward Origin (Part 4 §6.2); ideas from the replay feed only a new Version (another Trial)",
+   "Development-period performance is not confirmatory evidence (EVAL-SPEC-V1)"
+  ]
+ }
+}
