@@ -1,0 +1,2 @@
+Origin,Horizon,Parameter_State,N_Warmup,N_Groups,N_Gap_Origins,N_Excluded_Zero_Scale,E_Input_SHA256,Beta_US,Beta_JP,Beta_POS,Solver_Status,Solver_Subreason,Stage1_Iterations,Stage2_Iterations,UB_minus_LB,Phi_beta2_minus_LB,J_Star,Code_SHA256,Run_ID
+2026-10-22,1D,NOT_EVALUATED,3915,11745,7,0,cdea8db29b7163e1cb7aab79877a242a1147841d856f0fc001d64529ff0c224b,,,,,,,,,,,d3c77ebabcb510462373525281bb8adb321ff5035a030bf89307521980a677d4,39689057756-1
