@@ -2,8 +2,8 @@
 
 - 状態: **DRAFT v0.7 — Requirements Freeze Candidate FINAL**(Claude、2026-10-26)。むすびさんの確認待ち。**まだ Freeze していない。** むすびさんの最終監査(v0.6)で、この 3 点が正しく統合されれば Requirements 側に Freeze を妨げる未決事項はない、とされた。
 - 前の版: v0(blob ede24e7e…)、v0.1(blob b7e4aa92…)、v0.2(blob b2e3a9d4…)、v0.3(blob 7212a97b…)、v0.4(blob 1a698237…)、v0.5(blob 3368b461…)、v0.6(blob 597e0a03…)。どれも書き換えずに残してある。
-- v0.6 からの変更: むすびさんの最終監査(2026-10-26 16:02 JST、v0.6 = FREEZE CANDIDATE REVIEW PASS WITH 3 CLOSURE FIXES)の 3 点だけを統合した。**新しい設計は加えていない。**
-  1. **Issuance_Adjudication_Time = 08:45:00 JST**。08:15 の S0 cutoff → 08:30 の issuance deadline → 08:45 の adjudication。08:45 に 1 回だけ判定し、append-only で確定する。08:45 の時点で V1 の server 側の証拠を得られず、S0 が 08:15 までにあったかを判定できなければ **ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL**(分母から除かない)(§6.5、§7.5)。
+- v0.6 からの変更: むすびさんの最終監査(2026-10-26 16:02 JST、v0.6 = FREEZE CANDIDATE REVIEW PASS WITH 3 CLOSURE FIXES)の 3 点と、その後の adjudication の決定(2026-10-26 16:06 JST)を統合した。**新しい設計は加えていない。** この版の最初の commit(blob c3e66a00…)は書き換えずに残してあり、この内容は同じファイルへの追加の commit である。
+  1. **Issuance_Adjudication_Time = 08:45:00 JST は adjudication を開始できる時刻、Adjudication_Deadline = 09:15:00 JST**。時系列は 08:15 S0 Eligibility Cutoff → 08:30 Issuance Deadline → 08:45 Adjudication opens → 09:15 Adjudication Deadline。adjudication の job は A・C の両経路から起動でき、idempotent で、最初に正式に COMPLETE したものだけが canonical。09:15 までに canonical な adjudication が COMPLETE しなければ **ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → Issuance Gate FAIL**。判定のときに V1 の server 側の証拠を得られず判定できなければ **ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL**(分母から除かない)(§6.5、§7.5)。
   2. **Issuance の単位 = (Origin, Horizon)**。Reliability の単位は Origin / T_info の窓のまま。各 unit が Issuance-Eligible になるには、その Horizon の USDJPY・CHFJPY・INRJPY の 3 ペアすべての正式の S0 の親が 08:15 までにそろい、検証に PASS していることを要する。「Eligible の窓」を **Issuance-Eligible Unit** に改めた(§6.5、§7.5)。
   3. **Issuance の ON_TIME は V1 Part 4 の Verified_At_UTC 規則をそのまま継承する。** TSA による時計の検査を発行の締め切りに適用しないことを、**意図した非対称性**として明記した(§4.1)。
 - v0.6 までの変更の経緯は、前の版の冒頭を参照。
@@ -243,19 +243,20 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 
 **状態遷移(決定)**
 
-通常の 60 窓に属する Issuance の unit u = (Origin, Horizon) のそれぞれは、08:45:00 JST の adjudication(§7.5)で、次のどれか 1 つに必ず落ちる。
+通常の 60 窓に属する Issuance の unit u = (Origin, Horizon) のそれぞれは、canonical な adjudication(§7.5。08:45 から開始でき、09:15 が期限)で、次のどれか 1 つに必ず落ちる。
 
 | acquisition state(03:15 の Decision_Time) | S0 の親(その Horizon の 3 ペア、08:15:00 JST まで) | Reliability Gate への寄与(窓ごと) | Issuance Gate での扱い(unit ごと) |
 |---|---|---|---|
 | FAILURE(原因コードは §6.3) | (問わない) | **FAILURE 1 個** | **N/A**(分母に入れない) |
 | SUCCESS | 3 ペアすべてそろい、検証に PASS(§7.5) | SUCCESS | **評価する**(Issuance-Eligible Unit) |
 | SUCCESS | そろっていない、または検証に PASS していないことが、server 側の証拠で確定した | SUCCESS | **PARENT_NOT_READY_BY_CUTOFF**。N/A(分母に入れない。件数は必ず記録して報告する) |
-| SUCCESS | 08:45 の時点で server 側の証拠を得られず、**判定できない** | SUCCESS | **ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL**(分母から除かない) |
+| SUCCESS | adjudication のときに server 側の証拠を得られず、**判定できない** | SUCCESS | **ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL**(分母から除かない) |
+| SUCCESS | 09:15:00 JST までに canonical な adjudication が COMPLETE しなかった | SUCCESS | **ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → Issuance Gate FAIL**(分母から除かない) |
 
 - Reliability Gate の分母は、**通常の 60 窓すべて**である。NO_ACQUISITION などの FAILURE も分母に入る(§7.2)。
 - Issuance Gate の分母は、**通常の 60 窓に属する unit のうち、Issuance-Eligible Unit だけ**である(§7.5)。
 - ELIGIBILITY_UNDETERMINED を分母から落とすと、API の障害などで「親があったか分からない unit」を除外できてしまい、Gate の抜け道になる。そのため、除外せずに FAIL とする。
-- 03:15 の Decision_Time と 08:45 の adjudication は、完全に別のものである。03:15 は acquisition state だけを確定し、08:45 は issuance の eligibility と結果を確定する。
+- 03:15 の Decision_Time と 08:45〜09:15 の adjudication は、完全に別のものである。03:15 は acquisition state だけを確定し、adjudication は issuance の eligibility と結果を確定する。
 - この表は試験の前に固定し、試験の途中や後で分母の定義を変えない。
 - 強制 failover の 4 窓は、どちらの Gate の分母にも入らない(§7.4)。その窓の発行の結果は記録だけする。
 
@@ -306,12 +307,21 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 **時刻の役割(決定)**
 
 ```
-08:15:00 JST  S0 cutoff                 親が間に合ったか
-08:30:00 JST  issuance deadline          V2 の発行が間に合ったか(V1 Part 4 の Verified_At_UTC 規則)
-08:45:00 JST  Issuance_Adjudication_Time その事実を確定して記録する監査の時刻
+08:15:00 JST  S0 Eligibility Cutoff                       親が間に合ったか
+08:30:00 JST  Issuance Deadline                          V2 の発行が間に合ったか(V1 Part 4 の Verified_At_UTC 規則)
+08:45:00 JST  Issuance_Adjudication_Time(Adjudication opens) 判定の対象となる証拠の cutoff が確定し、adjudication を開始できる時刻
+09:15:00 JST  Adjudication_Deadline                      canonical な adjudication が COMPLETE していなければならない期限
 ```
 
-- 08:45:00 JST に **1 回だけ**判定し、結果は append-only で確定する。その後に V1 の側に遅れて S0 が現れても、過去の判定は変えない。
+**adjudication の実行(決定)**
+
+- **Issuance_Adjudication_Time = 08:45:00 JST は、cron の実行の開始時刻ではない。** 判定の対象となる証拠の cutoff(08:15、08:30)が確定したあとで、adjudication を開始できるようになる時刻である。08:45 より前に始まった adjudication は無効とする。
+- adjudication の job は、**A と C の両方の経路から起動できる**ようにする。08:45 の A が遅れても、C が起動できる。adjudication を GitHub の定時実行 1 本に依存させない(F14-a と同じ種類の単一障害点を最後に残さないため)。
+- **idempotent**: 各 adjudication は、始めに同じ Origin の正式に COMPLETE した adjudication がすでにあるかを確かめ、あれば ALREADY_COMPLETE として何も書かずに終わる。**最初に正式に COMPLETE した adjudication だけを canonical とする。** 書き込みの手順は §4.4 の発行の transaction と同じ考え方(COMPLETE の追記と読み戻し、競合した場合は取り込み直して確かめ直す)で行う。
+- **Adjudication_Deadline = 09:15:00 JST。** 09:15 までに canonical な adjudication が COMPLETE しなければ、その Origin の unit はすべて **ADJUDICATION_NOT_COMPLETED_BY_DEADLINE** とし、**Issuance Gate は FAIL** とする。
+- 09:15 より後に起動した adjudication が監査の記録を残すことは構わない。ただし、その記録で formal な Gate を後から PASS に救済してはならない。これは 03:15 の Decision_Time の「後から証拠が現れても救済しない」原則(§6.4)と同じである。
+- canonical な adjudication の結果は append-only で確定する。その後に V1 の側に遅れて S0 が現れても、過去の判定は変えない。
+- **(Claude の補足。むすびさんの確認が必要)「09:15 までに COMPLETE した」の判定に使う時刻**: canonical な adjudication の COMPLETE の記録を含む V2 の commit が V2 の main に入ったことを示す、V2 の repository の activity API の記録の timestamp を使う(§9.2 の G と同じ手順。commit の author / committer の日時と runner の時計は使わない)。adjudication は V1 にない新しい段階なので V1 との互換性の制約がなく、運用の障害を隠せないようにするという目的には、server 側の時刻が合うためである。
 
 **Issuance-Eligible Unit の定義(決定)**
 
@@ -324,14 +334,14 @@ Issuance-Eligible(Origin, Horizon)
 ```
 
 - **Eligibility の cutoff は 08:15:00 JST**(最後の attempt の 08:20 ではない)。08:20 に S0 が使えるようになって 08:20 の attempt と競合する、という曖昧さを消すためである。
-- 「server 側の証拠の上で使えるようになった時刻」は、G と同じ考え方で決める。S0 の親の行を含む V1 の commit が V1 の main に入ったことを示す V1 の repository の activity API の記録の timestamp を、08:45 の adjudication の時点で API に直接問い合わせて確かめる(§9.2 の手順と同じ。commit の author / committer の日時は使わない)。
-- 08:45 の時点で、この server 側の証拠を得られず判定できなければ、その unit は **ELIGIBILITY_UNDETERMINED** とし、**Issuance Gate は FAIL** とする(§6.5)。
+- 「server 側の証拠の上で使えるようになった時刻」は、G と同じ考え方で決める。S0 の親の行を含む V1 の commit が V1 の main に入ったことを示す V1 の repository の activity API の記録の timestamp を、adjudication の実行の中で API に直接問い合わせて確かめる(§9.2 の手順と同じ。commit の author / committer の日時は使わない)。
+- adjudication の実行の中で、この server 側の証拠を得られず判定できなければ、その unit は **ELIGIBILITY_UNDETERMINED** とし、**Issuance Gate は FAIL** とする(§6.5)。
 
 **合格の条件**
 
 - **すべての Issuance-Eligible Unit の 100% で、V2 の発行が COMPLETE かつ ON_TIME であること。**
 - Issuance-Eligible Unit で、V2 の側の理由で未発行・不完全・締め切り超過が **1 件でもあれば、Issuance Gate は FAIL**。
-- ELIGIBILITY_UNDETERMINED の unit が **1 件でもあれば、Issuance Gate は FAIL**。
+- ELIGIBILITY_UNDETERMINED または ADJUDICATION_NOT_COMPLETED_BY_DEADLINE の unit が **1 件でもあれば、Issuance Gate は FAIL**。
 - 08:15:00 JST までに S0 の親(3 ペア)がそろわなかったことが server 側の証拠で確定した unit は **PARENT_NOT_READY_BY_CUTOFF** とし、分母から除く。ただし必ず記録し、件数を報告する。これは V2 の失敗を隠すための欠測の処理ではなく、V2 が制御できない範囲を、事前の規則で分けるものである。
 - **Issuance-Eligible Unit が 0 件なら、PASS にしない。INSUFFICIENT_ISSUANCE_EVIDENCE とする。**
 
@@ -365,7 +375,7 @@ Issuance-Eligible(Origin, Horizon)
 | 24 | 発行の attempt schedule | 決定: §4.4 の 10 時刻。A・C の両経路から起動可能。idempotent(ALREADY_COMPLETE)。二重の発行なし |
 | 25 | S0 の親の読み方 | 決定: §4.3。read-only、V1 の commit SHA を記録、検証を V2 で再実行。V1 への書き込みの権限を持たない |
 | 26 | Issuance Gate | 決定: §7.5。cutoff 08:15:00 JST、すべての Issuance-Eligible Unit で 100% COMPLETE かつ ON_TIME、0 件なら INSUFFICIENT_ISSUANCE_EVIDENCE |
-| 29 | Issuance_Adjudication_Time | 決定: 08:45:00 JST に 1 回だけ判定、append-only。判定できなければ ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL |
+| 29 | adjudication | 決定: 08:45:00 JST に開始可能、Adjudication_Deadline = 09:15:00 JST。A・C の両経路から起動可能、idempotent、最初に正式に COMPLETE したものが canonical、append-only。09:15 までに COMPLETE しなければ ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → FAIL。判定できなければ ELIGIBILITY_UNDETERMINED → FAIL。09:15 以後の実行は監査の記録だけで、救済しない |
 | 30 | Issuance の単位 | 決定: (Origin, Horizon)。その Horizon の 3 ペアすべての S0 の親が必要。Reliability の単位は Origin / T_info の窓 |
 | 31 | Issuance の ON_TIME の時計 | 決定: V1 Part 4 の Verified_At_UTC 規則を継承。TSA の検査は適用しない(意図した非対称性。§4.1) |
 | 27 | 分母の分離 | 決定: §6.5 の状態遷移 |
@@ -594,6 +604,7 @@ Retrieved_At_Runner ≤ Server_Anchored_At + ε
 
 ## 11. Freeze に向けた状態
 
-- むすびさんの v0.6 の最終監査で残った 3 点(Issuance_Adjudication_Time、Issuance の単位、ON_TIME の時計)は、この版で本文に統合した(§4.1、§6.5、§7.5、§8 の 29〜31)。
+- むすびさんの v0.6 の最終監査で残った 3 点(Issuance_Adjudication_Time、Issuance の単位、ON_TIME の時計)と、adjudication の開始可能時刻・期限・冗長な起動(2026-10-26 16:06 JST の決定)は、この版で本文に統合した(§4.1、§6.5、§7.5、§8 の 29〜31)。
+- 確認が残るのは、§7.5 の「(Claude の補足。むすびさんの確認が必要)」と書いた 1 点(Adjudication_Deadline の判定に使う時刻)だけである。
 - むすびさんの最終監査の結果によれば、この 3 点が正しく統合されれば、Requirements 側に Freeze を妨げる未決事項はない。
 - 現在の状態: V1 = FREEZE / PASS / CLOSE のまま変更なし。Development Replay = NOT STARTED。Historical Reserve Holdout = SEALED。V2 の試験 = 未開始(較正も未開始)。
