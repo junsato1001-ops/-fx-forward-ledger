@@ -1,0 +1,24 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5.md",
+  "sha256": "c63a092725860a02af8bddffb458c59575bf02c38a8a98f74c148853a960cde5",
+  "git_blob_sha1": "101f7cd49ec5e2991230faf084deb3e03785290a",
+  "freeze_source": "drafts/M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5.draft.md at commit 7814019cfad5a17d3832ef008bac816429a59f5f (byte-identical copy)",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-27 01:19 JST (v0.5 retrieved independently from GitHub at the freeze-source commit; 0 unresolved findings)",
+  "verification_chain": [
+    "むすび retrieved the file from GitHub at commit 7814019cfad5a17d3832ef008bac816429a59f5f and confirmed Git blob 101f7cd49ec5e2991230faf084deb3e03785290a. むすび compared edd598e4 -> 7814019c on GitHub (1 commit ahead, 1 added file, 473 additions / 0 deletions). SHA-256 was not recomputed by むすび (the connector returns the blob SHA only); the SHA-256 is recorded as Claude's declared value.",
+    "Claude copied the bytes from the freeze-source commit 7814019cfad5a17d3832ef008bac816429a59f5f and computed both identifiers of the same bytes (blob 101f7cd49ec5e2991230faf084deb3e03785290a, SHA-256 c63a092725860a02af8bddffb458c59575bf02c38a8a98f74c148853a960cde5)."
+  ],
+  "requirements_basis": "M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7 (SHA-256 edf27751a04fdff06dee5a65a6926ae052e96d52d994ac0743c31d4ce1de8326, Freeze commit b2571b7971cbc4ef62ab7cdbbaaa4879489a44e2); unchanged by this freeze",
+  "review_history": "v0 76b0b6be -> v0.1 d63a7862 -> v0.2 ce268470 -> v0.3 5731cb26 -> v0.4 f3f51793 -> v0.5 101f7cd4 (frozen). All earlier versions are kept unchanged in drafts/ and git history.",
+  "note_on_text": "The frozen text still carries its candidate header (DRAFT v0.5 / Freeze Candidate, not yet frozen). This record, not the header, states the frozen status.",
+  "findings": "F-P1-1 ACCEPT/CLOSE (Source_Year from Target_Origin via narrow/broad candidate agreement; UNDETERMINED otherwise); F-P1-2 ACCEPT (microsecond Retrieved_At_Runner, no truncation); F-P1-3 V1-equivalent; F-P1-4 ACCEPT (late diagnostic attempt max 1 per Target_Origin x path, never USABLE); F-P1-5 TSA-measured decision start; F-P1-6 REVISE applied (failover stops acquisition trigger, acquisition and decision trigger of the stopped path); F-P1-7 ACCEPT/CLOSE (Retrieved_At_Runner -> max Content_SHA256 -> max Manifest_SHA256); F-P1-8 byte-identical copies of V1 frozen modules checked against CODE_MANIFEST_V1; F-P1-9 ACCEPT (previous accepted dates within the same Source_Year); F-P1-10 V1 OPERATIONAL FINDING recorded as OPS-FORWARD-03 (AUDIT PASS / PREREGISTRATION ACCEPTED); F-P1-11 known limitation (GitHub storage dependency remains for C2); F-P1-12 PASS/CLOSE (Evidence_Cutoff = Decision_Time = 03:15 JST, Acquisition_Decision_Deadline = 03:20 JST, inclusion by main_entry_time only, UNRESOLVED -> no COMPLETE after 03:19).",
+  "scope_of_this_freeze": "Implementation Spec Part 1 (Acquisition / Trigger) only. Not a V2 implementation freeze or acceptance PASS. C2 is a Preferred Architecture Candidate, not frozen.",
+  "prerequisites_before_implementation_freeze": "Fixtures FX-Y1..FX-Y9 re-run and PASS in the V1 pinned tzdata environment (FX-Y9: 5,761 / 0 / 4); C2 provider selection and per-path calibration; Part 2 (Provenance / Clock / Anchor, including main_entry_time as a deterministic function), Part 3 (Parent / Issuance), Part 4 (Adjudication / Acceptance / Audit).",
+  "next_phase": "Implementation Spec Part 2 — Provenance / Clock / Anchor.",
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (no V1 workflow, code, config, data or ledger touched; preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED",
+  "v2_calibration_and_test": "NOT STARTED"
+}
