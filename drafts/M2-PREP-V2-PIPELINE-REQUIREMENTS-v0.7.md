@@ -2,10 +2,13 @@
 
 - 状態: **DRAFT v0.7 — Requirements Freeze Candidate FINAL**(Claude、2026-10-26)。むすびさんの確認待ち。**まだ Freeze していない。** むすびさんの最終監査(v0.6)で、この 3 点が正しく統合されれば Requirements 側に Freeze を妨げる未決事項はない、とされた。
 - 前の版: v0(blob ede24e7e…)、v0.1(blob b7e4aa92…)、v0.2(blob b2e3a9d4…)、v0.3(blob 7212a97b…)、v0.4(blob 1a698237…)、v0.5(blob 3368b461…)、v0.6(blob 597e0a03…)。どれも書き換えずに残してある。
-- v0.6 からの変更: むすびさんの最終監査(2026-10-26 16:02 JST、v0.6 = FREEZE CANDIDATE REVIEW PASS WITH 3 CLOSURE FIXES)の 3 点と、その後の adjudication の決定(2026-10-26 16:06 JST)を統合した。**新しい設計は加えていない。** この版の最初の commit(blob c3e66a00…)は書き換えずに残してあり、この内容は同じファイルへの追加の commit である。
+- v0.6 からの変更: むすびさんの最終監査(2026-10-26 16:02 JST、v0.6 = FREEZE CANDIDATE REVIEW PASS WITH 3 CLOSURE FIXES)の 3 点と、その後の adjudication の決定(2026-10-26 16:06 JST)と、Freeze 直前の 2 点の closure(2026-10-26 16:28 JST)を統合した。**新しい設計は加えていない。** この版の最初の commit(blob c3e66a00…)は書き換えずに残してあり、この内容は同じファイルへの追加の commit である。
   1. **Issuance_Adjudication_Time = 08:45:00 JST は adjudication を開始できる時刻、Adjudication_Deadline = 09:15:00 JST**。時系列は 08:15 S0 Eligibility Cutoff → 08:30 Issuance Deadline → 08:45 Adjudication opens → 09:15 Adjudication Deadline。adjudication の job は A・C の両経路から起動でき、idempotent で、最初に正式に COMPLETE したものだけが canonical。09:15 までに canonical な adjudication が COMPLETE しなければ **ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → Issuance Gate FAIL**。判定のときに V1 の server 側の証拠を得られず判定できなければ **ELIGIBILITY_UNDETERMINED → Issuance Gate FAIL**(分母から除かない)(§6.5、§7.5)。
   2. **Issuance の単位 = (Origin, Horizon)**。Reliability の単位は Origin / T_info の窓のまま。各 unit が Issuance-Eligible になるには、その Horizon の USDJPY・CHFJPY・INRJPY の 3 ペアすべての正式の S0 の親が 08:15 までにそろい、検証に PASS していることを要する。「Eligible の窓」を **Issuance-Eligible Unit** に改めた(§6.5、§7.5)。
   3. **Issuance の ON_TIME は V1 Part 4 の Verified_At_UTC 規則をそのまま継承する。** TSA による時計の検査を発行の締め切りに適用しないことを、**意図した非対称性**として明記した(§4.1)。
+  4. **Adjudication_Completed_At** は、V2 の repository の activity API の server 側の timestamp で判定する(§7.5)。
+  5. **Decision_Time = 03:15 JST は acquisition の判定を開始できる時刻、Acquisition_Decision_Deadline = 03:20:00 JST**。判定の job は A・C の両経路から起動でき、idempotent で、最初に正式に COMPLETE したものだけが canonical。COMPLETE の時刻は V2 の activity API の server 側の timestamp で判定する。03:20 までに COMPLETE しなければ UNDETERMINED → Reliability FAILURE。03:20 以後の実行は監査の記録だけで、救済しない(§6.4)。
+  6. §8 の番号を、内容を変えずに 1〜31 の昇順に並べ直した。
 - v0.6 までの変更の経緯は、前の版の冒頭を参照。
 - 根拠: OPS-FORWARD-01(blob 17b02eae…)、OPS-FORWARD-02(blob 052251bc…)、F14-a(V2 PIPELINE-DESIGN FINDING / CONFIRMED)、F8-a・F11-a(Freeze の記録で使った activity API の照合と、その落とし穴)。
 - このメモではしないこと: V1 の workflow・code・config の変更、V2 の本番取得、Development Replay、Holdout の計算。
@@ -116,21 +119,21 @@ R:  timestamp token の messageImprint → Manifest_SHA256 → manifest のバ�
 ```
 
 - δ = 300 秒、**ε = 6.0 秒**(§10.6)。どちらも決定。
-- (1)〜(6) は、すべて Decision_Time(§6.4)の時点で判定する。G が (4) の有効な anchor に入るのは、Decision_Time までに GitHub の API に直接問い合わせて検証できた場合だけである(§9.2)。
+- (1)〜(6) は、すべて canonical な acquisition decision(§6.4。03:15 から開始でき、03:20 が期限)で判定する。G が (4) の有効な anchor に入るのは、canonical な acquisition decision の実行の中で(Acquisition_Decision_Deadline の 03:20 までに) GitHub の API に直接問い合わせて検証できた場合だけである(§9.2)。
 - (3) は v0.2 の `Retrieved_At_Runner ∈ (T_info − 6h, T_info]` を、時計の不確かさの分だけ内側に狭めたものである。e_lo = e_hi = 0 なら v0.2 と一致する。
 
 ## 4. 対象にする orchestration
 
 ```
-CFTC acquisition → [Decision_Time: acquisition state を確定] → feature readiness → S0 parent readiness → M1 issuance
+CFTC acquisition → [03:15〜03:20: acquisition state を確定] → feature readiness → S0 parent readiness → M1 issuance
 ```
 
 S0 のモデルは変えない。対象は、この順に行う運用の仕組みである。
 
 ### 4.1 acquisition の判定と発行を分ける(決定)
 
-- Decision_Time(= T_info + 15 分、通常は 03:15 JST)に、その Origin の **acquisition state を不可逆に確定する**(§6.4)。
-- M1 の issuance orchestration は、Decision_Time の**後に**始める。
+- canonical な acquisition decision(Decision_Time = T_info + 15 分、通常 03:15 JST から開始でき、Acquisition_Decision_Deadline = T_info + 20 分、通常 03:20 JST が期限)で、その Origin の **acquisition state を不可逆に確定する**(§6.4)。
+- M1 の issuance orchestration は、Acquisition_Decision_Deadline の 03:20 から始まる(最初の attempt が 03:20)。発行の attempt は、canonical な acquisition decision が SUCCESS で COMPLETE していることを確かめてから進む。
 - 発行には、確定した acquisition state に加えて、**feature readiness と S0 parent readiness** が必要である。
 - 発行は、単一の固定の時刻ではなく、**固定の attempt schedule と最終の deadline** で行う。最終の deadline は既存どおり **08:30 JST**(V1 の Part 3・Part 4 と同じ。締め切りの判定は V1 Part 4 §3 の Verified_At_UTC ≤ 08:30 JST の規則をそのまま引き継ぐ)。
 - **意図した非対称性(決定)**: acquisition の provenance では、TSA による runner の時計の検査を要求する(§10)。一方、Issuance の ON_TIME は V1 との互換性を優先し、V1 Part 4 の Verified_At_UTC の規則を継承する。この非対称性は既知の設計上の性質であり、V2 では変更しない。V2 の目的は F14-a を起点とした pipeline の再設計であって、発行の締め切りの意味そのものを定義し直すことではないからである。
@@ -220,17 +223,34 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 - FAILURE の窓には、原因コードを記録する。
   - w に属する取得が 1 つもない: **NO_ACQUISITION**
   - 取得はあるが USABLE がない: 検査の順で**最も先まで進んだ取得**のコードを主な原因とする。同じ段階で止まった取得が複数あれば、Retrieved_At_Runner が最も遅いものを採る。ほかの取得のコードも、すべて残す。
-  - Decision_Time までに判定が終わらなかった(検証の job が動かなかった、など): **UNDETERMINED**(決定)。これも FAILURE とする。「判定できなかった」を分母から外すと、pipeline の障害を後から欠測として扱えてしまうからである。
+  - Acquisition_Decision_Deadline(03:20)までに canonical な acquisition decision が COMPLETE しなかった(判定の job が動かなかった、など): **UNDETERMINED**(決定)。これも FAILURE とする。「判定できなかった」を分母から外すと、pipeline の障害を後から欠測として扱えてしまうからである。
 - **原因コードは分類のためのものであって、Reliability Gate から外す理由にはならない。** どのコードの FAILURE も、§7.2 の失敗の 1 回として数える。2 回続けて FAILURE なら、その時点で即 FAIL。
 
-### 6.4 判定の時点(Decision_Time)
+### 6.4 判定の時点(Decision_Time と Acquisition_Decision_Deadline)
 
-- 試験窓 w の判定は、Decision_Time(w) に 1 回だけ行い、append-only で記録する。
+- 試験窓 w の判定は、canonical な acquisition decision が 1 回だけ確定させ、append-only で記録する。
 - **原則(決定)**: Decision_Time(w) は、T_info(w) + δ に、anchor の取得・G と R の検証・SUCCESS / FAILURE の確定に要する**固定の buffer** を加えた時刻とする。`Decision_Time > T_info + 300s` だけでは足りない。
 - **値(決定)**: `Decision_Time(w) = T_info(w) + 15 分`。通常は 03:15 JST。anchor の期限 03:05 から 10 分の buffer がある。
 - Decision_Time に確定するのは **acquisition state だけ**である。forecast の発行はその後に別に行う(§4.1)。
 - 03:15 以後に G が見つかったり、TSA の証拠が届いたりしても、その窓の FAILURE を SUCCESS に変えない。
 - Decision_Time のあとに証拠が出てきても、FAILURE を SUCCESS に変えない(救済しない)。
+
+**判定の job の実行(決定)**
+
+```
+03:00:00 JST  T_info
+03:05:00 JST  anchor の期限(T_info + δ)
+03:15:00 JST  Decision_Time(Decision opens)      acquisition の判定を開始できる時刻
+03:20:00 JST  Acquisition_Decision_Deadline        canonical な decision が COMPLETE していなければならない期限。発行の最初の attempt の時刻
+```
+
+- **Decision_Time = 03:15:00 JST は、cron の実行の開始時刻ではない。** acquisition の判定を開始できるようになる時刻である。03:15 より前に始まった判定は無効とする。
+- 判定の job は、**A と C の両方の経路から起動できる**ようにする。判定を GitHub の定時実行 1 本に依存させない。
+- **idempotent**: 各判定は、始めに同じ Origin の正式に COMPLETE した判定がすでにあるかを確かめ、あれば ALREADY_COMPLETE として何も書かずに終わる。**最初に正式に COMPLETE した判定だけを canonical とする。** 書き込みの手順は §4.4 の発行の transaction と同じ考え方(COMPLETE の追記と読み戻し、競合した場合は取り込み直して確かめ直す)で行う。
+- **Acquisition_Decision_Deadline = T_info + 20 分(通常 03:20:00 JST)。** 発行の attempt schedule の最初の時刻と同じにし、acquisition state が正式に確定する前に発行の orchestration が始まる曖昧さをなくす。
+- **COMPLETE の時刻(Acquisition_Decision_Completed_At)**: canonical な判定の COMPLETE の記録を含む V2 の commit が V2 の main に入ったことを示す、V2 の repository の activity API の記録の server 側の timestamp。runner の時計と、commit の author / committer の日時は使わない。
+- 03:20 までに canonical な判定が COMPLETE しなければ、その窓は **UNDETERMINED → Reliability FAILURE**(§6.3)。
+- 03:20 より後の実行は、監査の記録として残してよい。ただし、FAILURE を SUCCESS に救済しない。
 - あとの独立の監査で、判定が実装の誤りのために間違っていたとわかった場合は、記録を書き換えず、Determinism / Audit Gate(§7.3)の FAIL として扱う。
 
 ### 6.5 Reliability と Issuance の状態遷移(決定。分母を混ぜない)
@@ -245,7 +265,7 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 
 通常の 60 窓に属する Issuance の unit u = (Origin, Horizon) のそれぞれは、canonical な adjudication(§7.5。08:45 から開始でき、09:15 が期限)で、次のどれか 1 つに必ず落ちる。
 
-| acquisition state(03:15 の Decision_Time) | S0 の親(その Horizon の 3 ペア、08:15:00 JST まで) | Reliability Gate への寄与(窓ごと) | Issuance Gate での扱い(unit ごと) |
+| acquisition state(03:15〜03:20 の canonical decision) | S0 の親(その Horizon の 3 ペア、08:15:00 JST まで) | Reliability Gate への寄与(窓ごと) | Issuance Gate での扱い(unit ごと) |
 |---|---|---|---|
 | FAILURE(原因コードは §6.3) | (問わない) | **FAILURE 1 個** | **N/A**(分母に入れない) |
 | SUCCESS | 3 ペアすべてそろい、検証に PASS(§7.5) | SUCCESS | **評価する**(Issuance-Eligible Unit) |
@@ -256,7 +276,7 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 - Reliability Gate の分母は、**通常の 60 窓すべて**である。NO_ACQUISITION などの FAILURE も分母に入る(§7.2)。
 - Issuance Gate の分母は、**通常の 60 窓に属する unit のうち、Issuance-Eligible Unit だけ**である(§7.5)。
 - ELIGIBILITY_UNDETERMINED を分母から落とすと、API の障害などで「親があったか分からない unit」を除外できてしまい、Gate の抜け道になる。そのため、除外せずに FAIL とする。
-- 03:15 の Decision_Time と 08:45〜09:15 の adjudication は、完全に別のものである。03:15 は acquisition state だけを確定し、adjudication は issuance の eligibility と結果を確定する。
+- 03:15〜03:20 の acquisition decision と 08:45〜09:15 の adjudication は、完全に別のものである。前者は acquisition state だけを確定し、adjudication は issuance の eligibility と結果を確定する。
 - この表は試験の前に固定し、試験の途中や後で分母の定義を変えない。
 - 強制 failover の 4 窓は、どちらの Gate の分母にも入らない(§7.4)。その窓の発行の結果は記録だけする。
 
@@ -288,7 +308,7 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 - snapshot を選ぶ規則が V1 と同じであること。
 - hash を計算し直すと一致すること(Content_SHA256、Manifest_SHA256、保存した API 応答と token の hash)。
 - **R**: 保存した資料(token、証明書の鎖、失効の情報、manifest、原ファイル)**だけ**から独立に再検証し、同じ t_R,i になること。
-- **G**: Decision_Time に行った同時点の検証(G_CONTEMPORANEOUS_VALID)の記録・保存した応答の hash・結果を再計算し、**当時の判定の手順が決定論的に正しかった**ことを確かめる。GitHub 側の記録が保持期間のあとに消えた場合に、保存した応答だけから GitHub 由来であることを再証明できることは**要求しない**(G_LONG_TERM_SELF_CONTAINED = false)。
+- **G**: canonical な acquisition decision の中で行った同時点の検証(G_CONTEMPORANEOUS_VALID)の記録・保存した応答の hash・結果を再計算し、**当時の判定の手順が決定論的に正しかった**ことを確かめる。GitHub 側の記録が保持期間のあとに消えた場合に、保存した応答だけから GitHub 由来であることを再証明できることは**要求しない**(G_LONG_TERM_SELF_CONTAINED = false)。
 - 上の 2 つの結果から、同じ Valid_Anchor_Timestamps と Server_Anchored_At になること。
 - 経路と実行の ID が、実在の記録と一致すること。
 - §6 の判定を、保存した記録から独立にやり直すと、すべての試験窓で同じ SUCCESS / FAILURE と原因コードになること。
@@ -321,7 +341,7 @@ S0 のモデルは変えない。対象は、この順に行う運用の仕組�
 - **Adjudication_Deadline = 09:15:00 JST。** 09:15 までに canonical な adjudication が COMPLETE しなければ、その Origin の unit はすべて **ADJUDICATION_NOT_COMPLETED_BY_DEADLINE** とし、**Issuance Gate は FAIL** とする。
 - 09:15 より後に起動した adjudication が監査の記録を残すことは構わない。ただし、その記録で formal な Gate を後から PASS に救済してはならない。これは 03:15 の Decision_Time の「後から証拠が現れても救済しない」原則(§6.4)と同じである。
 - canonical な adjudication の結果は append-only で確定する。その後に V1 の側に遅れて S0 が現れても、過去の判定は変えない。
-- **(Claude の補足。むすびさんの確認が必要)「09:15 までに COMPLETE した」の判定に使う時刻**: canonical な adjudication の COMPLETE の記録を含む V2 の commit が V2 の main に入ったことを示す、V2 の repository の activity API の記録の timestamp を使う(§9.2 の G と同じ手順。commit の author / committer の日時と runner の時計は使わない)。adjudication は V1 にない新しい段階なので V1 との互換性の制約がなく、運用の障害を隠せないようにするという目的には、server 側の時刻が合うためである。
+- **「09:15 までに COMPLETE した」の判定に使う時刻(決定)**: `Adjudication_Completed_At` = canonical な adjudication の COMPLETE の記録を含む V2 の commit が V2 の main に入ったことを示す、V2 の repository の activity API の記録の server 側の timestamp。`Adjudication_Completed_At ≤ 09:15:00 JST` なら期限内である(§9.2 の G と同じ手順。commit の author / committer の日時と runner の時計は使わない)。adjudication は V1 にない新しい段階なので V1 との互換性の制約がなく、運用の障害を隠せないようにするという目的には、server 側の時刻が合うためである。
 
 **Issuance-Eligible Unit の定義(決定)**
 
@@ -364,7 +384,7 @@ Issuance-Eligible(Origin, Horizon)
 | 13 | Failover の窓 | 決定: Reliability の 60 窓とは別枠。最小 4 窓(A 停止 2、C 停止 2)。すべて SUCCESS が必要 |
 | 14 | 窓を狭める規則 | 決定: V2 provenance acceptance rule。V1 の定義は変えない |
 | 15 | CONTENT_INVALID、UNDETERMINED | 決定: 正式に採用。どちらも FAILURE |
-| 16 | Decision_Time | 決定: T_info + 15 分(通常 03:15 JST)。acquisition state だけを不可逆に確定する |
+| 16 | Decision_Time | 決定: T_info + 15 分(通常 03:15 JST)に開始可能、Acquisition_Decision_Deadline = T_info + 20 分(通常 03:20 JST)。A・C の両経路から起動可能、idempotent、canonical は最初の正式な COMPLETE。COMPLETE の時刻は V2 の activity API の server 側の timestamp。期限超過は UNDETERMINED → FAILURE。acquisition state だけを不可逆に確定する |
 | 17 | ε | 決定: E1。ε = D_max + RTT_max + 2·A_max = 2.0 + 2.0 + 2·1.0 = **6.0 秒**(engineering budget) |
 | 18 | 較正 | 決定: 連続 7 暦日、経路ごとに実行済みの pair が 100 組以上、p_min = 0.99 を経路ごとに判定。分母は実際に開始された実行。起動しなかった回は TRIGGER_NOT_STARTED として別に集計 |
 | 19 | 「2 個連続」と failover の置き方 | 決定: 通常の 60 窓だけの列で数える。failover の 4 窓は散らして置き、開始前に Origin を固定する |
@@ -375,11 +395,11 @@ Issuance-Eligible(Origin, Horizon)
 | 24 | 発行の attempt schedule | 決定: §4.4 の 10 時刻。A・C の両経路から起動可能。idempotent(ALREADY_COMPLETE)。二重の発行なし |
 | 25 | S0 の親の読み方 | 決定: §4.3。read-only、V1 の commit SHA を記録、検証を V2 で再実行。V1 への書き込みの権限を持たない |
 | 26 | Issuance Gate | 決定: §7.5。cutoff 08:15:00 JST、すべての Issuance-Eligible Unit で 100% COMPLETE かつ ON_TIME、0 件なら INSUFFICIENT_ISSUANCE_EVIDENCE |
-| 29 | adjudication | 決定: 08:45:00 JST に開始可能、Adjudication_Deadline = 09:15:00 JST。A・C の両経路から起動可能、idempotent、最初に正式に COMPLETE したものが canonical、append-only。09:15 までに COMPLETE しなければ ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → FAIL。判定できなければ ELIGIBILITY_UNDETERMINED → FAIL。09:15 以後の実行は監査の記録だけで、救済しない |
-| 30 | Issuance の単位 | 決定: (Origin, Horizon)。その Horizon の 3 ペアすべての S0 の親が必要。Reliability の単位は Origin / T_info の窓 |
-| 31 | Issuance の ON_TIME の時計 | 決定: V1 Part 4 の Verified_At_UTC 規則を継承。TSA の検査は適用しない(意図した非対称性。§4.1) |
 | 27 | 分母の分離 | 決定: §6.5 の状態遷移 |
 | 28 | TSA の要求の量 | 決定: R-ACC-13 を具体化。試験の開始前に確認。不明なら候補から外す |
+| 29 | adjudication | 決定: 08:45:00 JST に開始可能、Adjudication_Deadline = 09:15:00 JST。A・C の両経路から起動可能、idempotent、最初に正式に COMPLETE したものが canonical、append-only。09:15 までに COMPLETE しなければ ADJUDICATION_NOT_COMPLETED_BY_DEADLINE → FAIL。判定できなければ ELIGIBILITY_UNDETERMINED → FAIL。09:15 以後の実行は監査の記録だけで、救済しない。COMPLETE の時刻は V2 の activity API の server 側の timestamp |
+| 30 | Issuance の単位 | 決定: (Origin, Horizon)。その Horizon の 3 ペアすべての S0 の親が必要。Reliability の単位は Origin / T_info の窓 |
+| 31 | Issuance の ON_TIME の時計 | 決定: V1 Part 4 の Verified_At_UTC 規則を継承。TSA の検査は適用しない(意図した非対称性。§4.1) |
 
 ## 9. server anchor
 
@@ -394,8 +414,8 @@ Server_Anchored_At = min(Valid_Anchor_Timestamps)     (集合が空でないと�
 ```
 
 - **定義(機械的)**: Server_Anchored_At は、**採用された有効な anchor の群のうち、最も早い anchor の timestamp** である。この定義の外の意味づけは、判定に使わない。
-- 「有効」とは、その anchor に固有の検証(§9.2 または §9.3)に通り、**さらに対象の Content_SHA256 との結合まで確認できた**ことをいう。G については、さらに Decision_Time までに GitHub の API に直接問い合わせて確認できたこと(G_CONTEMPORANEOUS_VALID)を要する。時刻の文字列があるだけでは有効にならない。
-- **G と R の証拠の力は同じではない。** R は、署名された timestamp の token として、TSA に問い合わせずに後から独立に検証できる。G は、Decision_Time の時点で GitHub の server 側の記録と照合する仕組みであり、自己完結した署名付きの timestamp ではない(§9.2)。それぞれ別の検証手順を持ち、どちらの手順も Freeze の対象にする。
+- 「有効」とは、その anchor に固有の検証(§9.2 または §9.3)に通り、**さらに対象の Content_SHA256 との結合まで確認できた**ことをいう。G については、さらに canonical な acquisition decision の実行の中で(Acquisition_Decision_Deadline の 03:20 までに) GitHub の API に直接問い合わせて確認できたこと(G_CONTEMPORANEOUS_VALID)を要する。時刻の文字列があるだけでは有効にならない。
+- **G と R の証拠の力は同じではない。** R は、署名された timestamp の token として、TSA に問い合わせずに後から独立に検証できる。G は、canonical な acquisition decision の時点で GitHub の server 側の記録と照合する仕組みであり、自己完結した署名付きの timestamp ではない(§9.2)。それぞれ別の検証手順を持ち、どちらの手順も Freeze の対象にする。
 - 補足(判定には使わない): R については、min は「署名された証拠として最も早く存在が確かめられる時刻」に近い意味を持つ。G については、そこまでの意味は主張しない。
 - min を使うと、「有効な anchor が 1 つ以上あればよい」という採用の規則と論理的に一致する。§3.4 の (6) は「T_info + δ までに有効な anchor が 1 つでもある」と同じ意味になる。
 - §3.4 の (5) は min に対して検査する。min がこの条件を満たせば、ほかの anchor の時刻もすべて満たす。
@@ -426,13 +446,13 @@ Server_Anchored_At = min(Valid_Anchor_Timestamps)     (集合が空でないと�
 **G が有効にならない場合**
 
 - 条件を満たす記録が見つからない、結合が確認できない、API が失敗した。
-- Decision_Time までに検証の job が実行されなかった、または終わらなかった。
+- canonical な acquisition decision の実行の中で(Acquisition_Decision_Deadline の 03:20 までに)検証が行われなかった、または終わらなかった。
 
 **G の 2 段階の区別(決定)**
 
 | 区分 | 値 | 意味 |
 |---|---|---|
-| G_CONTEMPORANEOUS_VALID | true / false | Decision_Time までに、検証の job が GitHub の API に直接問い合わせ、上の手順に通った。**G が有効な anchor になるのは、これが true のときだけ** |
+| G_CONTEMPORANEOUS_VALID | true / false | canonical な acquisition decision の実行の中で(Acquisition_Decision_Deadline の 03:20 までに)、検証が GitHub の API に直接問い合わせ、上の手順に通った。**G が有効な anchor になるのは、これが true のときだけ** |
 | G_LONG_TERM_SELF_CONTAINED | **常に false** | API の記録が保持期間を過ぎたあとに、保存した応答・自前の hash・TSA だけで「GitHub が発行した記録である」ことまで完全に独立に証明できる、とは主張しない |
 
 - 保存した応答は、自分で保存したものなので、それだけでは第三者の証拠にならない。研究者の側で書き換えることができるからである。
@@ -605,6 +625,6 @@ Retrieved_At_Runner ≤ Server_Anchored_At + ε
 ## 11. Freeze に向けた状態
 
 - むすびさんの v0.6 の最終監査で残った 3 点(Issuance_Adjudication_Time、Issuance の単位、ON_TIME の時計)と、adjudication の開始可能時刻・期限・冗長な起動(2026-10-26 16:06 JST の決定)は、この版で本文に統合した(§4.1、§6.5、§7.5、§8 の 29〜31)。
-- 確認が残るのは、§7.5 の「(Claude の補足。むすびさんの確認が必要)」と書いた 1 点(Adjudication_Deadline の判定に使う時刻)だけである。
+- Freeze 直前の 2 点(Adjudication_Completed_At の時計、03:15〜03:20 の acquisition decision)も、この版で本文に統合した(§6.4、§7.5)。
 - むすびさんの最終監査の結果によれば、この 3 点が正しく統合されれば、Requirements 側に Freeze を妨げる未決事項はない。
 - 現在の状態: V1 = FREEZE / PASS / CLOSE のまま変更なし。Development Replay = NOT STARTED。Historical Reserve Holdout = SEALED。V2 の試験 = 未開始(較正も未開始)。
