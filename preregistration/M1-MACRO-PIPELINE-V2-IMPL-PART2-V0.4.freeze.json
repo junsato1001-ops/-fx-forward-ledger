@@ -1,0 +1,37 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-IMPL-PART2-V0.4",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-IMPL-PART2-V0.4.md",
+  "sha256": "6e9082a4727aa1614020fee93a610643612eb57d9c1cead4181357fb57a78f8a",
+  "git_blob_sha1": "5a253a3b556ec1c26fa24a775a3a48097b34f49d",
+  "freeze_source": "drafts/M1-MACRO-PIPELINE-V2-IMPL-PART2-V0.4.draft.md at commit f81db5e6adada7535d73f6129386af7ec4778a13 (byte-identical copy)",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-27 01:53 JST (v0.4 retrieved from GitHub at the freeze-source commit; v0.3 1c588a06 -> v0.4 f81db5e6 = ahead_by 1, 1 added file; final freeze audit PASS)",
+  "verification_chain": [
+    "むすび retrieved the file from GitHub at commit f81db5e6adada7535d73f6129386af7ec4778a13 and independently confirmed Git blob 5a253a3b556ec1c26fa24a775a3a48097b34f49d. SHA-256 was NOT recomputed by むすび; 6e9082a4... is Claude's declared value.",
+    "Claude copied the bytes from the freeze-source commit and computed both identifiers of the same bytes (blob 5a253a3b556ec1c26fa24a775a3a48097b34f49d, SHA-256 6e9082a4727aa1614020fee93a610643612eb57d9c1cead4181357fb57a78f8a)."
+  ],
+  "requirements_basis": "M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7 (SHA-256 edf27751a04fdff06dee5a65a6926ae052e96d52d994ac0743c31d4ce1de8326) and M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5 (SHA-256 c63a092725860a02af8bddffb458c59575bf02c38a8a98f74c148853a960cde5) with Erratum E1; all unchanged by this freeze",
+  "review_history": "v0 69fe4c70 -> v0.1 95fc3ccf -> v0.2 b654be98 -> v0.3 8bb75137 -> v0.4 5a253a3b (frozen). All earlier versions are kept unchanged in drafts/ and git history.",
+  "note_on_text": "The frozen text still carries its candidate header (DRAFT v0.4 / Freeze Candidate, not yet frozen). Its §13 shows F-P2-2, F-P2-5 and F-P2-10 with their v0 labels; their final verdicts are recorded in this record (findings), not in the text.",
+  "findings": {
+    "F-P2-1": "PASS / CLOSE WITH ERRATUM (Erratum E1 registered)",
+    "F-P2-2": "ACCEPT / CLOSE (manifest keys extend Requirements §3.3 without removing or replacing required items; むすび 2026-10-27 01:53 JST)",
+    "F-P2-3": "PASS / CLOSE (canonical runner timestamp resolution 1 microsecond, floor)",
+    "F-P2-4": "PASS / CLOSE (per-decision canonical revocation evidence; Revocation_Evidence_Cutoff = T_info + 18 min)",
+    "F-P2-5": "ACCEPT / CLOSE AS STRUCTURAL CONSEQUENCE (POST runner times bound by the server-side evidence of their commit; むすび 2026-10-27 01:53 JST)",
+    "F-P2-6": "DEFER / NOT BLOCKING FOR PART 2 FREEZE (interface and fail-closed states fixed in §10.6; C provider binding is an open prerequisite before V2 implementation/acceptance)",
+    "F-P2-7": "PASS / CLOSE",
+    "F-P2-8": "PASS / CLOSE",
+    "F-P2-9": "PASS / CLOSE",
+    "F-P2-10": "PASS / CLOSE — REQUIREMENTS AS WRITTEN (genTime used as is in min(Valid_Anchor_Timestamps); むすび 2026-10-27 01:53 JST)",
+    "F-P2-11": "PASS / CLOSE",
+    "F-P2-12": "PASS / CLOSE (DECISION_START verified with the same canonical revocation evidence; Revocation_Conflict_Check)"
+  },
+  "implementation_parameter_candidates": "TSA_HTTP_TIMEOUT = 30 s, TSA_RETRY = 1 after 3 s, ACTIVITY_REPOLL = 10 s, REVOCATION_REFETCH = 10 s, EXECUTION_REFETCH = 10 s are frozen as candidate values defined by this Part, not as Requirements values. They must be fixed with the same values in the implementation candidate's workflow/config and included in Code_SHA. Any change during implementation is handled as a Finding, never by silently editing this Part.",
+  "scope_of_this_freeze": "Implementation Spec Part 2 (Provenance / Clock / Anchor) only. Not a V2 implementation freeze or acceptance PASS.",
+  "open_prerequisites": "TSA selection record (R-ACC-1..13, OCSP availability or CRL issuance interval, request volume); C2 provider selection record including the C Execution_ID binding (F-P2-6) and ALLOWED_ACTORS for C; Part 3 (Parent / Issuance); Part 4 (Adjudication / Acceptance / Audit); fixtures FX-Y1..FX-Y9 in the pinned tzdata environment (Part 1).",
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED",
+  "v2_calibration_and_test": "NOT STARTED"
+}
