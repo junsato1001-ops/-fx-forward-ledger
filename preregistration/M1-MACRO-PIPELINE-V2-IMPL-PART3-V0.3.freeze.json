@@ -1,0 +1,38 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-IMPL-PART3-V0.3",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-IMPL-PART3-V0.3.md",
+  "sha256": "115d8bc41b498e91291b428cf9cffdc379dece39fe627e8ce019de5f1d3701fe",
+  "git_blob_sha1": "47c93ca61eae66fef359fad334f0d350a6486d67",
+  "freeze_source": "drafts/M1-MACRO-PIPELINE-V2-IMPL-PART3-V0.3.draft.md at commit 5dc5577c49fa3ebe27a6d2b79d9c7e6de60f2330 (byte-identical copy)",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-27 02:18 JST (v0.3 retrieved from GitHub at the freeze-source commit; v0.2 e2519ba6 -> v0.3 5dc5577c = ahead_by 1, 1 added file, 353 additions / 0 deletions; FREEZE CANDIDATE / FINAL AUDIT PASS)",
+  "verification_chain": [
+    "むすび retrieved the file from GitHub at commit 5dc5577c49fa3ebe27a6d2b79d9c7e6de60f2330 and independently confirmed Git blob 47c93ca61eae66fef359fad334f0d350a6486d67. SHA-256 was NOT recomputed by むすび; 115d8bc4... is Claude's declared value.",
+    "Claude copied the bytes from the freeze-source commit and computed both identifiers of the same bytes (blob 47c93ca61eae66fef359fad334f0d350a6486d67, SHA-256 115d8bc41b498e91291b428cf9cffdc379dece39fe627e8ce019de5f1d3701fe)."
+  ],
+  "requirements_basis": "M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7 (SHA-256 edf27751...), M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5 (SHA-256 c63a0927...) with Erratum E1, M1-MACRO-PIPELINE-V2-IMPL-PART2-V0.4 (SHA-256 6e9082a4...); all unchanged by this freeze",
+  "review_history": "v0 80679676 -> v0.1 e53b7af8 -> v0.2 7de67d93 -> v0.3 47c93ca6 (frozen). All earlier versions are kept unchanged in drafts/ and git history.",
+  "note_on_text": "The frozen text still carries its candidate header (DRAFT v0.3 / Freeze Candidate, not yet frozen). This record, not the header, states the frozen status.",
+  "findings": {
+    "F-P3-1": "PASS / CLOSE (V2_S0_PARENT_CHECK = invariants P1-P6 verified by V2 itself on a pinned V1 commit; V1 Actions success is auxiliary evidence)",
+    "F-P3-2": "PASS / CLOSE (one-time byte-identical copy of the V1 private dev snapshot to V2 private storage with source manifest; no V1 credential in the V2 runtime)",
+    "F-P3-3": "ACCEPT / CLOSE (no M1 rows when acquisition state is not SUCCESS; evaluation denominators deferred to Part 4 / V2 evaluation spec)",
+    "F-P3-4": "ACCEPT / CLOSE (V2 repository + V2-* Run_ID, no schema change)",
+    "F-P3-5": "ACCEPT / CLOSE (COMPLETE commit is never rebased; refetch and recheck)",
+    "F-P3-6": "PASS / CLOSE WITH FIXED FIXTURE REQUIREMENT (synthetic + dedicated fixture with Fixture_ID, fixture SHA-256, generator SHA-256 and expected scope fixed before the equivalence gate; byte comparison only)",
+    "F-P3-7": "DEFER -> Part 4 (forced-failover scope for issuance and adjudication)",
+    "F-P3-8": "DEFER -> C2 provider selection (trigger volume and cost)",
+    "F-P3-9": "ACCEPT / CLOSE (ECB history read-only from the commit that first introduced the S0 rows; data/ecb/eurofxref-hist.csv)",
+    "F-P3-10": "PASS / CLOSE (V2 runtime holds no write credential to any V1 repository and no read credential to the V1 private repository)",
+    "F-P3-11": "PASS / CLOSE (final attempt = scheduled 08:20 JST; no promotion of earlier delayed attempts; TOO_LATE at or after 08:30)",
+    "F-P3-12": "PASS / CLOSE (estimation history continuous: V1 ledger features before B, V2 Forward ledger from B; prediction series fully separated)",
+    "F-P3-13": "ACCEPT / CLOSE WITH ONE CLARIFICATION (B = first scheduled V2 Forward Origin per horizon, fixed in a separate preregistration record; acceptance rows in ledger_acceptance/ never enter E_{t,h}, permanently)"
+  },
+  "scope_of_this_freeze": "Implementation Spec Part 3 (Parent / Issuance) only. Not a V2 implementation freeze or acceptance PASS.",
+  "open_prerequisites": "V2 Forward start record fixing B; dedicated equivalence fixture fixed in advance; one-time copy of the V1 private dev snapshot; V2 private storage; Part 4 (Adjudication / Acceptance / Audit, including F-P3-7); TSA selection record; C2 provider selection record (including F-P2-6 and F-P3-8); Part 1 fixtures FX-Y1..FX-Y9 in the pinned tzdata environment.",
+  "observation": "During Part 3 v0 drafting (2026-10-27), Claude displayed one existing M0-RW0 row of V1 ledger/forecasts.csv while checking column names. むすび recorded it as an audit observation, not an M1-MACRO performance leak or Holdout contact; it was not used in the design. Later V1 references are limited mechanically to the required columns and rows.",
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED",
+  "v2_calibration_and_test": "NOT STARTED"
+}
