@@ -1,0 +1,22 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7.md",
+  "sha256": "edf27751a04fdff06dee5a65a6926ae052e96d52d994ac0743c31d4ce1de8326",
+  "git_blob_sha1": "21cb5c1347d27b285fbf8e6b12ad5f9376da15e2",
+  "freeze_source": "drafts/M2-PREP-V2-PIPELINE-REQUIREMENTS-v0.7.md at commit 6d6905198270abceb26ae6bee97dfcd06ebd5864 (byte-identical copy)",
+  "status": "FREEZE / PASS",
+  "approved_by": "むすび 2026-10-26 16:43 JST (630-line text; SHA-256 recomputed independently by むすび and matched; 0 further change requests)",
+  "verification_chain": [
+    "むすび recomputed the file SHA-256 edf27751a04fdff06dee5a65a6926ae052e96d52d994ac0743c31d4ce1de8326 of the 630-line v0.7 and confirmed the match.",
+    "Claude copied the bytes from the freeze-source commit 6d6905198270abceb26ae6bee97dfcd06ebd5864 and computed both identifiers of the same bytes (blob 21cb5c1347d27b285fbf8e6b12ad5f9376da15e2, SHA-256 edf27751a04fdff06dee5a65a6926ae052e96d52d994ac0743c31d4ce1de8326)."
+  ],
+  "review_history": "v0 ede24e7e -> v0.1 b7e4aa92 -> v0.2 b2e3a9d4 -> v0.3 7212a97b -> v0.4 1a698237 -> v0.5 3368b461 -> v0.6 597e0a03 -> v0.7 c3e66a00 -> 95e7805a -> 21cb5c13 (frozen). All earlier versions are kept unchanged in drafts/ and git history.",
+  "note_on_text": "The frozen text still carries its candidate header (DRAFT v0.7 / Requirements Freeze Candidate FINAL, not yet frozen). This record, not the header, states the frozen status.",
+  "summary": "Pipeline-only successor to M1-MACRO-V1 (acquisition / trigger / provenance / issuance orchestration; statistical model, features, estimation and evaluation unchanged; V1 Forward continues unchanged and is never re-labelled). Acquisition: window (T_info-6h, T_info] unchanged; V2 provenance acceptance rule narrows it by measured runner-clock uncertainty; Acquisition_Manifest binds content and Retrieved_At_Runner; Server_Anchored_At = min(valid G/R anchors); G = GitHub activity API only, contemporaneous within the canonical acquisition decision (G_LONG_TERM_SELF_CONTAINED = false); R = two RFC 3161 TSAs (different operator and root), A_max = 1.0 s, R-ACC-1..13; delta = 300 s; epsilon = 6.0 s (E1 budget: D_max 2.0 + RTT_max 2.0 + 2*A_max); clock evidence from TSA only, no fallback. Decision: 03:15 opens / 03:20 deadline, A+C, idempotent, server-side COMPLETE time, UNDETERMINED = FAILURE, no late rescue. Gates: Safety (incl. Holdout boundary and no V1 write credential), Reliability (60 normal windows, (60,2), 2 consecutive FAILURE = immediate FAIL, all cause codes count), Determinism/Audit, Failover (4 forced windows, distributed, pre-fixed, all SUCCESS), Issuance ((Origin,Horizon) units; S0 cutoff 08:15, deadline 08:30 with V1 Verified_At_UTC rule, adjudication 08:45 opens / 09:15 deadline; 100% COMPLETE and ON_TIME; ELIGIBILITY_UNDETERMINED and ADJUDICATION_NOT_COMPLETED_BY_DEADLINE = FAIL; 0 eligible = INSUFFICIENT_ISSUANCE_EVIDENCE). Calibration: 7 days, >=100 executed pairs per path, p_min 0.99 per path, TRIGGER_NOT_STARTED excluded from the calibration denominator only.",
+  "scope_of_this_freeze": "Requirements only. Not a V2 implementation freeze, not an Acceptance PASS. Calibration, the 60 Reliability windows and the 4 Failover windows have not started.",
+  "next_phase": "V2 implementation specification against this frozen requirements SHA.",
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (no V1 workflow, code, config, data or ledger touched; preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED",
+  "v2_calibration_and_test": "NOT STARTED"
+}
