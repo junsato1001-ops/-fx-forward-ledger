@@ -1,0 +1,18 @@
+{
+  "record_id": "M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5-ERRATUM-E1",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5.errata.md",
+  "sha256": "9c6714fe49e4877d25ecc12b25536c7015ce4c9079545d0069ebaeba2699b4bf",
+  "git_blob_sha1": "9785dac0a4981de22ea7d9509a1fd928fdd5127d",
+  "source": "drafts/M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5.errata.draft.md at commit 2c3a6f5edf098895708322820d99150eb32c76ff (byte-identical copy)",
+  "status": "ERRATUM / AUDIT PASS",
+  "approved_by": "むすび 2026-10-27 01:35 JST (retrieved from GitHub at commit 2c3a6f5e; blob 9785dac0 confirmed; Part 1 Erratum E1 DRAFT = AUDIT PASS)",
+  "verification_chain": [
+    "むすび retrieved the draft from GitHub at commit 2c3a6f5edf098895708322820d99150eb32c76ff and confirmed Git blob 9785dac0a4981de22ea7d9509a1fd928fdd5127d. SHA-256 was not recomputed by むすび; it is recorded as Claude's declared value.",
+    "Claude copied the bytes from that commit and computed both identifiers of the same bytes (blob 9785dac0a4981de22ea7d9509a1fd928fdd5127d, SHA-256 9c6714fe49e4877d25ecc12b25536c7015ce4c9079545d0069ebaeba2699b4bf)."
+  ],
+  "applies_to": "M1-MACRO-PIPELINE-V2-IMPL-PART1-V0.5 (SHA-256 c63a092725860a02af8bddffb458c59575bf02c38a8a98f74c148853a960cde5, blob 101f7cd49ec5e2991230faf084deb3e03785290a, Freeze commit cbb9d60936272da81f5b5a87eed4b8138a667fa0)",
+  "summary": "Part 1 §8.1 'CFTC_Source_Year は manifest と PRE の記録に書く' conflicts with Requirements V0.7 §10.3 (PRE record has exactly 6 keys). Requirements prevails: 'と PRE の記録' is non-normative; CFTC_Source_Year is written to the manifest only. The Source_Year rule, manifest anchoring and decision recomputation are unchanged.",
+  "unchanged": "Part 1 V0.5 text, SHA-256, blob, Freeze commit and registry row are unchanged; Part 1 is not re-frozen. Not a statistical or operational rule change.",
+  "origin_finding": "F-P2-1 (Implementation Spec Part 2) = PASS / CLOSE WITH ERRATUM",
+  "note_on_text": "The erratum text still carries its draft header (状態: DRAFT). This record, not the header, states its status."
+}
