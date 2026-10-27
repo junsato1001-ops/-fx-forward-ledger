@@ -1,0 +1,40 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-TSA-PROBE-SPEC-V0.1",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-TSA-PROBE-SPEC-V0.1.md",
+  "sha256": "a3e4e44735a4fb0f45dd67b487236801b7d627e1b20e38f6cb6689c75ad60582",
+  "git_blob_sha1": "5a7bf7bcb7fbb4bfc5ed19c456525c29a61d197f",
+  "freeze_source": "drafts/M1-MACRO-PIPELINE-V2-TSA-PROBE-SPEC-V0.1.draft.md at commit 5090ecfaba289a372173012c5c04b378ed754b69 (byte-identical copy; source blob 5a7bf7bcb7fbb4bfc5ed19c456525c29a61d197f)",
+  "status": "FREEZE / PASS",
+  "classification": "PROBE / NON-FORMAL / PRE-SELECTION (not Calibration, not Acceptance)",
+  "approved_by": "むすび (relayed by 純 2026-10-27 23:57 JST): FREEZE CANDIDATE / FINAL AUDIT PASS, no new blocking finding",
+  "verification_chain": [
+    "むすび independently confirmed Git blob 5a7bf7bcb7fbb4bfc5ed19c456525c29a61d197f from GitHub at the source commit. SHA-256 was NOT recomputed by むすび; a3e4e447... is Claude's declared value.",
+    "Claude copied the bytes from the source commit and computed both identifiers of the same bytes (blob 5a7bf7bcb7fbb4bfc5ed19c456525c29a61d197f, SHA-256 a3e4e44735a4fb0f45dd67b487236801b7d627e1b20e38f6cb6689c75ad60582)."
+  ],
+  "upper_specs": "M1-MACRO-PIPELINE-V2-REQUIREMENTS-V0.7 (edf27751...), IMPL-PART1-V0.5 (c63a0927...) with Erratum E1, IMPL-PART2-V0.4 (6e9082a4...), IMPL-PART3-V0.3 (115d8bc4...), IMPL-PART4-V0.2 (8d57262c...); all unchanged by this freeze",
+  "related_records": "TSA Selection Record DRAFT v0 (drafts/M1-MACRO-PIPELINE-V2-TSA-SELECTION-V0.draft.md, commit ec325170, blob e80a87f6) = RESEARCH RECORD / AUDIT PASS WITH OPEN FINDINGS, unchanged; TSA probe spec DRAFT v0 (commit 89cbd431, blob f042e818) kept unchanged",
+  "review_history": "v0 f042e818 -> v0.1 5a7bf7bc (frozen). Earlier version kept unchanged in drafts/ and git history.",
+  "note_on_text": "The frozen text still carries its draft header (DRAFT v0.1, awaiting audit) and §9 questions. This record, not the header, states the frozen status.",
+  "audit_confirmations": [
+    "p_min = 0.99 is not used as a pass/fail threshold in the pre-selection probe; reserved for formal Calibration",
+    "Fresh_vs_window_attempts evaluates each token in the 6-hour window individually against Part 2 check 11",
+    "policy OID observed without reqPolicy is policy-discovery evidence only, not a formal policy-check PASS",
+    "missed schedules and fetch failures are not backfilled; recorded as NOT_OBSERVED",
+    "probe is NON-FORMAL / PRE-SELECTION and never enters Calibration or Acceptance denominators",
+    "no access to the V1 repository, V1 credentials, forecasts, M1 features, M1 ledger, or Holdout pair data",
+    "C2 provider not yet selected: this probe measures path A only; A results alone do not establish A/C usability",
+    "R-ACC-13 request volume/frequency permission is handled by provider written confirmation, not by the probe"
+  ],
+  "scope_of_this_freeze": "TSA pre-selection probe specification only. Not a TSA selection, not Calibration, not a V2 implementation freeze.",
+  "execution_location": "V2 implementation repository junsato1001-ops/-fx-forward-ledger-v2 (.github/workflows/tsa-probe.yml + fixed probe script), to be implemented and implementation-audited before any probe run",
+  "open_prerequisites": "probe workflow and script implementation in the V2 repository; implementation audit PASS; then probe execution; then TSA Selection v0.1; provider written confirmations for R-ACC-13 (C-DC, C-GS); C-GMO contract terms; C2 provider selection (path C reachability, TSA-F7)",
+  "states": {
+    "tsa_selection": "PENDING",
+    "probe": "NOT STARTED",
+    "calibration": "NOT STARTED",
+    "v2_implementation_freeze": "NOT YET"
+  },
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED"
+}
