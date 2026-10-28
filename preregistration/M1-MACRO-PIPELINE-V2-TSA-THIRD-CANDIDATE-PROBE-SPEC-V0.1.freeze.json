@@ -1,0 +1,40 @@
+{
+  "spec_id": "M1-MACRO-PIPELINE-V2-TSA-THIRD-CANDIDATE-PROBE-SPEC-V0.1",
+  "file": "preregistration/M1-MACRO-PIPELINE-V2-TSA-THIRD-CANDIDATE-PROBE-SPEC-V0.1.md",
+  "sha256": "0658b04b24ecb2c8ccb4e6e574fd07768ef79f51100c4135713c3dbe7747bd1a",
+  "git_blob_sha1": "d652a45c46c2c051a37b481c5ac8b63b882100a4",
+  "freeze_source": "drafts/M1-MACRO-PIPELINE-V2-TSA-THIRD-CANDIDATE-PROBE-SPEC-V0.1-R2.draft.md at commit 440feae5f2c531a3491a63758a3a8914cb83c1dc (revision 2; byte-identical copy; source blob d652a45c46c2c051a37b481c5ac8b63b882100a4)",
+  "status": "FREEZE / PASS",
+  "classification": "PROBE / NON-FORMAL / PRE-SELECTION (stage 1 only; C-CT only; not Calibration, not Acceptance)",
+  "approved_by": "むすび (relayed by 純 2026-10-28 18:42 JST): V0.1 R2 = PASS / FREEZE CANDIDATE; F-TC-S1 and F-TC-S2 CLOSE; no new blocking finding",
+  "verification_chain": [
+    "むすび retrieved revision 2 from GitHub at commit 440feae5 (1 commit ahead of 1dd2b20c, one added file) and audited it. SHA-256 was NOT recomputed by むすび; 0658b04b... is Claude's declared value.",
+    "Claude copied the bytes from the source commit and computed both identifiers of the same bytes (blob d652a45c46c2c051a37b481c5ac8b63b882100a4, SHA-256 0658b04b24ecb2c8ccb4e6e574fd07768ef79f51100c4135713c3dbe7747bd1a)."
+  ],
+  "review_history": "revision 1 (drafts/...-V0.1.draft.md, commit 1dd2b20c, blob 97a21e7a) = CONDITIONAL PASS / 2 FIXES (F-TC-S1, F-TC-S2) -> revision 2 (commit 440feae5, blob d652a45c) = PASS (frozen). Revision 1 kept unchanged in drafts/.",
+  "note_on_text": "The frozen text still carries its draft header (DRAFT V0.1, revision 2, awaiting audit) and §9 questions. This record, not the header, states the frozen status and the audit answers.",
+  "findings": {
+    "F-TC-S1": "CLOSE (stage-1 decision set = Part 2 §6.2 checks 1-10 and 12(a); check 10 judged by the offline P4-equivalent result; R-ACC numbers not used in the decision)",
+    "F-TC-S2": "CLOSE (STAGE1_HARD_FAILURE = at least one target-check FAIL established from obtained evidence; STAGE1_NO_HARD_FAILURE = all 5 tokens obtained and no FAIL; STAGE1_NOT_OBSERVED = otherwise; decided in that order; HTTP 200 body unusable as TimeStampResp or PKIStatus not 0/1 = check 1 FAIL)"
+  },
+  "audit_answers_to_section_9": [
+    "§3 construction approved: audited probe/tsa_probe.py unchanged, separate config via TSA_PROBE_CONFIG, separate out-root probe/tsa-third/, separate workflow with workflow_dispatch only and no schedule",
+    "the three stage-1 classes approved; revocation issuance times are recorded but not used in the stage-1 conclusion",
+    "T2 recorded as an observation about the chain saved in this probe, not as a proof that no other chain to a GlobalSign root exists",
+    "stage 1 (at most 10 TSA requests) may run before Certum's written answer; this does not establish R-ACC-13, which stays undetermined until the written answer"
+  ],
+  "upper_specs": "Requirements V0.7, Part 1 V0.5 + E1, Part 2 V0.4, Part 3 V0.3, Part 4 V0.2, TSA-PROBE-SPEC V0.1; all unchanged by this freeze",
+  "scope_of_this_freeze": "Stage-1 probe specification for C-CT only. Not a TSA selection, not a freshness (P3-equivalent) specification, not Calibration.",
+  "execution_location": "V2 repository junsato1001-ops/-fx-forward-ledger-v2: separate config and separate workflow (no schedule), out-root probe/tsa-third/, implemented and implementation-audited before any run; the running C-DC/C-GS P3 files (probe/tsa_probe.py, probe/tsa_probe_config.json, .github/workflows/tsa-probe.yml) are not modified",
+  "states": {
+    "c_ct_probe": "NOT STARTED",
+    "c_dc_c_gs_p3": "scheduled from 2026-10-29T00:41:00Z",
+    "tsa_selection": "PENDING",
+    "r_acc_13_c_ct": "UNDETERMINED (Certum written answer pending)",
+    "calibration": "NOT STARTED",
+    "v2_implementation_freeze": "NOT YET"
+  },
+  "v1_state": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged (preregistration/ is outside CODE_MANIFEST_V1)",
+  "development_replay": "NOT STARTED",
+  "historical_reserve_holdout": "SEALED"
+}
