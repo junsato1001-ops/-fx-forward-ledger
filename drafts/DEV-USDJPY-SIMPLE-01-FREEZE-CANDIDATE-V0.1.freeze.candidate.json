@@ -1,0 +1,239 @@
+{
+  "status_of_this_file": "FREEZE CANDIDATE V0.1 (draft). NOT FROZEN. Proposed content of preregistration/DEV-USDJPY-SIMPLE-01.freeze.json. Placeholders <...> are filled only at Freeze, after むすび's final audit and 純's explicit decision. Supersedes FREEZE CANDIDATE V0 (kept unchanged).",
+  "trial_id": "DEV-USDJPY-SIMPLE-01",
+  "classification": "DEVELOPMENT DIAGNOSTIC TRIAL (not confirmatory; not Forward; not a V1 or V2 freeze)",
+  "status": "FREEZE / PASS",
+  "approved_by": "<純's explicit Freeze decision, JST timestamp>; むすび Freeze Candidate V0.1 final audit = <verdict, JST timestamp>",
+  "frozen_documents": {
+    "spec": {
+      "file": "preregistration/DEV-USDJPY-SIMPLE-01-SPEC-V0.3.md",
+      "freeze_source": "drafts/DEV-USDJPY-SIMPLE-01-SPEC-V0.3.draft.md at commit 17cc7c6d7c2489038bbffd07b95fd3db1d1697ac (byte-identical copy)",
+      "git_blob_sha1": "647fcc19fd1c8624bee0fed369bab07b53de237f",
+      "sha256": "13e7e3306050d39e47cd669a075f3aaa1caf15e33619894885a70f5f5a191bab",
+      "audit": "むすび differential audit PASS (v0.3)"
+    },
+    "freeze_prep": {
+      "file": "preregistration/DEV-USDJPY-SIMPLE-01-FREEZE-PREP-V0.1.md",
+      "freeze_source": "drafts/DEV-USDJPY-SIMPLE-01-FREEZE-PREP-V0.1.draft.md at commit fb4381e73c9d877d55f9d8f13d974b59882d28d8 (byte-identical copy)",
+      "git_blob_sha1": "bb3617b8a2f7eb0481d95d5d98f53d134b8e2fa4",
+      "sha256": "b6f545de900a5bc03c630b8b109dec2d789bd860b2af837eb6b7935949d2a917",
+      "role": "resolves SPEC v0.3 §14 items 1-5; does not change the v0.3 text",
+      "audit": "FREEZE-PREP V0.1 = PASS / READY FOR FREEZE PREPARATION / NOT FROZEN / NOT EXECUTION-AUTHORIZED (むすび, relayed by 純 2026-10-31)"
+    }
+  },
+  "sha256_verification": "SHA-256 = Claude-declared unless independently verified. Git blob ids of the implementation commits were confirmed by むすび on GitHub. The numpy wheel SHA-256 was confirmed by むすび from PyPI (Claude could not reach PyPI).",
+  "snapshot": {
+    "path_in_execution_repo": "data/eurofxref-hist_20261009.zip",
+    "sha256": "f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649",
+    "git_blob_sha1": "88b4dcdbca1a062d78a1a85b7a9112199451ad9b",
+    "member": "eurofxref-hist.csv",
+    "source": "V1 tests/fixtures/eurofxref-hist_20261009.zip at 17cc7c6d (byte copy)",
+    "development_target_end_max": "2026-10-09"
+  },
+  "s0_source_decision": "(a) regenerate with frozen S0 v1.1 is authoritative; (b) compare with published V1 S0 rows only when available (none in Development); FREEZE-PREP v0.1 §2.2",
+  "allowlist_boundary": "Only Date, JPY, USD field values may be materialized/decoded/stored/returned/logged; raw bytes of other columns may pass and be scanned only to locate delimiters; csv module, split(','), pandas forbidden on the read path; any double quote stops the reader (FREEZE-PREP v0.1 §3.2)",
+  "implementation": {
+    "repository": "junsato1001-ops/-fx-dev-trials",
+    "branch": "impl/dev-usdjpy-simple-01",
+    "commit": "a792100770aac264dab2a996aa2af04e92db1984",
+    "tree": "29d72c501dc49b2e5602e7fc1ec6c873ea2f7088",
+    "audit_chain": [
+      "cafd2205b922a3d1adc0808b6598cc9c169ffad6 = REVISE MINOR (むすび, 2026-10-31): S0 exact identity at beta=0 was approximate; SPEC v0.3 §10 report-only diagnostics missing",
+      "7ad94415bbf21a69523307a1bb4bcf47925763d8 = DIFFERENTIAL AUDIT PASS / IMPLEMENTATION AUDIT PASS (むすび, relayed by 純 2026-10-31 03:25 JST); Claude's §13 additions ACCEPTED",
+      "Freeze Candidate V0 (V1 commit 75eb8020) = REVISE MINOR (むすび): F-FC-1 runtime pinning insufficient for FREEZE-PREP v0.1 §3.5 -> option A",
+      "a792100770aac264dab2a996aa2af04e92db1984 = DIFFERENTIAL AUDIT PASS (むすび, relayed by 純 2026-10-31 03:42 JST): runtime pinning only; 4 files; model/reader/estimator/stats/Gate/run.py/config/snapshot/vendor unchanged"
+    ],
+    "files": {
+      ".github/workflows/dev-trial.yml": {
+        "blob": "bec599d5a776656efe06e5c80883e137794f17dc",
+        "sha256": "ffcda62ef1143ae93fe99db8d550132d46f0418753cabdd5fe24a33e43e16c6a"
+      },
+      ".gitignore": {
+        "blob": "72269c3088e65159f15d4a38c3a020aee1ea9777",
+        "sha256": "05487312caa2020b20fe9fed1d7473d87a67e324fb333033674707ed90744c9b"
+      },
+      "IMPLEMENTATION-NOTES.md": {
+        "blob": "d5b0111e700d1a67357ec9109ef40673ec5cd0b0",
+        "sha256": "e48158efc70d17f1bc841cab1335c651647dbf60fe3f291d379f644debc7c368"
+      },
+      "README.md": {
+        "blob": "0bc4d9aa4ff844e82afedb306755c1be00060f8a",
+        "sha256": "b05b9e8f4693b85408aabf4e6c809a28f55fff3c70b7f8b633c168560f71dbbb"
+      },
+      "data/eurofxref-hist_20261009.zip": {
+        "blob": "88b4dcdbca1a062d78a1a85b7a9112199451ad9b",
+        "sha256": "f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649"
+      },
+      "devtrial/diagnostics.py": {
+        "blob": "a72096beb26def27e7667ebcfc6b3f072c49a621",
+        "sha256": "78841fe7643133a32354fffbbd57baa40349e64cbc843fc7b009b92485bfb8c0"
+      },
+      "devtrial/frozen.py": {
+        "blob": "637ccd763fa869e28cef51c71339da686f7512e8",
+        "sha256": "ef67cc4c82c52517b371408ddb6447ca1da2f61373b97768fcdec76186f20535"
+      },
+      "devtrial/model.py": {
+        "blob": "f835c9a10ca922f41b0be96582c7c30f732e60a3",
+        "sha256": "6a86564596e2b7fb939f8512ed7f39d2b18b763d1ba605200c852953c5997669"
+      },
+      "devtrial/reader.py": {
+        "blob": "fce27794886f66bf6a9e3071ccc2d980f5d0ecf0",
+        "sha256": "c2e91f6353d10002a67f1bb5c62a4e9dcc01b55dad61844ddea74e316f66398e"
+      },
+      "devtrial/run.py": {
+        "blob": "e3275ea038ca63ad0c29641c6e599cd68843c3a1",
+        "sha256": "bde7e5ae947620120842ff879878d65031b1a8bd9b650c8a543e4407c0c73982"
+      },
+      "devtrial/stats.py": {
+        "blob": "bbd8f2b9bfff81c019882954a5a135f7d9803893",
+        "sha256": "6d53cc47e93c919875a458b21acc61c285b211463ef74706f4f85632bc900cb5"
+      },
+      "devtrial/summary.py": {
+        "blob": "f88433e6e7316beb3d197ea0be1b1cc22ccd2a29",
+        "sha256": "58d0e2bc2eb2c65bca50ac590d1189b73c54f35df25a58cfbe48aca07696b108"
+      },
+      "requirements.txt": {
+        "blob": "2e4c76244fb28e21d6d58266a2d1458b1c0252a3",
+        "sha256": "a22ec875f2f6205b796f3f4ce6d41ce85ad576da336173632716b9b9de980b67"
+      },
+      "tests/__init__.py": {
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "tests/_synth.py": {
+        "blob": "0540603294c74354a1b6e12c363c705ba11b929b",
+        "sha256": "4bee4ad73578ab6f0a4e6debbf8a01cf5cfdc591aa2a8120c73ebf6490cfec81"
+      },
+      "tests/test_diagnostics.py": {
+        "blob": "e1e703ca8c1371b82f5b3d1c8afd1221d03af84c",
+        "sha256": "0f7fe2286a3ddef19cd7e710a0abf9006a0e81cfc890b93e5ab1759054f5c46b"
+      },
+      "tests/test_e2e.py": {
+        "blob": "aec6e99c20fa3dcfa7d7ce739f40732b3b8e39ce",
+        "sha256": "57f711cc87c03b81d25accf2271367967bd35d95423e4bc143eeaeae0de6cce2"
+      },
+      "tests/test_estimator.py": {
+        "blob": "46ba0f8700b4bef61e2c0b52d3d28303dedca232",
+        "sha256": "9869ab567d78545fdcc88772ebf5b5c3ca83193664e92c6945d4b718a491ff17"
+      },
+      "tests/test_reader.py": {
+        "blob": "b99bd3d3d6304af215ce8759eb5e7ab71258a8b0",
+        "sha256": "6764ead9dc33bf830b74a655271a4c719ee80e9e26d0f76d629b901136f7434a"
+      },
+      "tests/test_static.py": {
+        "blob": "938d5e7282642750ebaaf701fc9c2c19a1be7d08",
+        "sha256": "c2098290dea7c8e6db46bcab09d3c712a0f5b00ef1fec9770401225c4b3614d3"
+      },
+      "tests/test_stats.py": {
+        "blob": "856b7aa1a57fdda4d55bd656ed058a784d37df94",
+        "sha256": "8f7272bda859465d269d63dc36e5fe8efff9851a19db7aeca9101d6d81a97cce"
+      },
+      "trials/DEV-USDJPY-SIMPLE-01/config.json": {
+        "blob": "590bae415a2981a1bfc4ccc3e57e1dc4f6cf8353",
+        "sha256": "58023fed5d67172111b081fc70e284f5f7dad19a062df9867ceb2a6964d38b0d"
+      },
+      "vendor/v1/forward/ledger_builder.py": {
+        "blob": "9c1cbecda3e69aa1de9c5ffc165816d234d8ec90",
+        "sha256": "5d3b91c7a666b9f7d5c12db88dbbf969ebceef5386bbabb22f13e3e907de25a0"
+      },
+      "vendor/v1/frozen/m0_walkforward_v1_2.py": {
+        "blob": "6d03099942a0cabb3eb6f0f971e2039ecba97f3e",
+        "sha256": "4ca2f37ab729d08f24f008d75c5ceb95f11d79d5bf9575941f44ffd32a77e3d5"
+      },
+      "vendor/v1/frozen/origin_target_map_v1.py": {
+        "blob": "de8f724f03e03aaa0c46bd873e03a3b4818e5393",
+        "sha256": "902f0b43a84a0ec309a6e99b6617ca2816e240054bd77e9dbf7d3b2812f3c988"
+      },
+      "vendor/v1/frozen/s0_empclim_std_exp_v1_1.py": {
+        "blob": "c89a067ad0701eb0e5c90614690ca3be9dac0153",
+        "sha256": "84c317661e6798b906063a50fc416c9d594708ffcfbb6010a5bd83f636487676"
+      }
+    },
+    "vendor_match": "the 3 frozen modules and ledger_builder.py match V1 CODE_MANIFEST_V1 SHA-256 (FREEZE-PREP v0.1 §3.4)",
+    "runtime": {
+      "python": "3.13.17 (actions/setup-python python-version exact; workflow step asserts sys.version == 3.13.17)",
+      "numpy": {
+        "version": "2.5.3",
+        "wheel": "numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "a5fa86b80fd24bcd1aff83ad23be44ea323de3f787be8f8b15d4a65621e25321",
+        "source": "PyPI numpy 2.5.3 file page and PyPI provenance subject digest, confirmed by むすび",
+        "install": "python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements.txt"
+      },
+      "runner": "ubuntu-24.04",
+      "actions": {
+        "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262 (v4.4.0)",
+        "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065 (v5.6.0)",
+        "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02 (v4.6.2)"
+      },
+      "recorded_at_run": "GATE.json provenance records python_version and numpy_version"
+    }
+  },
+  "frozen_parameters": {
+    "pair": "USDJPY",
+    "horizon": "1D",
+    "f_mom_window_target_days": 20,
+    "n_warmup": 250,
+    "n_eval_min": 250,
+    "alpha_dev": 0.05,
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20261016,
+    "primary_mean_block_length": 4,
+    "sensitivity_mean_block_length": 12,
+    "hac_lag": 4,
+    "source": "trials/DEV-USDJPY-SIMPLE-01/config.json at the implementation commit"
+  },
+  "gate": "FORWARD_CANDIDATE_ELIGIBLE iff N_EVAL >= 250 and p_dev < 0.05 (stationary bootstrap, block 4) and second-half D < 0; N_EVAL < 250 -> NOT_EVALUABLE; otherwise NOT_ELIGIBLE (SPEC v0.3 §10). No re-run under the same Trial_ID with changed conditions.",
+  "report_only_boundary": "diagnostics (Coverage, counts, beta trajectory, RPS, Brier, IS/sigma, PI80 coverage, VRC, direction diagnostics), block-12 bootstrap, HAC, p_inf and full-common-sample D are report-only. The three direction diagnostics (modal-class hit, point-sign hit, mean probability of realized class) are Development descriptive diagnostics only: they must not later be reinterpreted as confirmatory evidence, as a Gate condition, or as a DA Safety Veto. Any future DA Safety Veto must be specified and frozen separately before Development results are seen (むすび, 2026-10-31).",
+  "first_origin_rule": "first USD/JPY 1D formal Origin with ledger FORECAST_READY, S0 FORECAST and F_MOM defined (FREEZE-PREP v0.1 §5.1); determined by preflight, not by this record",
+  "execution_protocol": {
+    "order": "Freeze -> separate preflight approval -> preflight -> separate Development run approval -> run",
+    "execution_commit_rule": "An execution commit must be a descendant of implementation commit a792100770aac264dab2a996aa2af04e92db1984. Its tree may differ from tree 29d72c501dc49b2e5602e7fc1ec6c873ea2f7088 only by (i) adding or changing trials/DEV-USDJPY-SIMPLE-01/AUTHORIZATION.json and (ii) files under records/DEV-USDJPY-SIMPLE-01/ added by earlier result-preservation commits (never read by the code). Any other difference = not this Trial (ABORT registry event and a new Trial_ID). Execution happens on branch exec/dev-usdjpy-simple-01; impl/dev-usdjpy-simple-01 is not moved. No main branch is created (F-FC-4).",
+    "authorization_file": {
+      "path": "trials/DEV-USDJPY-SIMPLE-01/AUTHORIZATION.json",
+      "required_fields": [
+        "trial_id",
+        "modes",
+        "freeze_commit",
+        "authorized_by",
+        "authorized_at_jst"
+      ],
+      "freeze_commit": "the V1 commit that adds this freeze record (<FREEZE_COMMIT>)",
+      "rule": "created only after 純's explicit approval of that mode; preflight approval lists only \"preflight\""
+    },
+    "preflight": "dates, counts and states only (FREEZE-PREP v0.1 §5.2); stored as a separate artifact and recorded as a PREFLIGHT registry event; this freeze record is never edited after Freeze",
+    "result_preservation": {
+      "rule": "fixed procedure, not operator-dependent (F-FC-2, むすび ACCEPT with modification)",
+      "steps": [
+        "1. The workflow run prints, for every artifact file, its path and SHA-256 (run.py) and uploads the files as one Actions artifact.",
+        "2. The artifact is downloaded and each file's SHA-256 is recomputed; it must equal the SHA-256 printed in that run's log. Any mismatch or missing file = PRESERVATION_FAILURE (recorded; files are not edited or regenerated).",
+        "3. The files are committed byte-for-byte as an immutable raw copy under records/DEV-USDJPY-SIMPLE-01/<mode>/<run_id>/ in -fx-dev-trials, on the execution branch, in a commit that adds only those files. Stored files are never modified or deleted afterwards.",
+        "4. The storage commit, run ID, execution commit and per-file SHA-256 are written in the registry event (PREFLIGHT or EXECUTION_RESULT) in DEV-TRIAL-REGISTRY.csv."
+      ],
+      "registry_note_format": "Note = 'artifact_files=<name>:<sha256>[|<name>:<sha256>...]; records_commit=<sha>; workflow_run=<run_id>; preservation=OK|PRESERVATION_FAILURE'",
+      "relation_to_execution_rule": "storage commits are not execution commits; their records/ files are allowed in later execution trees by execution_commit_rule (ii)"
+    }
+  },
+  "registry": {
+    "freeze_registry": "preregistration/registry.csv (one appended line)",
+    "dev_trial_registry": "preregistration/DEV-TRIAL-REGISTRY.csv (created with the FREEZE event; append-only; FREEZE-PREP v0.1 §6)",
+    "research_question_id": "USDJPY-1D-PRICE-ONLY-LOCATION",
+    "registry_count_at_design": "0 (candidate value; confirmed mechanically at Freeze, see registry.count_check)",
+    "count_check": "At Freeze, before commit A: count distinct Trial_ID with Registry_Event = FREEZE and Research_Question_ID = USDJPY-1D-PRICE-ONLY-LOCATION in preregistration/DEV-TRIAL-REGISTRY.csv at the V1 commit Freeze is based on (file absent = 0), and grep all of preregistration/ and drafts/ for the Research_Question_ID string outside the DEV-USDJPY-SIMPLE-01 files. Command, base commit and output are written in the commit B message. If the result is not 0, Freeze stops and the value is reported before anything is committed."
+  },
+  "note_on_text": "The frozen spec and freeze-prep texts keep their draft headers (SPEC CANDIDATE v0.3, DRAFT v0.1) and their open-question sections. This record, not the headers, states the frozen status; SPEC v0.3 §14 items are resolved by FREEZE-PREP v0.1.",
+  "states_at_freeze": {
+    "preflight": "NOT AUTHORIZED",
+    "development_run": "NOT AUTHORIZED",
+    "forward": "NOT AUTHORIZED (requires SPEC v0.3 §10 'Gate の後' items 1-3)",
+    "da_safety_veto": "NOT DEFINED (separate spec, frozen before use)",
+    "v1": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged; preregistration/ is outside CODE_MANIFEST_V1",
+    "v1_development_replay": "NOT STARTED",
+    "historical_reserve_holdout": "SEALED"
+  },
+  "open_items_resolved": {
+    "F-FC-1": "RESOLVED / PASS: implementation a7921007 pins Python 3.13.17, numpy 2.5.3 wheel SHA-256 with --require-hashes, Actions by commit SHA",
+    "F-FC-2": "ACCEPTED with modification: execution_protocol.result_preservation",
+    "F-FC-3": "FREEZE-PREP V0.1 = PASS / READY FOR FREEZE PREPARATION / NOT FROZEN / NOT EXECUTION-AUTHORIZED",
+    "F-FC-4": "ACCEPTED: no main branch in -fx-dev-trials; Freeze pins commit and tree"
+  }
+}
