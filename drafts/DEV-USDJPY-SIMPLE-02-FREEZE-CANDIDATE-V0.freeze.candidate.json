@@ -1,0 +1,261 @@
+{
+  "status_of_this_file": "DEV-USDJPY-SIMPLE-02 FREEZE CANDIDATE V0 (draft). NOT FROZEN. Proposed content of preregistration/DEV-USDJPY-SIMPLE-02.freeze.json. Placeholders <...> in approved_by are filled at Freeze; the result_preservation format strings (<mode>, <run_id>, <name>, <sha256>, <sha>) are templates and stay. This record never contains the SHA or time of its own Freeze commit (lesson of 01 Errata E1).",
+  "trial_id": "DEV-USDJPY-SIMPLE-02",
+  "classification": "DEVELOPMENT DIAGNOSTIC TRIAL (not confirmatory; not Forward; not a V1 or V2 freeze)",
+  "status": "FREEZE / PASS",
+  "approved_by": "<純's explicit Freeze decision, JST timestamp>; むすび Freeze-candidate audit = <verdict, JST timestamp>",
+  "supersedes": {
+    "trial_id": "DEV-USDJPY-SIMPLE-01",
+    "disposition": "ABORT (V1 preregistration/DEV-TRIAL-REGISTRY.csv Event_Seq 2, commit 853e7509be37420fdc1f903251b1e07c8962fd70; ruled by むすび, relayed by 純 2026-10-31 19:02 JST)",
+    "01_freeze": "Freeze commit d00e348d7d6bf229b30fc284f2802c65ead101c5, registry commit cb276490bd7c57a2fccb6ce06afb53b47b68e695 (valid history, unchanged)",
+    "incident": "01 frozen implementation a7921007 .github/workflows/dev-trial.yml line 26 was not valid YAML (unquoted ':all: ' in a plain run scalar; introduced by Claude in 01 implementation v0.2 and not caught by its string-only static test). GitHub could not load the workflow: dispatch HTTP 422; push runs 41190736222 and 41108650695 failed with jobs = 0 and artifacts = 0. Preflight (authorized 2026-10-31 18:53 JST) never started; snapshot not read; no performance information observed. Fixing the workflow changes the frozen tree, so 01 was ABORTed per its execution_commit_rule (remediation option A; options B and C rejected).",
+    "remedy_in_02": "workflow pip install run value double-quoted (identical command); tests/test_workflow_yaml.py regression test; Trial ID mechanical changes; config.json 'supersedes' provenance field (むすび: keep). Differential audit 2212653b = PASS (むすび, relayed by 純 2026-10-31 19:07 JST).",
+    "scientific_content": "identical to 01: same SPEC v0.3, FREEZE-PREP v0.1, model, estimator, Gate, statistics, parameters, snapshot, vendor, runtime pins"
+  },
+  "frozen_documents": {
+    "inherited_spec": {
+      "file": "preregistration/DEV-USDJPY-SIMPLE-01-SPEC-V0.3.md",
+      "frozen_in": "d00e348d7d6bf229b30fc284f2802c65ead101c5",
+      "git_blob_sha1": "647fcc19fd1c8624bee0fed369bab07b53de237f",
+      "sha256": "13e7e3306050d39e47cd669a075f3aaa1caf15e33619894885a70f5f5a191bab"
+    },
+    "inherited_freeze_prep": {
+      "file": "preregistration/DEV-USDJPY-SIMPLE-01-FREEZE-PREP-V0.1.md",
+      "frozen_in": "d00e348d7d6bf229b30fc284f2802c65ead101c5",
+      "git_blob_sha1": "bb3617b8a2f7eb0481d95d5d98f53d134b8e2fa4",
+      "sha256": "b6f545de900a5bc03c630b8b109dec2d789bd860b2af837eb6b7935949d2a917",
+      "audit": "FREEZE-PREP V0.1 = PASS / READY FOR FREEZE PREPARATION"
+    },
+    "inherited_01_freeze_record": {
+      "file": "preregistration/DEV-USDJPY-SIMPLE-01.freeze.json",
+      "frozen_in": "d00e348d7d6bf229b30fc284f2802c65ead101c5",
+      "git_blob_sha1": "242ef882f46742345284b5b10674f94468ac532d",
+      "sha256": "ae552e73f26d406c804c7bcf0ab215bf1e91cebc291ce3ece2e28f4db7368c31"
+    },
+    "inheritance_rule": "02 inherits the frozen SPEC v0.3 and FREEZE-PREP v0.1 texts unchanged, by reference to the files frozen in d00e348d (no new copies). Wherever those texts say 'DEV-USDJPY-SIMPLE-01', read 'DEV-USDJPY-SIMPLE-02' for the Trial_ID, trial directory, AUTHORIZATION.json path, artifact names, records path and execution branch only; nothing else is substituted."
+  },
+  "sha256_verification": "SHA-256 = Claude-declared unless independently verified. Git blob ids of the implementation commits were confirmed by むすび on GitHub. The numpy wheel SHA-256 was confirmed by むすび from PyPI (Claude could not reach PyPI).",
+  "snapshot": {
+    "path_in_execution_repo": "data/eurofxref-hist_20261009.zip",
+    "sha256": "f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649",
+    "git_blob_sha1": "88b4dcdbca1a062d78a1a85b7a9112199451ad9b",
+    "member": "eurofxref-hist.csv",
+    "source": "V1 tests/fixtures/eurofxref-hist_20261009.zip at 17cc7c6d (byte copy)",
+    "development_target_end_max": "2026-10-09"
+  },
+  "s0_source_decision": "(a) regenerate with frozen S0 v1.1 is authoritative; (b) compare with published V1 S0 rows only when available (none in Development); FREEZE-PREP v0.1 §2.2",
+  "allowlist_boundary": "Only Date, JPY, USD field values may be materialized/decoded/stored/returned/logged; raw bytes of other columns may pass and be scanned only to locate delimiters; csv module, split(','), pandas forbidden on the read path; any double quote stops the reader (FREEZE-PREP v0.1 §3.2)",
+  "implementation": {
+    "repository": "junsato1001-ops/-fx-dev-trials",
+    "branch": "impl/dev-usdjpy-simple-02",
+    "commit": "2212653b9602cfea32f23ea28b2aa5aeb3214ec2",
+    "tree": "8ed09862631203ac4787f330b02619a5fd04b220",
+    "audit_chain": [
+      "cafd2205b922a3d1adc0808b6598cc9c169ffad6 = REVISE MINOR (むすび, 2026-10-31): S0 exact identity at beta=0 was approximate; SPEC v0.3 §10 report-only diagnostics missing",
+      "7ad94415bbf21a69523307a1bb4bcf47925763d8 = DIFFERENTIAL AUDIT PASS / IMPLEMENTATION AUDIT PASS (むすび, relayed by 純 2026-10-31 03:25 JST); Claude's §13 additions ACCEPTED",
+      "Freeze Candidate V0 (V1 commit 75eb8020) = REVISE MINOR (むすび): F-FC-1 runtime pinning insufficient for FREEZE-PREP v0.1 §3.5 -> option A",
+      "a792100770aac264dab2a996aa2af04e92db1984 = DIFFERENTIAL AUDIT PASS (むすび, relayed by 純 2026-10-31 03:42 JST): runtime pinning only; 4 files; model/reader/estimator/stats/Gate/run.py/config/snapshot/vendor unchanged",
+      "a792100770aac264dab2a996aa2af04e92db1984 frozen for 01; workflow found not loadable at preflight -> 01 ABORT",
+      "2212653b9602cfea32f23ea28b2aa5aeb3214ec2 = DIFFERENTIAL AUDIT PASS (むすび, relayed by 純 2026-10-31 19:07 JST): 10 files vs a7921007; YAML quoting + regression test + Trial ID mechanical changes + supersedes; numerical logic, stats, reader, diagnostics, summary, snapshot, vendor unchanged"
+    ],
+    "files": {
+      ".github/workflows/dev-trial.yml": {
+        "blob": "2da72acd4b7442cb7c5a0231c939d2420f868379",
+        "sha256": "1eca40d51d4926ce9cd989b95f738e5926ac6c67d7e622b6686ef8f2fbb2cde0"
+      },
+      ".gitignore": {
+        "blob": "72269c3088e65159f15d4a38c3a020aee1ea9777",
+        "sha256": "05487312caa2020b20fe9fed1d7473d87a67e324fb333033674707ed90744c9b"
+      },
+      "IMPLEMENTATION-NOTES.md": {
+        "blob": "6911d3863b693db682dde678b87250b60ca9b159",
+        "sha256": "2aff47564249735974b446b5252e9daba2e31e49572dac5a52ebe75448ead693"
+      },
+      "README.md": {
+        "blob": "1bc4228b84e12909ef6c95ce99fbeec2a3ffc490",
+        "sha256": "0c44680ec868096dbb2c2e034232bc33eed132702e79b538b2d0347a6fe04699"
+      },
+      "data/eurofxref-hist_20261009.zip": {
+        "blob": "88b4dcdbca1a062d78a1a85b7a9112199451ad9b",
+        "sha256": "f36e0affc225bc572cc589d4183352c5815f178769f04c2b27a452567c6f7649"
+      },
+      "devtrial/diagnostics.py": {
+        "blob": "a72096beb26def27e7667ebcfc6b3f072c49a621",
+        "sha256": "78841fe7643133a32354fffbbd57baa40349e64cbc843fc7b009b92485bfb8c0"
+      },
+      "devtrial/frozen.py": {
+        "blob": "a4bb566bef64ae434825ad1dbcec34c3115e6344",
+        "sha256": "531ca058926e16a9638e10fc69817da478008dce0cc6c2858167685b5259aeba"
+      },
+      "devtrial/model.py": {
+        "blob": "cfb3ace6e90256dfa4c8a451d92754357c35474e",
+        "sha256": "97bfcff0d4de85866b89a424a398b3d2190d04c64b723e3e2660fea92d078f58"
+      },
+      "devtrial/reader.py": {
+        "blob": "fce27794886f66bf6a9e3071ccc2d980f5d0ecf0",
+        "sha256": "c2e91f6353d10002a67f1bb5c62a4e9dcc01b55dad61844ddea74e316f66398e"
+      },
+      "devtrial/run.py": {
+        "blob": "3c38c24083c07cb53b9be75c7b4ef73a9f536214",
+        "sha256": "fb7495fc669c31200558d95528bdb4aeba8136bbe7b666e1e45e2e2344178bd5"
+      },
+      "devtrial/stats.py": {
+        "blob": "bbd8f2b9bfff81c019882954a5a135f7d9803893",
+        "sha256": "6d53cc47e93c919875a458b21acc61c285b211463ef74706f4f85632bc900cb5"
+      },
+      "devtrial/summary.py": {
+        "blob": "f88433e6e7316beb3d197ea0be1b1cc22ccd2a29",
+        "sha256": "58d0e2bc2eb2c65bca50ac590d1189b73c54f35df25a58cfbe48aca07696b108"
+      },
+      "requirements.txt": {
+        "blob": "85429ea9913f054fbdc081f011880eb0098e899d",
+        "sha256": "9cd6e87fd6f94983fcfcd44c5f393082382dc643250611099a9f0902c5877efe"
+      },
+      "tests/__init__.py": {
+        "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "tests/_synth.py": {
+        "blob": "0540603294c74354a1b6e12c363c705ba11b929b",
+        "sha256": "4bee4ad73578ab6f0a4e6debbf8a01cf5cfdc591aa2a8120c73ebf6490cfec81"
+      },
+      "tests/test_diagnostics.py": {
+        "blob": "e1e703ca8c1371b82f5b3d1c8afd1221d03af84c",
+        "sha256": "0f7fe2286a3ddef19cd7e710a0abf9006a0e81cfc890b93e5ab1759054f5c46b"
+      },
+      "tests/test_e2e.py": {
+        "blob": "aec6e99c20fa3dcfa7d7ce739f40732b3b8e39ce",
+        "sha256": "57f711cc87c03b81d25accf2271367967bd35d95423e4bc143eeaeae0de6cce2"
+      },
+      "tests/test_estimator.py": {
+        "blob": "46ba0f8700b4bef61e2c0b52d3d28303dedca232",
+        "sha256": "9869ab567d78545fdcc88772ebf5b5c3ca83193664e92c6945d4b718a491ff17"
+      },
+      "tests/test_reader.py": {
+        "blob": "b99bd3d3d6304af215ce8759eb5e7ab71258a8b0",
+        "sha256": "6764ead9dc33bf830b74a655271a4c719ee80e9e26d0f76d629b901136f7434a"
+      },
+      "tests/test_static.py": {
+        "blob": "8b6c7193f5a318990ac26a514f5f5242c8fd6e35",
+        "sha256": "763bdb8a18e5d325a616a4dc8fa5c6784744b429d35f5bd7b75c4b4a9c150d5f"
+      },
+      "tests/test_stats.py": {
+        "blob": "856b7aa1a57fdda4d55bd656ed058a784d37df94",
+        "sha256": "8f7272bda859465d269d63dc36e5fe8efff9851a19db7aeca9101d6d81a97cce"
+      },
+      "tests/test_workflow_yaml.py": {
+        "blob": "a62742f3260e95ab9405c7249f1fa2e3b46e0574",
+        "sha256": "d7b9752030201b5f33c48ee97692f0b114845c8c476d0ea0a265b2e7e8881bc3"
+      },
+      "trials/DEV-USDJPY-SIMPLE-02/config.json": {
+        "blob": "11be380515a1f839e865677c367d0a2242ccdb19",
+        "sha256": "211357eec23a0783c089a0e374435de081afa8011a3941a0be89afd65072a92d"
+      },
+      "vendor/v1/forward/ledger_builder.py": {
+        "blob": "9c1cbecda3e69aa1de9c5ffc165816d234d8ec90",
+        "sha256": "5d3b91c7a666b9f7d5c12db88dbbf969ebceef5386bbabb22f13e3e907de25a0"
+      },
+      "vendor/v1/frozen/m0_walkforward_v1_2.py": {
+        "blob": "6d03099942a0cabb3eb6f0f971e2039ecba97f3e",
+        "sha256": "4ca2f37ab729d08f24f008d75c5ceb95f11d79d5bf9575941f44ffd32a77e3d5"
+      },
+      "vendor/v1/frozen/origin_target_map_v1.py": {
+        "blob": "de8f724f03e03aaa0c46bd873e03a3b4818e5393",
+        "sha256": "902f0b43a84a0ec309a6e99b6617ca2816e240054bd77e9dbf7d3b2812f3c988"
+      },
+      "vendor/v1/frozen/s0_empclim_std_exp_v1_1.py": {
+        "blob": "c89a067ad0701eb0e5c90614690ca3be9dac0153",
+        "sha256": "84c317661e6798b906063a50fc416c9d594708ffcfbb6010a5bd83f636487676"
+      }
+    },
+    "vendor_match": "the 3 frozen modules and ledger_builder.py match V1 CODE_MANIFEST_V1 SHA-256 (FREEZE-PREP v0.1 §3.4)",
+    "runtime": {
+      "python": "3.13.17 (actions/setup-python python-version exact; workflow step asserts sys.version == 3.13.17)",
+      "numpy": {
+        "version": "2.5.3",
+        "wheel": "numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "a5fa86b80fd24bcd1aff83ad23be44ea323de3f787be8f8b15d4a65621e25321",
+        "source": "PyPI numpy 2.5.3 file page and PyPI provenance subject digest, confirmed by むすび",
+        "install": "python -m pip install --require-hashes --only-binary=:all: --no-deps -r requirements.txt"
+      },
+      "runner": "ubuntu-24.04",
+      "actions": {
+        "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262 (v4.4.0)",
+        "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065 (v5.6.0)",
+        "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02 (v4.6.2)"
+      },
+      "recorded_at_run": "GATE.json provenance records python_version and numpy_version"
+    },
+    "parent_frozen_implementation_of_01": "a792100770aac264dab2a996aa2af04e92db1984 (tree 29d72c501dc49b2e5602e7fc1ec6c873ea2f7088)",
+    "workflow_validity_evidence": {
+      "static": "tests/test_workflow_yaml.py: structural check (always) and PyYAML full parse (where installed): triggers == {workflow_dispatch}, install command string equals the frozen command",
+      "local_parse": "<recorded at Freeze: PyYAML version and parse output on the 02 workflow blob 2da72acd4b7442cb7c5a0231c939d2420f868379>",
+      "github_recognition": "<recorded at Freeze: GET /repos/junsato1001-ops/-fx-dev-trials/actions/workflows -> name == 'dev-trial' (parsed) after the default-branch precondition; non-executing>"
+    }
+  },
+  "frozen_parameters": {
+    "pair": "USDJPY",
+    "horizon": "1D",
+    "f_mom_window_target_days": 20,
+    "n_warmup": 250,
+    "n_eval_min": 250,
+    "alpha_dev": 0.05,
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 20261016,
+    "primary_mean_block_length": 4,
+    "sensitivity_mean_block_length": 12,
+    "hac_lag": 4,
+    "source": "trials/DEV-USDJPY-SIMPLE-02/config.json at the implementation commit (values identical to 01)"
+  },
+  "gate": "FORWARD_CANDIDATE_ELIGIBLE iff N_EVAL >= 250 and p_dev < 0.05 (stationary bootstrap, block 4) and second-half D < 0; N_EVAL < 250 -> NOT_EVALUABLE; otherwise NOT_ELIGIBLE (SPEC v0.3 §10). No re-run under the same Trial_ID with changed conditions.",
+  "report_only_boundary": "diagnostics (Coverage, counts, beta trajectory, RPS, Brier, IS/sigma, PI80 coverage, VRC, direction diagnostics), block-12 bootstrap, HAC, p_inf and full-common-sample D are report-only. The three direction diagnostics (modal-class hit, point-sign hit, mean probability of realized class) are Development descriptive diagnostics only: they must not later be reinterpreted as confirmatory evidence, as a Gate condition, or as a DA Safety Veto. Any future DA Safety Veto must be specified and frozen separately before Development results are seen (むすび, 2026-10-31).",
+  "first_origin_rule": "first USD/JPY 1D formal Origin with ledger FORECAST_READY, S0 FORECAST and F_MOM defined (FREEZE-PREP v0.1 §5.1); determined by preflight, not by this record",
+  "execution_protocol": {
+    "order": "Freeze -> separate preflight approval -> preflight -> separate Development run approval -> run",
+    "execution_commit_rule": "An execution commit must be a descendant of implementation commit 2212653b9602cfea32f23ea28b2aa5aeb3214ec2. Its tree may differ from tree 8ed09862631203ac4787f330b02619a5fd04b220 only by (i) adding or changing trials/DEV-USDJPY-SIMPLE-02/AUTHORIZATION.json and (ii) files under records/DEV-USDJPY-SIMPLE-02/ added by earlier result-preservation commits (never read by the code). Any other difference = not this Trial (ABORT registry event and a new Trial_ID). Execution happens on branch exec/dev-usdjpy-simple-02; impl/dev-usdjpy-simple-02 is not moved. No main branch is created.",
+    "authorization_file": {
+      "path": "trials/DEV-USDJPY-SIMPLE-02/AUTHORIZATION.json",
+      "required_fields": [
+        "trial_id",
+        "modes",
+        "freeze_commit",
+        "authorized_by",
+        "authorized_at_jst"
+      ],
+      "freeze_commit": "recorded as Freeze_Commit in the DEV-USDJPY-SIMPLE-02 FREEZE event of preregistration/DEV-TRIAL-REGISTRY.csv (and in preregistration/registry.csv); AUTHORIZATION.json freeze_commit must equal that value",
+      "rule": "created only after 純's explicit approval of that mode; preflight approval lists only \"preflight\""
+    },
+    "preflight": "dates, counts and states only (FREEZE-PREP v0.1 §5.2); stored as a separate artifact and recorded as a PREFLIGHT registry event; this freeze record is never edited after Freeze",
+    "result_preservation": {
+      "rule": "fixed procedure, not operator-dependent (F-FC-2, むすび ACCEPT with modification)",
+      "steps": [
+        "1. The workflow run prints, for every artifact file, its path and SHA-256 (run.py) and uploads the files as one Actions artifact.",
+        "2. The artifact is downloaded and each file's SHA-256 is recomputed; it must equal the SHA-256 printed in that run's log. Any mismatch or missing file = PRESERVATION_FAILURE (recorded; files are not edited or regenerated).",
+        "3. The files are committed byte-for-byte as an immutable raw copy under records/DEV-USDJPY-SIMPLE-02/<mode>/<run_id>/ in -fx-dev-trials, on the execution branch, in a commit that adds only those files. Stored files are never modified or deleted afterwards.",
+        "4. The storage commit, run ID, execution commit and per-file SHA-256 are written in the registry event (PREFLIGHT or EXECUTION_RESULT) in DEV-TRIAL-REGISTRY.csv."
+      ],
+      "registry_note_format": "Note = 'artifact_files=<name>:<sha256>[|<name>:<sha256>...]; records_commit=<sha>; workflow_run=<run_id>; preservation=OK|PRESERVATION_FAILURE'",
+      "relation_to_execution_rule": "storage commits are not execution commits; their records/ files are allowed in later execution trees by execution_commit_rule (ii)"
+    },
+    "preflight_boundary_ruling": "Proposed: the PRE-FLIGHT BOUNDARY RULING recorded for 01 (V1 drafts/DEV-USDJPY-SIMPLE-01-PREFLIGHT-BOUNDARY-RULING.md, commit ce89162c, blob 1ebe5a5e8bdc6d9f787c02ff41206b920e2afeb6) applies to 02 unchanged, because preflight()/preflight_summary()/run_model() are identical in 02 except the trial directory and artifact file names. <むすび to confirm (F-02-2)>",
+    "github_preconditions": "Before any dispatch: the repository default branch must hold a loadable copy of this workflow (GitHub requires workflow_dispatch workflows to exist on the default branch). Current default branch impl/dev-usdjpy-simple-01 holds the invalid 01 workflow. Proposed: 純 changes the default branch to impl/dev-usdjpy-simple-02 (repository setting; no tree change) before Freeze; recognition is then checked without execution (implementation.workflow_validity_evidence.github_recognition)."
+  },
+  "registry": {
+    "freeze_registry": "preregistration/registry.csv (one appended line)",
+    "dev_trial_registry": "preregistration/DEV-TRIAL-REGISTRY.csv (created with the FREEZE event; append-only; FREEZE-PREP v0.1 §6)",
+    "research_question_id": "USDJPY-1D-PRICE-ONLY-LOCATION",
+    "registry_count_at_design": "<measured at Freeze by count_check; not fixed in advance>",
+    "count_check": "At Freeze, before commit A, on the V1 commit Freeze is based on: count distinct Trial_ID with Registry_Event = FREEZE and Research_Question_ID = USDJPY-1D-PRICE-ONLY-LOCATION in preregistration/DEV-TRIAL-REGISTRY.csv (also report the full event list for that Research_Question_ID), and grep preregistration/ and drafts/ for the Research_Question_ID outside DEV-USDJPY-SIMPLE-01 and DEV-USDJPY-SIMPLE-02 files. The measured count is written as Registry_Count_At_Design in the 02 FREEZE event; command, base commit and output go in the commit B message. An unexpected result (count other than the number of earlier Trials listed, or an unexplained grep hit) stops Freeze before anything is committed."
+  },
+  "note_on_text": "The inherited SPEC v0.3 and FREEZE-PREP v0.1 texts keep their draft headers and the Trial_ID DEV-USDJPY-SIMPLE-01; frozen_documents.inheritance_rule governs how they apply to 02. This record, not those headers, states the frozen status of 02.",
+  "states_at_freeze": {
+    "preflight": "NOT AUTHORIZED",
+    "development_run": "NOT AUTHORIZED",
+    "forward": "NOT AUTHORIZED (requires SPEC v0.3 §10 'Gate の後' items 1-3)",
+    "da_safety_veto": "NOT DEFINED (separate spec, frozen before use)",
+    "v1": "M1-MACRO-V1 = FREEZE / PASS / CLOSE, unchanged; preregistration/ is outside CODE_MANIFEST_V1",
+    "v1_development_replay": "NOT STARTED",
+    "historical_reserve_holdout": "SEALED",
+    "dev_usdjpy_simple_01": "ABORT (Event_Seq 2)"
+  }
+}
